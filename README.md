@@ -2,17 +2,17 @@
 Expanded Math Functionality for Unity
 
 ## Features
- - Constants for Tau and the Golden Ratio
- - Remap functions
- - Quadratic & Linear Root finding functions
+ - Quadratic & Linear Root finders
  - 2D Angle helpers (AngToDir, DirToAng...)
  - 2D Vector extension methods (Rotate90CCW/CW, Rotate, RotateAround...)
+ - Trajectory Math helpers (GetLaunchSpeed, GetMaxRange, TryGetLaunchAngles...)
+ - Remap functions
+ - Added Tau and the Golden Ratio
  - Vector extension methods (WithMagnitude, ClampMagnitude(min,max)...)
+ - Expanded basic math operations to vectors (Clamp, Round, Abs...)
  - Color extensions (WithAlpha, MultiplyRGB...)
  - Smoothing functions (Smooth01, SmoothCos01...)
  - Triangle Math helpers (SignedArea, Circumcenter...)
- - Trajectory Math helpers (GetLaunchSpeed, GetMaxRange, TryGetLaunchAngles...)
- - Expanded basic math operations to vectors, such as clamp, round, abs, etc.
  - Added alternate angle functions to use radians instead of degrees
  - And more!
 
