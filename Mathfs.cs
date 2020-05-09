@@ -2,27 +2,16 @@
 // The original Mathf.cs source https://github.com/Unity-Technologies/UnityCsReference/blob/master/Runtime/Export/Math/Mathf.cs
 // ...and the bits of it in here is copyright (c) Unity Technologies with license: https://unity3d.com/legal/licenses/Unity_Reference_Only_License
 // 
-// Collected and expanded upon to by Freya Holmér (https://github.com/FreyaHolmer) 
+// Collected and expanded upon to by Freya Holmér (https://github.com/FreyaHolmer/Mathfs) 
 
 
 // Keep the below defined if you want to port a project from using Mathf to Mathfs, otherwise I recommend commenting this out!
 
-#define MATCH_UNITYS_IMPLEMENTATION
-
-// Changes made compared to Unity's Mathf, when MATCH_UNITYS_IMPLEMENTATION is not defined:
-// • min/max( <empty array> ) throws if empty instead of returning 0
-// • lerp/inverse lerp are unclamped by default (to match shader languages)
-//     • LerpClamped / InverseLerpClamped are now the special case functions
-//     • they all now also use the more numerically stable (1-t)a+tb instead of a+t(b-a)
-//     • inverse lerps return NaN instead of 0 when dividing by zero 
-// • SmoothStep replaced with SmoothLerp
-//     • SmoothInverseLerp acts like smoothstep of shader languages
-//     • both are clamped due to the clamped nature of smoothing
-//     • I omitted "clamped" from their names since it'll make them long and unweildy sorry </3
-// • Angle functions are renamed from "[...]Angle" to "[...]AngleDeg" to distinguish them from the radians versions and clarify what units they use
+#define MATCH_UNITYS_IMPLEMENTATION // See what this does in the readme or at https://github.com/FreyaHolmer/Mathfs
 
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Uei = UnityEngine.Internal;
 
@@ -482,6 +471,56 @@ public static class Mathfs {
 			return ( center, radius );
 		}
 
+	}
+	
+	// Root Finding
+	public static float GetLinearRoot( float k, float m ) => -m / k;
+
+	public static bool TryGetLinearRoot( float k, float m, out float root ) { // kx + m
+		if( Mathf.Abs( k ) > 0.00001f ) {
+			root = -m / k;
+			return true;
+		}
+
+		root = default;
+		return false;
+	}
+	
+	public enum PolynomialType {
+		Constant,
+		Linear,
+		Quadratic
+	}
+
+	public static PolynomialType GetPolynomialType( float a, float b, float c ) {
+		if( Mathf.Abs( a ) < 0.00001f )
+			return Mathf.Abs( b ) < 0.00001f ? PolynomialType.Constant : PolynomialType.Linear;
+		return PolynomialType.Quadratic;
+	}
+	
+	public static List<float> GetQuadraticRoots( float a, float b, float c ) { // ax² + bx + c
+		List<float> roots = new List<float>();
+
+		switch( GetPolynomialType( a, b, c ) ) {
+			case PolynomialType.Constant:
+				break; // either no roots or infinite roots if c == 0
+			case PolynomialType.Linear:
+				roots.Add( -c / b );
+				break;
+			case PolynomialType.Quadratic:
+				float rootContent = b * b - 4 * a * c;
+				if( Mathf.Abs( rootContent ) < 0.0001f ) {
+					roots.Add( -b / ( 2 * a ) ); // two equivalent solutions at one point
+				} else if( rootContent >= 0 ) {
+					float root = Mathf.Sqrt( rootContent );
+					roots.Add( ( -b + root ) / ( 2 * a ) ); // crosses at two points
+					roots.Add( ( -b - root ) / ( 2 * a ) );
+				} // else no roots
+
+				break;
+		}
+
+		return roots;
 	}
 
 
