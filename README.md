@@ -17,7 +17,7 @@ Expanded Math Functionality for Unity
  - And more!
 
 ## Changes
-Mathf.cs has a #define to match Unity's library - **keep this defined if you are porting an existing project to use Mathfs, otherwise I recommend commenting it out**! It makes a few changes outlines in the file itself:
+Mathf.cs has a #define to match Unity's library - **keep this defined if you are porting an existing project to use Mathfs, otherwise I recommend commenting it out**! It makes a few changes:
  - Lerp and InverseLerp
    - Now unclamped by default
    - Now uses the more numerically stable evaluation
