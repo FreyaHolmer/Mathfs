@@ -87,4 +87,10 @@ public static class MathfsExtensions {
 	public static Color MultiplyRGB( this Color c, Color m ) => new Color( c.r * m.r, c.g * m.g, c.b * m.b, c.a );
 	public static Color MultiplyA( this Color c, float m ) => new Color( c.r, c.g, c.b, c.a * m );
 
+	public static bool Within( this float v, float min, float max ) => v >= min && v <= max;
+	public static bool Between( this float v, float min, float max ) => v > min && v < max;
+	public static float AtLeast( this float v, float min ) => Mathfs.Max( v, min );
+	public static float AtMost( this float v, float max ) => Mathfs.Min( v, max );
+
+
 }
