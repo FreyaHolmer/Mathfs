@@ -472,7 +472,7 @@ public static class Mathfs {
 		}
 
 	}
-	
+
 	// Root Finding
 	public static float GetLinearRoot( float k, float m ) => -m / k;
 
@@ -485,7 +485,7 @@ public static class Mathfs {
 		root = default;
 		return false;
 	}
-	
+
 	public enum PolynomialType {
 		Constant,
 		Linear,
@@ -497,7 +497,7 @@ public static class Mathfs {
 			return Mathf.Abs( b ) < 0.00001f ? PolynomialType.Constant : PolynomialType.Linear;
 		return PolynomialType.Quadratic;
 	}
-	
+
 	public static List<float> GetQuadraticRoots( float a, float b, float c ) { // ax² + bx + c
 		List<float> roots = new List<float>();
 
