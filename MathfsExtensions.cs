@@ -67,6 +67,8 @@ public static class MathfsExtensions {
 		return v;
 	}
 
+	public static Vector3 FlattenY( this Vector3 v ) => new Vector3( v.x, 0f, v.z );
+
 	public static Vector2 To( this Vector2 v, Vector2 target ) => target - v;
 	public static Vector3 To( this Vector3 v, Vector3 target ) => target - v;
 	public static Vector2 DirTo( this Vector2 v, Vector2 target ) => ( target - v ).normalized;
