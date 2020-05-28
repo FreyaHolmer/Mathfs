@@ -26,4 +26,4 @@ Mathf.cs has a #define to match Unity's library - **keep this defined if you are
    - LerpSmooth (which is how it was implemented) and
    - InverseLerpSmooth (which is how it is implemented everywhere but Unity's Mathf.cs)
  - Angle functions will explicitly have a Deg-suffix to indicate degrees (this library adds radian versions as well)
- - Min/Max functions with arbitrary inputs/array input will throw instead of returning 0
+ - Min/Max functions with arbitrary inputs/array input will throw on empty instead of returning 0
