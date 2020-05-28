@@ -92,12 +92,12 @@ public static class Mathfs {
 	public static float Min( float a, float b ) => a < b ? a : b;
 	public static float Min( float a, float b, float c ) => Min( Min( a, b ), c );
 	public static float Min( float a, float b, float c, float d ) => Min( Min( a, b ), Min( c, d ) );
-	public static float Max( float a, float b ) => a < b ? a : b;
+	public static float Max( float a, float b ) => a > b ? a : b;
 	public static float Max( float a, float b, float c ) => Max( Max( a, b ), c );
 	public static float Max( float a, float b, float c, float d ) => Max( Max( a, b ), Max( c, d ) );
 	public static int Min( int a, int b ) => a < b ? a : b;
 	public static int Min( int a, int b, int c ) => Min( Min( a, b ), c );
-	public static int Max( int a, int b ) => a < b ? a : b;
+	public static int Max( int a, int b ) => a > b ? a : b;
 	public static int Max( int a, int b, int c ) => Max( Max( a, b ), c );
 
 
