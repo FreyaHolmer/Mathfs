@@ -93,6 +93,7 @@ public static class MathfsExtensions {
 	public static bool Between( this float v, float min, float max ) => v > min && v < max;
 	public static float AtLeast( this float v, float min ) => Mathfs.Max( v, min );
 	public static float AtMost( this float v, float max ) => Mathfs.Min( v, max );
+	public static float Clamp01( this float v ) => Mathfs.Clamp01( v );
 
 
 }
