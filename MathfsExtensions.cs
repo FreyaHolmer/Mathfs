@@ -94,6 +94,12 @@ public static class MathfsExtensions {
 	public static float AtLeast( this float v, float min ) => Mathfs.Max( v, min );
 	public static float AtMost( this float v, float max ) => Mathfs.Min( v, max );
 	public static float Clamp01( this float v ) => Mathfs.Clamp01( v );
+	public static float Clamp( this float v, float min, float max ) => Mathfs.Clamp( v, min, max );
+	public static float Remap( this float v, float iMin, float iMax, float oMin, float oMax ) => Mathfs.Remap( iMin, iMax, oMin, oMax, v );
+	public static float Repeat( this float v, float length ) => Mathfs.Repeat( v, length );
+	public static int RoundToInt( this float v ) => Mathfs.RoundToInt( v );
+	public static int FloorToInt( this float v ) => Mathfs.FloorToInt( v );
+	public static int CeilToInt( this float v ) => Mathfs.CeilToInt( v );
 
 
 }
