@@ -374,13 +374,6 @@ public static class Mathfs {
 		return aDeg + delta * Clamp01( t );
 	}
 
-	public static float DeltaAngleDeg( float current, float target ) {
-		float delta = Mathf.Repeat( ( target - current ), 360f );
-		if( delta > 180f )
-			delta -= 360f;
-		return delta;
-	}
-
 	static public float MoveTowardsAngleDeg( float current, float target, float maxDelta ) {
 		float deltaAngle = DeltaAngleDeg( current, target );
 		if( -maxDelta < deltaAngle && deltaAngle < maxDelta )
@@ -405,6 +398,8 @@ public static class Mathfs {
 		return SmoothDamp( current, target, ref currentVelocity, smoothTime, maxSpeed, deltaTime );
 	}
 	#endif
+
+
 	public static float LerpAngleRad( float aRad, float bRad, float t ) {
 		float delta = Repeat( ( bRad - aRad ), TAU );
 		if( delta > PI )
@@ -412,11 +407,23 @@ public static class Mathfs {
 		return aRad + delta * Clamp01( t );
 	}
 
-	public static float DeltaAngleRad( float current, float target ) {
-		float delta = Mathf.Repeat( ( target - current ), TAU );
-		if( delta > PI )
-			delta -= TAU;
-		return delta;
+
+	public static float DeltaAngleRad( float a, float b ) => ( b - a + PI ).Repeat( TAU ) - PI;
+	public static float InverseLerpAngleRad( float a, float b, float v ) {
+		float angBetween = DeltaAngleRad( a, b );
+		b = a + angBetween; // removes any a->b discontinuity
+		float h = a + angBetween * 0.5f; // halfway angle
+		v = h + DeltaAngleRad( h, v ); // get offset from h, and offset by h
+		return ILERP_CLAMPED( a, b, v );
+	}
+
+	public static float DeltaAngleDeg( float a, float b ) => ( b - a + 180 ).Repeat( 360 ) - 180;
+	static float InverseLerpAngleDeg( float a, float b, float v ) {
+		float angBetween = DeltaAngleDeg( a, b );
+		b = a + angBetween; // removes any a->b discontinuity
+		float h = a + angBetween * 0.5f; // halfway angle
+		v = h + DeltaAngleDeg( h, v ); // get offset from h, and offset by h
+		return ILERP_CLAMPED( a, b, v );
 	}
 
 	static public float MoveTowardsAngleRad( float current, float target, float maxDelta ) {
