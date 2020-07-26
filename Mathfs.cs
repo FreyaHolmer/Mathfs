@@ -569,6 +569,26 @@ public static class Mathfs {
 		}
 	}
 
+	// coordinate shenanigans
+	public static Vector2 SquareToDisc( Vector2 c ) {
+		float u = c.x * Sqrt( 1 - ( c.y * c.y ) / 2 );
+		float v = c.y * Sqrt( 1 - ( c.x * c.x ) / 2 );
+		return new Vector2( u, v );
+	}
+
+	public static Vector2 DiscToSquare( Vector2 c ) {
+		float u = c.x;
+		float v = c.y;
+		float u2 = c.x * c.x;
+		float v2 = c.y * c.y;
+		const float SQ2 = 1.41421356237f;
+		Vector2 n = new Vector2( 1, -1 );
+		Vector2 p = new Vector2( 2, 2 ) + n * ( u2 - v2 );
+		Vector2 q = 2 * SQ2 * c;
+		Vector2 smolVec = Vector2.one * 0.0001f;
+		Vector2 Sqrt( Vector2 noot ) => new Vector2( Mathf.Sqrt( noot.x ), Mathf.Sqrt( noot.y ) );
+		return 0.5f * ( Sqrt( Vector2.Max( smolVec, p + q ) ) - Sqrt( Vector2.Max( smolVec, p - q ) ) );
+	}
 
 	// internal functions to deal with branching
 	#if MATCH_UNITYS_IMPLEMENTATION
