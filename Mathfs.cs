@@ -163,6 +163,9 @@ public static class Mathfs {
 	// Rounding
 	public static float Sign( float value ) => value >= 0f ? 1f : -1f;
 	public static float Floor( float value ) => (float)Math.Floor( value );
+	public static Vector2 Floor( Vector2 value ) => new Vector2( (float)Math.Floor( value.x ), (float)Math.Floor( value.y ) );
+	public static Vector3 Floor( Vector3 value ) => new Vector3( (float)Math.Floor( value.x ), (float)Math.Floor( value.y ), (float)Math.Floor( value.z ) );
+	public static Vector4 Floor( Vector4 value ) => new Vector4( (float)Math.Floor( value.x ), (float)Math.Floor( value.y ), (float)Math.Floor( value.z ), (float)Math.Floor( value.w ) );
 	public static float Ceil( float value ) => (float)Math.Ceiling( value );
 	public static float Round( float value ) => (float)Math.Round( value );
 	public static int FloorToInt( float value ) => (int)Math.Floor( value );
@@ -171,6 +174,9 @@ public static class Mathfs {
 
 	// Repeating
 	public static float Frac( float x ) => x - Floor( x );
+	public static Vector2 Frac( Vector2 x ) => x - Floor( x );
+	public static Vector3 Frac( Vector3 x ) => x - Floor( x );
+	public static Vector4 Frac( Vector4 x ) => x - Floor( x );
 	public static float Repeat( float t, float length ) => Clamp( t - Floor( t / length ) * length, 0.0f, length );
 
 	public static float PingPong( float t, float length ) {
