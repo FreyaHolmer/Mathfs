@@ -4,20 +4,11 @@
 // 
 // Collected and expanded upon to by Freya Holmér (https://github.com/FreyaHolmer/Mathfs) 
 
-
-// Keep the below defined if you want to port a project from using Mathf to Mathfs, otherwise I recommend commenting this out!
-
-#define MATCH_UNITYS_IMPLEMENTATION // See what this does in the readme or at https://github.com/FreyaHolmer/Mathfs
-
-
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Uei = UnityEngine.Internal;
-
-#if MATCH_UNITYS_IMPLEMENTATION == false
 using System.Linq; // used for arbitrary count min/max functions, so it's safe and won't allocate garbage don't worry~
-#endif
 
 public static class Mathfs {
 
@@ -100,65 +91,10 @@ public static class Mathfs {
 	public static int Max( int a, int b ) => a > b ? a : b;
 	public static int Max( int a, int b, int c ) => Max( Max( a, b ), c );
 
-
-	#if MATCH_UNITYS_IMPLEMENTATION
-	public static float Min( params float[] values ) {
-		int len = values.Length;
-		if( len == 0 )
-			return 0;
-		float m = values[0];
-		for( int i = 1; i < len; i++ ) {
-			if( values[i] < m )
-				m = values[i];
-		}
-
-		return m;
-	}
-
-	public static int Min( params int[] values ) {
-		int len = values.Length;
-		if( len == 0 )
-			return 0;
-		int m = values[0];
-		for( int i = 1; i < len; i++ ) {
-			if( values[i] < m )
-				m = values[i];
-		}
-
-		return m;
-	}
-
-	public static float Max( params float[] values ) {
-		int len = values.Length;
-		if( len == 0 )
-			return 0;
-		float m = values[0];
-		for( int i = 1; i < len; i++ ) {
-			if( values[i] > m )
-				m = values[i];
-		}
-
-		return m;
-	}
-
-	public static int Max( params int[] values ) {
-		int len = values.Length;
-		if( len == 0 )
-			return 0;
-		int m = values[0];
-		for( int i = 1; i < len; i++ ) {
-			if( values[i] > m )
-				m = values[i];
-		}
-
-		return m;
-	}
-	#else
 	public static float Min( params float[] values ) => values.Min();
 	public static float Max( params float[] values ) => values.Max();
 	public static int Min( params int[] values ) => values.Min();
 	public static int Max( params int[] values ) => values.Max();
-	#endif
 
 	// Rounding
 	public static float Sign( float value ) => value >= 0f ? 1f : -1f;
@@ -201,32 +137,15 @@ public static class Mathfs {
 
 
 	// Interpolation & Remapping
-	#if MATCH_UNITYS_IMPLEMENTATION
-	public static float Lerp( float a, float b, float t ) => a + ( b - a ) * Clamp01( t );
-	public static float LerpUnclamped( float a, float b, float t ) => a + ( b - a ) * t;
-
-	public static float InverseLerp( float a, float b, float value ) {
-		if( a != b )
-			return Clamp01( ( value - a ) / ( b - a ) );
-		else
-			return 0f;
-	}
-
-	public static float InverseLerpUnclamped( float a, float b, float value ) {
-		if( a != b )
-			return ( value - a ) / ( b - a );
-		else
-			return 0f;
-	}
-	#else
 	public static float InverseLerp( float a, float b, float value ) => ( value - a ) / ( b - a );
 	public static float InverseLerpClamped( float a, float b, float value ) => Clamp01( ( value - a ) / ( b - a ) );
 	public static float Lerp( float a, float b, float t ) => ( 1f - t ) * a + t * b;
+
 	public static float LerpClamped( float a, float b, float t ) {
 		t = Clamp01( t );
 		return ( 1f - t ) * a + t * b;
 	}
-	#endif
+
 	public static float Eerp( float a, float b, float t ) => Mathf.Pow( a, 1 - t ) * Mathf.Pow( b, t );
 	public static float InverseEerp( float a, float b, float v ) => Mathf.Log( a / v ) / Mathf.Log( a / b );
 
@@ -243,23 +162,14 @@ public static class Mathfs {
 	}
 
 	public static float Remap( float iMin, float iMax, float oMin, float oMax, float value ) {
-		float t = ILERP_UNCLAMPED( iMin, iMax, value );
-		return Mathf.Lerp( oMin, oMax, t );
+		float t = InverseLerp( iMin, iMax, value );
+		return Lerp( oMin, oMax, t );
 	}
 
 	public static float RemapClamped( float iMin, float iMax, float oMin, float oMax, float value ) {
-		float t = ILERP_CLAMPED( iMin, iMax, value );
-		return Mathf.LerpUnclamped( oMin, oMax, t );
+		float t = InverseLerpClamped( iMin, iMax, value );
+		return Lerp( oMin, oMax, t );
 	}
-
-	#if MATCH_UNITYS_IMPLEMENTATION
-	// omitted because it's confusing - it contradicts what smoothstep means in every other context
-	public static float SmoothStep( float from, float to, float t ) {
-		t = Mathf.Clamp01( t );
-		t = -2.0f * t * t * t + 3.0f * t * t;
-		return to * t + from * ( 1F - t );
-	}
-	#endif
 
 	public static float InverseLerpSmooth( float a, float b, float value ) => Smooth01( Clamp01( ( value - a ) / ( b - a ) ) );
 
@@ -268,7 +178,7 @@ public static class Mathfs {
 		return ( 1f - t ) * a + t * b;
 	}
 
-	static public float MoveTowards( float current, float target, float maxDelta ) {
+	public static float MoveTowards( float current, float target, float maxDelta ) {
 		if( Mathf.Abs( target - current ) <= maxDelta )
 			return target;
 		return current + Mathf.Sign( target - current ) * maxDelta;
@@ -334,45 +244,6 @@ public static class Mathfs {
 		return Mathf.Acos( Vector2.Dot( a.normalized, b.normalized ) ) * Mathf.Sign( Determinant( a, b ) ); // 0 to tau/2
 	}
 
-	#if MATCH_UNITYS_IMPLEMENTATION
-	public static float LerpAngle( float a, float b, float t ) {
-		float delta = Repeat( ( b - a ), 360 );
-		if( delta > 180 )
-			delta -= 360;
-		return a + delta * Clamp01( t );
-	}
-
-	public static float DeltaAngle( float current, float target ) {
-		float delta = Mathf.Repeat( ( target - current ), 360f );
-		if( delta > 180f )
-			delta -= 360f;
-		return delta;
-	}
-
-	static public float MoveTowardsAngle( float current, float target, float maxDelta ) {
-		float deltaAngle = DeltaAngle( current, target );
-		if( -maxDelta < deltaAngle && deltaAngle < maxDelta )
-			return target;
-		target = current + deltaAngle;
-		return MoveTowards( current, target, maxDelta );
-	}
-
-	public static float SmoothDampAngle( float current, float target, ref float currentVelocity, float smoothTime, float maxSpeed ) {
-		float deltaTime = Time.deltaTime;
-		return SmoothDampAngle( current, target, ref currentVelocity, smoothTime, maxSpeed, deltaTime );
-	}
-
-	public static float SmoothDampAngle( float current, float target, ref float currentVelocity, float smoothTime ) {
-		float deltaTime = Time.deltaTime;
-		float maxSpeed = Mathf.Infinity;
-		return SmoothDampAngle( current, target, ref currentVelocity, smoothTime, maxSpeed, deltaTime );
-	}
-
-	public static float SmoothDampAngle( float current, float target, ref float currentVelocity, float smoothTime, [Uei.DefaultValue( "Mathf.Infinity" )] float maxSpeed, [Uei.DefaultValue( "Time.deltaTime" )] float deltaTime ) {
-		target = current + DeltaAngle( current, target );
-		return SmoothDamp( current, target, ref currentVelocity, smoothTime, maxSpeed, deltaTime );
-	}
-	#else
 	public static float LerpAngleDeg( float aDeg, float bDeg, float t ) {
 		float delta = Repeat( ( bDeg - aDeg ), 360f );
 		if( delta > 180f )
@@ -387,7 +258,7 @@ public static class Mathfs {
 		target = current + deltaAngle;
 		return MoveTowards( current, target, maxDelta );
 	}
-	
+
 	public static float SmoothDampAngleDeg( float current, float target, ref float currentVelocity, float smoothTime, float maxSpeed ) {
 		float deltaTime = Time.deltaTime;
 		return SmoothDampAngleDeg( current, target, ref currentVelocity, smoothTime, maxSpeed, deltaTime );
@@ -403,8 +274,6 @@ public static class Mathfs {
 		target = current + DeltaAngleDeg( current, target );
 		return SmoothDamp( current, target, ref currentVelocity, smoothTime, maxSpeed, deltaTime );
 	}
-	#endif
-
 
 	public static float LerpAngleRad( float aRad, float bRad, float t ) {
 		float delta = Repeat( ( bRad - aRad ), TAU );
@@ -415,21 +284,23 @@ public static class Mathfs {
 
 
 	public static float DeltaAngleRad( float a, float b ) => ( b - a + PI ).Repeat( TAU ) - PI;
+
 	public static float InverseLerpAngleRad( float a, float b, float v ) {
 		float angBetween = DeltaAngleRad( a, b );
 		b = a + angBetween; // removes any a->b discontinuity
 		float h = a + angBetween * 0.5f; // halfway angle
 		v = h + DeltaAngleRad( h, v ); // get offset from h, and offset by h
-		return ILERP_CLAMPED( a, b, v );
+		return InverseLerpClamped( a, b, v );
 	}
 
 	public static float DeltaAngleDeg( float a, float b ) => ( b - a + 180 ).Repeat( 360 ) - 180;
+
 	static float InverseLerpAngleDeg( float a, float b, float v ) {
 		float angBetween = DeltaAngleDeg( a, b );
 		b = a + angBetween; // removes any a->b discontinuity
 		float h = a + angBetween * 0.5f; // halfway angle
 		v = h + DeltaAngleDeg( h, v ); // get offset from h, and offset by h
-		return ILERP_CLAMPED( a, b, v );
+		return InverseLerpClamped( a, b, v );
 	}
 
 	static public float MoveTowardsAngleRad( float current, float target, float maxDelta ) {
@@ -595,19 +466,6 @@ public static class Mathfs {
 		Vector2 Sqrt( Vector2 noot ) => new Vector2( Mathf.Sqrt( noot.x ), Mathf.Sqrt( noot.y ) );
 		return 0.5f * ( Sqrt( Vector2.Max( smolVec, p + q ) ) - Sqrt( Vector2.Max( smolVec, p - q ) ) );
 	}
-
-	// internal functions to deal with branching
-	#if MATCH_UNITYS_IMPLEMENTATION
-	static float LERP_UNCLAMPED( float a, float b, float t ) => LerpUnclamped( a, b, t );
-	static float LERP_CLAMPED( float a, float b, float t ) => Lerp( a, b, t );
-	static float ILERP_UNCLAMPED( float a, float b, float value ) => InverseLerpUnclamped( a, b, value );
-	static float ILERP_CLAMPED( float a, float b, float value ) => InverseLerp( a, b, value );
-	#else
-	static float LERP_UNCLAMPED( float a, float b, float t ) => Lerp( a, b, t );
-	static float LERP_CLAMPED( float a, float b, float t ) => LerpClamped( a, b, t );
-	static float ILERP_UNCLAMPED( float a, float b, float value ) => InverseLerp( a, b, value );
-	static float ILERP_CLAMPED( float a, float b, float value ) => InverseLerpClamped( a, b, value );
-	#endif
 
 
 }
