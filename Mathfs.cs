@@ -113,7 +113,8 @@ public static class Mathfs {
 	public static Vector2 Frac( Vector2 x ) => x - Floor( x );
 	public static Vector3 Frac( Vector3 x ) => x - Floor( x );
 	public static Vector4 Frac( Vector4 x ) => x - Floor( x );
-	public static float Repeat( float t, float length ) => Clamp( t - Floor( t / length ) * length, 0.0f, length );
+	public static float Repeat( float value, float length ) => Clamp( value - Floor( value / length ) * length, 0.0f, length );
+	public static int Mod( int value, int length ) => ( value % length + length ) % length; // modulo
 
 	public static float PingPong( float t, float length ) {
 		t = Repeat( t, length * 2f );
