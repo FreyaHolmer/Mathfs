@@ -17,13 +17,13 @@ Expanded Math Functionality for Unity
  - And more!
 
 ## Changes
-Mathf.cs has a #define to match Unity's library - **keep this defined if you are porting an existing project to use Mathfs, otherwise I recommend commenting it out**! It makes a few changes:
- - Lerp and InverseLerp
-   - Now unclamped by default
-   - Now uses the more numerically stable evaluation
+Mathfs.cs does **not fully match Unity's Mathf.cs**, I've made a few changes:
+ - Lerp and InverseLerp:
+   - Unclamped by default
    - LerpClamped/InverseLerpClamped are now the special case functions/exceptions
+   - Uses the more numerically stable evaluation
  - Smoothstep is removed in favor of the more explicit:
    - LerpSmooth (which is how it was implemented) and
    - InverseLerpSmooth (which is how it is implemented everywhere but Unity's Mathf.cs)
- - Angle functions will explicitly have a Deg-suffix to indicate degrees (this library adds radian versions as well)
+ - Angle functions will explicitly have a Deg-suffix to indicate degrees, otherwise they use radians
  - Min/Max functions with arbitrary inputs/array input will throw on empty instead of returning 0
