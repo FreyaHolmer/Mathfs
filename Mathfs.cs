@@ -240,10 +240,10 @@ public static class Mathfs {
 	// Angles & Rotation
 	public static Vector2 AngToDir( float aRad ) => new Vector2( Mathf.Cos( aRad ), Mathf.Sin( aRad ) );
 	public static float DirToAng( Vector2 dir ) => Mathf.Atan2( dir.y, dir.x );
-
-	public static float SignedAngle( Vector2 a, Vector2 b ) {
-		return Mathf.Acos( Vector2.Dot( a.normalized, b.normalized ) ) * Mathf.Sign( Determinant( a, b ) ); // 0 to tau/2
-	}
+	public static float SignedAngle( Vector2 a, Vector2 b ) => AngleBetween( a, b ) * Mathf.Sign( Determinant( a, b ) ); // -tau/2 to tau/2
+	public static float AngleBetween( Vector2 a, Vector2 b ) => Mathf.Acos( Vector2.Dot( a.normalized, b.normalized ) );
+	public static float AngleFromToCW( Vector2 from, Vector2 to ) => Determinant( from, to ) < 0 ? AngleBetween( from, to ) : TAU - AngleBetween( from, to );
+	public static float AngleFromToCCW( Vector2 from, Vector2 to ) => Determinant( from, to ) > 0 ? AngleBetween( from, to ) : TAU - AngleBetween( from, to );
 
 	public static float LerpAngleDeg( float aDeg, float bDeg, float t ) {
 		float delta = Repeat( ( bDeg - aDeg ), 360f );
