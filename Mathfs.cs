@@ -350,12 +350,21 @@ public static class Mathfs {
 			Vector2 s13 = SqSub( a, c ); // the heck is this
 			Vector2 s21 = SqSub( b, a );
 			Vector2 noot = BA * ( s13.x + s13.y ) + CA * ( s21.x + s21.y );
-			Vector2 center = new Vector2( noot.y, -noot.x ) / ( 2 * Mathfs.Determinant( CA, BA ) );
+			Vector2 center = new Vector2( noot.y, -noot.x ) / ( 2 * Determinant( CA, BA ) );
 			float boop = -a.x * a.x - a.y * a.y + 2 * center.x * a.x + 2 * center.y * a.y;
 			float radius = Mathf.Sqrt( center.sqrMagnitude - boop );
 			return ( center, radius );
 		}
 
+		public static bool Contains( Vector2 a, Vector2 b, Vector2 c, Vector2 point, float aMargin = 0f, float bMargin = 0f, float cMargin = 0f ) {
+			float d0 = Determinant( b - a, point - a );
+			float d1 = Determinant( c - b, point - b );
+			float d2 = Determinant( a - c, point - c );
+			bool b0 = d0 < cMargin;
+			bool b1 = d1 < aMargin;
+			bool b2 = d2 < bMargin;
+			return b0 == b1 && b1 == b2; // on the same side of all halfspaces, this can only happen inside
+		}
 	}
 
 	// Root Finding
