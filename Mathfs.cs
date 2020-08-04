@@ -365,6 +365,26 @@ public static class Mathfs {
 			bool b2 = d2 < bMargin;
 			return b0 == b1 && b1 == b2; // on the same side of all halfspaces, this can only happen inside
 		}
+
+	}
+
+	public static class Polygon {
+
+		public static bool IsClockwise( IReadOnlyList<Vector2> pts ) => SignedArea( pts ) > 0;
+		public static float Area( IReadOnlyList<Vector2> pts ) => Mathf.Abs( SignedArea( pts ) );
+
+		public static float SignedArea( IReadOnlyList<Vector2> pts ) {
+			int count = pts.Count;
+			float sum = 0f;
+			for( int i = 0; i < count; i++ ) {
+				Vector2 a = pts[i];
+				Vector2 b = pts[( i + 1 ) % count];
+				sum += ( b.x - a.x ) * ( ( b.y + a.y ) * 0.5f );
+			}
+
+			return sum;
+		}
+
 	}
 
 	// Root Finding
