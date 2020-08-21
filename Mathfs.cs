@@ -104,6 +104,7 @@ public static class Mathfs {
 	public static Vector4 Floor( Vector4 value ) => new Vector4( (float)Math.Floor( value.x ), (float)Math.Floor( value.y ), (float)Math.Floor( value.z ), (float)Math.Floor( value.w ) );
 	public static float Ceil( float value ) => (float)Math.Ceiling( value );
 	public static float Round( float value ) => (float)Math.Round( value );
+	public static float Round( float value, float snapInterval ) => Mathf.Round( value / snapInterval ) * snapInterval;
 	public static int FloorToInt( float value ) => (int)Math.Floor( value );
 	public static int CeilToInt( float value ) => (int)Math.Ceiling( value );
 	public static int RoundToInt( float value ) => (int)Math.Round( value );
@@ -235,6 +236,8 @@ public static class Mathfs {
 	public static Vector3 CenterPos( Vector3 a, Vector3 b ) => ( a + b ) / 2f;
 	public static Vector2 CenterDir( Vector2 aDir, Vector2 bDir ) => ( aDir + bDir ).normalized;
 	public static Vector3 CenterDir( Vector3 aDir, Vector3 bDir ) => ( aDir + bDir ).normalized;
+	public static Vector2 Rotate90CW( Vector2 v ) => new Vector2( v.y, -v.x );
+	public static Vector2 Rotate90CCW( Vector2 v ) => new Vector2( -v.y, v.x );
 
 
 	// Angles & Rotation
@@ -437,6 +440,11 @@ public static class Mathfs {
 		return roots;
 	}
 
+	// Random stuff (like, actually things of the category randomization, not, "various items")
+	public static class Random {
+		public static Vector2 InUnitSquare => new Vector2( UnityEngine.Random.value, UnityEngine.Random.value );
+	}
+
 
 	// Trajectory math
 	public static class Trajectory {
@@ -474,6 +482,24 @@ public static class Mathfs {
 			float yDisp = speed * time * Mathf.Sin( angle ) - .5f * gravity * time * time;
 			return new Vector2( xDisp, yDisp );
 		}
+
+		public static float GetHeightPotential( float currentHeight, float speed ) {
+			float g = Physics2D.gravity.y;
+			return currentHeight + ( speed * speed ) / ( 2 * -g );
+		}
+
+		public static bool TryGetSpeedFromHeightPotential( float currentHeight, float heightPotential, out float speed ) {
+			float g = Physics2D.gravity.y;
+			float speedSq = ( heightPotential - currentHeight ) * -2 * g;
+			if( speedSq <= 0 ) {
+				speed = default; // Imaginary speed :sparkles:
+				return false;
+			}
+
+			speed = Mathf.Sqrt( speedSq );
+			return true;
+		}
+
 	}
 
 	// coordinate shenanigans

@@ -19,10 +19,12 @@ public static class MathfsExtensions {
 	public static Vector2 XZ( this Vector3 v ) => new Vector2( v.x, v.z );
 	public static Vector3 XZtoXYZ( this Vector2 v, float y = 0 ) => new Vector3( v.x, y, v.y );
 
+	public static float Frac( this float v ) => v - Mathfs.Floor( v );
 	public static Vector2 Frac( this Vector2 v ) => v - v.Floor();
 	public static Vector3 Frac( this Vector3 v ) => v - v.Floor();
 	public static Vector4 Frac( this Vector4 v ) => v - v.Floor();
 
+	public static float Clamp01( this float v ) => Mathfs.Clamp01( v );
 	public static Vector2 Clamp01( this Vector2 v ) => new Vector2( Mathfs.Clamp01( v.x ), Mathfs.Clamp01( v.y ) );
 	public static Vector3 Clamp01( this Vector3 v ) => new Vector3( Mathfs.Clamp01( v.x ), Mathfs.Clamp01( v.y ), Mathfs.Clamp01( v.z ) );
 	public static Vector4 Clamp01( this Vector4 v ) => new Vector4( Mathfs.Clamp01( v.x ), Mathfs.Clamp01( v.y ), Mathfs.Clamp01( v.z ), Mathfs.Clamp01( v.w ) );
@@ -81,7 +83,9 @@ public static class MathfsExtensions {
 	public static Vector3 Ceil( this Vector3 v ) => new Vector3( Mathfs.Ceil( v.x ), Mathfs.Ceil( v.y ), Mathfs.Ceil( v.z ) );
 	public static Vector4 Ceil( this Vector4 v ) => new Vector4( Mathfs.Ceil( v.x ), Mathfs.Ceil( v.y ), Mathfs.Ceil( v.z ), Mathfs.Ceil( v.w ) );
 	public static Vector2 Round( this Vector2 v ) => new Vector2( Mathfs.Round( v.x ), Mathfs.Round( v.y ) );
+	public static Vector2Int RoundToInt( this Vector2 v ) => new Vector2Int( Mathf.RoundToInt( v.x ), Mathf.RoundToInt( v.y ) );
 	public static Vector3 Round( this Vector3 v ) => new Vector3( Mathfs.Round( v.x ), Mathfs.Round( v.y ), Mathfs.Round( v.z ) );
+	public static Vector3Int RoundToInt( this Vector3 v ) => new Vector3Int( Mathf.RoundToInt( v.x ), Mathf.RoundToInt( v.y ), Mathf.RoundToInt( v.z ) );
 	public static Vector4 Round( this Vector4 v ) => new Vector4( Mathfs.Round( v.x ), Mathfs.Round( v.y ), Mathfs.Round( v.z ), Mathfs.Round( v.w ) );
 
 	public static Color WithAlpha( this Color c, float a ) => new Color( c.r, c.g, c.b, a );
@@ -89,11 +93,15 @@ public static class MathfsExtensions {
 	public static Color MultiplyRGB( this Color c, Color m ) => new Color( c.r * m.r, c.g * m.g, c.b * m.b, c.a );
 	public static Color MultiplyA( this Color c, float m ) => new Color( c.r, c.g, c.b, c.a * m );
 
+	public static float Round( this float v, float snapInterval ) => Mathfs.Round( v, snapInterval );
 	public static bool Within( this float v, float min, float max ) => v >= min && v <= max;
 	public static bool Between( this float v, float min, float max ) => v > min && v < max;
 	public static float AtLeast( this float v, float min ) => Mathfs.Max( v, min );
 	public static float AtMost( this float v, float max ) => Mathfs.Min( v, max );
-	public static float Clamp01( this float v ) => Mathfs.Clamp01( v );
+
+	public static float Square( this float v ) => v * v;
+	public static float Abs( this float v ) => Mathfs.Abs( v );
+	public static float Magnitude( this float v ) => Mathfs.Abs( v );
 	public static float Clamp( this float v, float min, float max ) => Mathfs.Clamp( v, min, max );
 	public static float Remap( this float v, float iMin, float iMax, float oMin, float oMax ) => Mathfs.Remap( iMin, iMax, oMin, oMax, v );
 	public static float Repeat( this float v, float length ) => Mathfs.Repeat( v, length );
