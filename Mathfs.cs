@@ -449,17 +449,11 @@ public static class Mathfs {
 	// Trajectory math
 	public static class Trajectory {
 
-		public static float GetLaunchSpeed( float lateralDistance, float angleRad ) => GetLaunchSpeed( lateralDistance, angleRad, -Physics.gravity.y );
-
-		public static float GetLaunchSpeed( float lateralDistance, float angleRad, float gravity ) {
-			return Mathf.Sqrt( ( lateralDistance * gravity ) / Mathf.Sin( 2 * angleRad ) );
+		public static float GetLaunchSpeed( float gravity, float lateralDistance, float angle ) {
+			return Mathf.Sqrt( ( lateralDistance * gravity ) / Mathf.Sin( 2 * angle ) );
 		}
 
-		public static bool TryGetLaunchAngles( float lateralDistance, float speed, out float angleLow, out float angleHigh ) {
-			return TryGetLaunchAngles( lateralDistance, speed, -Physics.gravity.y, out angleLow, out angleHigh );
-		}
-
-		public static bool TryGetLaunchAngles( float lateralDistance, float speed, float gravity, out float angleLow, out float angleHigh ) {
+		public static bool TryGetLaunchAngles( float gravity, float lateralDistance, float speed, out float angleLow, out float angleHigh ) {
 			float asinContent = ( lateralDistance * gravity ) / ( speed * speed );
 			if( asinContent >= -1 && asinContent <= 1 ) {
 				angleLow = Mathf.Asin( asinContent ) / 2;
@@ -472,25 +466,20 @@ public static class Mathfs {
 			return false;
 		}
 
-		public static float GetMaxRange( float speed ) => GetMaxRange( speed, -Physics.gravity.y );
-		public static float GetMaxRange( float speed, float gravity ) => speed * speed / gravity;
+		public static float GetMaxRange( float gravity, float speed ) => speed * speed / gravity;
 
-		public static Vector2 GetDisplacement( float speed, float angle, float time ) => GetDisplacement( speed, angle, time, -Physics.gravity.y );
-
-		public static Vector2 GetDisplacement( float speed, float angle, float time, float gravity ) {
+		public static Vector2 GetDisplacement( float gravity, float speed, float angle, float time ) {
 			float xDisp = speed * time * Mathf.Cos( angle );
 			float yDisp = speed * time * Mathf.Sin( angle ) - .5f * gravity * time * time;
 			return new Vector2( xDisp, yDisp );
 		}
 
-		public static float GetHeightPotential( float currentHeight, float speed ) {
-			float g = Physics2D.gravity.y;
-			return currentHeight + ( speed * speed ) / ( 2 * -g );
+		public static float GetHeightPotential( float gravity, float currentHeight, float speed ) {
+			return currentHeight + ( speed * speed ) / ( 2 * -gravity );
 		}
 
-		public static bool TryGetSpeedFromHeightPotential( float currentHeight, float heightPotential, out float speed ) {
-			float g = Physics2D.gravity.y;
-			float speedSq = ( heightPotential - currentHeight ) * -2 * g;
+		public static bool TryGetSpeedFromHeightPotential( float gravity, float currentHeight, float heightPotential, out float speed ) {
+			float speedSq = ( heightPotential - currentHeight ) * -2 * gravity;
 			if( speedSq <= 0 ) {
 				speed = default; // Imaginary speed :sparkles:
 				return false;
