@@ -449,35 +449,101 @@ public static class Mathfs {
 	// Trajectory math
 	public static class Trajectory {
 
-		public static float GetLaunchSpeed( float gravity, float lateralDistance, float angle ) {
-			return Mathf.Sqrt( ( lateralDistance * gravity ) / Mathf.Sin( 2 * angle ) );
-		}
-
-		public static bool TryGetLaunchAngles( float gravity, float lateralDistance, float speed, out float angleLow, out float angleHigh ) {
-			float asinContent = ( lateralDistance * gravity ) / ( speed * speed );
-			if( asinContent >= -1 && asinContent <= 1 ) {
-				angleLow = Mathf.Asin( asinContent ) / 2;
-				angleHigh = ( -angleLow + Mathf.PI / 2 );
-				return true;
+		/// <summary>
+		/// Outputs the launch speed required to traverse a given lateral distance when launched at a given angle, if one exists
+		/// </summary>
+		/// <param name="gravity">Gravitational acceleration in meters per second</param>
+		/// <param name="lateralDistance">Target lateral distance in meters</param>
+		/// <param name="angle">Launch angle in radians (0 = flat)</param>
+		/// <param name="speed">Launch speed in meters per second</param>
+		/// <returns>Whether or not there is a valid launch speed</returns>
+		public static bool TryGetLaunchSpeed( float gravity, float lateralDistance, float angle, out float speed ) {
+			float num = lateralDistance * gravity;
+			float den = Mathf.Sin( 2 * angle );
+			if( Mathf.Abs( den ) < 0.00001f ) {
+				speed = default;
+				return false; // direction is parallel, no speed would get you there
 			}
 
-			angleLow = default;
-			angleHigh = default;
-			return false;
+			float speedSquared = num / den;
+			if( speedSquared < 0 ) {
+				speed = 0;
+				return false; // can't reach destination because you're going the wrong way
+			}
+
+			speed = Mathf.Sqrt( speedSquared );
+			return true;
 		}
 
-		public static float GetMaxRange( float gravity, float speed ) => speed * speed / gravity;
+		/// <summary>
+		/// Outputs the two launch angles given a lateral distance and launch speed, if they exist
+		/// </summary>
+		/// <param name="gravity">Gravitational acceleration in meters per second</param>
+		/// <param name="lateralDistance">Target lateral distance in meters</param>
+		/// <param name="speed">Launch speed in meters per second</param>
+		/// <param name="angleLow">The low launch angle in radians</param>
+		/// <param name="angleHigh">The high launch angle in radians</param>
+		/// <returns>Whether or not valid launch angles exist</returns>
+		public static bool TryGetLaunchAngles( float gravity, float lateralDistance, float speed, out float angleLow, out float angleHigh ) {
+			if( speed == 0 ) {
+				angleLow = angleHigh = default;
+				return false; // can't reach anything without speed
+			}
 
+			float asinContent = ( lateralDistance * gravity ) / ( speed * speed );
+			if( asinContent.Within( -1, 1 ) == false ) {
+				angleLow = angleHigh = default;
+				return false; // can't reach no matter what angle is used
+			}
+
+			angleLow = Asin( asinContent ) / 2;
+			angleHigh = ( -angleLow + TAU / 4 );
+			return true;
+		}
+
+		/// <summary>
+		/// Returns the maximum lateral range a trajectory could reach, when launched at the optimal angle of 45°
+		/// </summary>
+		/// <param name="gravity">Gravitational acceleration in meters per second</param>
+		/// <param name="speed">Launch speed in meters per second</param>
+		/// <returns>Maximum lateral range in meters per second</returns>
+		public static float GetMaxRange( float gravity, float speed ) {
+			return speed * speed / gravity;
+		}
+
+		/// <summary>
+		/// Returns the displacement given a launch speed, launch angle and a traversal time 
+		/// </summary>
+		/// <param name="gravity">Gravitational acceleration in meters per second</param>
+		/// <param name="speed">Launch speed in meters per second</param>
+		/// <param name="angle">Launch angle in radians (0 = flat)</param>
+		/// <param name="time">Traversal time in seconds</param>
+		/// <returns>Displacement, where x = lateral displacement and y = vertical displacement</returns>
 		public static Vector2 GetDisplacement( float gravity, float speed, float angle, float time ) {
 			float xDisp = speed * time * Mathf.Cos( angle );
 			float yDisp = speed * time * Mathf.Sin( angle ) - .5f * gravity * time * time;
 			return new Vector2( xDisp, yDisp );
 		}
 
+		/// <summary>
+		/// Returns the maximum height that can possibly be reached if speed was redirected upwards, given a current height and speed
+		/// </summary>
+		/// <param name="gravity">Gravitational acceleration in meters per second</param>
+		/// <param name="currentHeight">Current height in meters</param>
+		/// <param name="speed">Launch speed in meters per second</param>
+		/// <returns>Potential height in meters</returns>
 		public static float GetHeightPotential( float gravity, float currentHeight, float speed ) {
 			return currentHeight + ( speed * speed ) / ( 2 * -gravity );
 		}
 
+		/// <summary>
+		/// Outputs the speed of an object with a given height potential and current height, if it exists
+		/// </summary>
+		/// <param name="gravity">Gravitational acceleration in meters per second</param>
+		/// <param name="currentHeight">Current height in meters</param>
+		/// <param name="heightPotential">Potential height in meters</param>
+		/// <param name="speed">Speed in meters per second</param>
+		/// <returns>Whether or not there is a valid speed</returns>
 		public static bool TryGetSpeedFromHeightPotential( float gravity, float currentHeight, float heightPotential, out float speed ) {
 			float speedSq = ( heightPotential - currentHeight ) * -2 * gravity;
 			if( speedSq <= 0 ) {
