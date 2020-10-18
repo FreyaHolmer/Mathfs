@@ -25,6 +25,10 @@ public static partial class Mathfs {
 		public static float RadiusToCircumference( float r ) => r * TAU;
 		public static float CircumferenceToRadius( float c ) => c / TAU;
 
+		public static Circle FromTwoPoints( Vector2 a, Vector2 b ) {
+			return new Circle( ( a + b ) / 2f, Vector2.Distance( a, b ) / 2f );
+		}
+
 		public static bool FromThreePoints( Vector2 a, Vector2 b, Vector2 c, out Circle circle ) {
 			Line2D lineA = LineSegment2D.GetBisectorFast( a, b );
 			Line2D lineB = LineSegment2D.GetBisectorFast( b, c );
