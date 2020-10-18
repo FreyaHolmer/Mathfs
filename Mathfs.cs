@@ -1,8 +1,8 @@
-﻿// Lots of this code is from Unity's original Mathf source to match functionality.
+﻿// Lots of this code is similar to Unity's original Mathf source to match functionality.
 // The original Mathf.cs source https://github.com/Unity-Technologies/UnityCsReference/blob/master/Runtime/Export/Math/Mathf.cs
-// ...and the bits of it in here is copyright (c) Unity Technologies with license: https://unity3d.com/legal/licenses/Unity_Reference_Only_License
+// ...and the trace amounts of it left in here is copyright (c) Unity Technologies with license: https://unity3d.com/legal/licenses/Unity_Reference_Only_License
 // 
-// Collected and expanded upon to by Freya Holmér (https://github.com/FreyaHolmer/Mathfs) 
+// Collected and expanded upon to by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
 using System;
 using System.Collections.Generic;
@@ -251,86 +251,44 @@ public static partial class Mathfs {
 	public static float AngleFromToCW( Vector2 from, Vector2 to ) => Determinant( from, to ) < 0 ? AngleBetween( from, to ) : TAU - AngleBetween( from, to );
 	public static float AngleFromToCCW( Vector2 from, Vector2 to ) => Determinant( from, to ) > 0 ? AngleBetween( from, to ) : TAU - AngleBetween( from, to );
 
-	public static float LerpAngleDeg( float aDeg, float bDeg, float t ) {
-		float delta = Repeat( ( bDeg - aDeg ), 360f );
-		if( delta > 180f )
-			delta -= 360f;
-		return aDeg + delta * Clamp01( t );
-	}
-
-	static public float MoveTowardsAngleDeg( float current, float target, float maxDelta ) {
-		float deltaAngle = DeltaAngleDeg( current, target );
-		if( -maxDelta < deltaAngle && deltaAngle < maxDelta )
-			return target;
-		target = current + deltaAngle;
-		return MoveTowards( current, target, maxDelta );
-	}
-
-	public static float SmoothDampAngleDeg( float current, float target, ref float currentVelocity, float smoothTime, float maxSpeed ) {
-		float deltaTime = Time.deltaTime;
-		return SmoothDampAngleDeg( current, target, ref currentVelocity, smoothTime, maxSpeed, deltaTime );
-	}
-
-	public static float SmoothDampAngleDeg( float current, float target, ref float currentVelocity, float smoothTime ) {
-		float deltaTime = Time.deltaTime;
-		float maxSpeed = Mathf.Infinity;
-		return SmoothDampAngleDeg( current, target, ref currentVelocity, smoothTime, maxSpeed, deltaTime );
-	}
-
-	public static float SmoothDampAngleDeg( float current, float target, ref float currentVelocity, float smoothTime, [Uei.DefaultValue( "Mathf.Infinity" )] float maxSpeed, [Uei.DefaultValue( "Time.deltaTime" )] float deltaTime ) {
-		target = current + DeltaAngleDeg( current, target );
-		return SmoothDamp( current, target, ref currentVelocity, smoothTime, maxSpeed, deltaTime );
-	}
-
-	public static float LerpAngleRad( float aRad, float bRad, float t ) {
+	public static float LerpAngle( float aRad, float bRad, float t ) {
 		float delta = Repeat( ( bRad - aRad ), TAU );
 		if( delta > PI )
 			delta -= TAU;
 		return aRad + delta * Clamp01( t );
 	}
 
+	public static float DeltaAngle( float a, float b ) => ( b - a + PI ).Repeat( TAU ) - PI;
 
-	public static float DeltaAngleRad( float a, float b ) => ( b - a + PI ).Repeat( TAU ) - PI;
-
-	public static float InverseLerpAngleRad( float a, float b, float v ) {
-		float angBetween = DeltaAngleRad( a, b );
+	public static float InverseLerpAngle( float a, float b, float v ) {
+		float angBetween = DeltaAngle( a, b );
 		b = a + angBetween; // removes any a->b discontinuity
 		float h = a + angBetween * 0.5f; // halfway angle
-		v = h + DeltaAngleRad( h, v ); // get offset from h, and offset by h
+		v = h + DeltaAngle( h, v ); // get offset from h, and offset by h
 		return InverseLerpClamped( a, b, v );
 	}
 
-	public static float DeltaAngleDeg( float a, float b ) => ( b - a + 180 ).Repeat( 360 ) - 180;
-
-	static float InverseLerpAngleDeg( float a, float b, float v ) {
-		float angBetween = DeltaAngleDeg( a, b );
-		b = a + angBetween; // removes any a->b discontinuity
-		float h = a + angBetween * 0.5f; // halfway angle
-		v = h + DeltaAngleDeg( h, v ); // get offset from h, and offset by h
-		return InverseLerpClamped( a, b, v );
-	}
-
-	static public float MoveTowardsAngleRad( float current, float target, float maxDelta ) {
-		float deltaAngle = DeltaAngleRad( current, target );
+	static public float MoveTowardsAngle( float current, float target, float maxDelta ) {
+		float deltaAngle = DeltaAngle( current, target );
 		if( -maxDelta < deltaAngle && deltaAngle < maxDelta )
 			return target;
 		target = current + deltaAngle;
 		return MoveTowards( current, target, maxDelta );
 	}
 
-	public static float SmoothDampAngleRad( float current, float target, ref float currentVelocity, float smoothTime, float maxSpeed ) {
+	public static float SmoothDampAngle( float current, float target, ref float currentVelocity, float smoothTime, float maxSpeed ) {
 		float deltaTime = Time.deltaTime;
-		return SmoothDampAngleRad( current, target, ref currentVelocity, smoothTime, maxSpeed, deltaTime );
+		return SmoothDampAngle( current, target, ref currentVelocity, smoothTime, maxSpeed, deltaTime );
 	}
 
-	public static float SmoothDampAngleRad( float current, float target, ref float currentVelocity, float smoothTime ) {
+	public static float SmoothDampAngle( float current, float target, ref float currentVelocity, float smoothTime ) {
 		float deltaTime = Time.deltaTime;
 		float maxSpeed = Mathf.Infinity;
-		return SmoothDampAngleRad( current, target, ref currentVelocity, smoothTime, maxSpeed, deltaTime );
+		return SmoothDampAngle( current, target, ref currentVelocity, smoothTime, maxSpeed, deltaTime );
 	}
 
-	public static float SmoothDampAngleRad( float current, float target, ref float currentVelocity, float smoothTime, [Uei.DefaultValue( "Mathf.Infinity" )] float maxSpeed, [Uei.DefaultValue( "Time.deltaTime" )] float deltaTime ) {
-		target = current + DeltaAngleRad( current, target );
+	public static float SmoothDampAngle( float current, float target, ref float currentVelocity, float smoothTime, [Uei.DefaultValue( "Mathf.Infinity" )] float maxSpeed, [Uei.DefaultValue( "Time.deltaTime" )] float deltaTime ) {
+		target = current + DeltaAngle( current, target );
 		return SmoothDamp( current, target, ref currentVelocity, smoothTime, maxSpeed, deltaTime );
 	}
 
