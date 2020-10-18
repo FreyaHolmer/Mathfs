@@ -333,7 +333,6 @@ public static partial class Mathfs {
 	}
 
 
-
 	public static class Polygon {
 
 		public static bool IsClockwise( IReadOnlyList<Vector2> pts ) => SignedArea( pts ) > 0;
@@ -354,11 +353,13 @@ public static partial class Mathfs {
 	}
 
 	// Root Finding
-	public static float GetLinearRoot( float k, float m ) => -m / k;
+	/// <summary>Finds the root (x-intercept) of a linear equation of the form ax+b</summary>
+	public static float GetLinearRoot( float a, float b ) => -b / a;
 
-	public static bool TryGetLinearRoot( float k, float m, out float root ) { // kx + m
-		if( Mathf.Abs( k ) > 0.00001f ) {
-			root = -m / k;
+	/// <summary>Tries to find the root (x-intercept) of a linear equation of the form ax+b</summary>
+	public static bool TryGetLinearRoot( float a, float b, out float root ) {
+		if( Mathf.Abs( a ) > 0.00001f ) {
+			root = -b / a;
 			return true;
 		}
 
@@ -372,13 +373,15 @@ public static partial class Mathfs {
 		Quadratic
 	}
 
+	/// <summary>Get the net polynomial type, accounting for values very close to 0, of a polynomial of the form ax²+bx+c</summary>
 	public static PolynomialType GetPolynomialType( float a, float b, float c ) {
 		if( Mathf.Abs( a ) < 0.00001f )
 			return Mathf.Abs( b ) < 0.00001f ? PolynomialType.Constant : PolynomialType.Linear;
 		return PolynomialType.Quadratic;
 	}
 
-	public static List<float> GetQuadraticRoots( float a, float b, float c ) { // ax² + bx + c
+	/// <summary>Finds the roots, if any, of a quadratic polynomial of the form ax²+bx+c</summary>
+	public static List<float> GetQuadraticRoots( float a, float b, float c ) {
 		List<float> roots = new List<float>();
 
 		switch( GetPolynomialType( a, b, c ) ) {
@@ -402,7 +405,6 @@ public static partial class Mathfs {
 
 		return roots;
 	}
-
 
 
 	// coordinate shenanigans
