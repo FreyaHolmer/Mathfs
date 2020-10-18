@@ -9,9 +9,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Uei = UnityEngine.Internal;
 using System.Linq; // used for arbitrary count min/max functions, so it's safe and won't allocate garbage don't worry~
-using static UnityEngine.Random;
 
-public static class Mathfs {
+public static partial class Mathfs {
 
 	// Constants
 	public const float TAU = 6.28318530717959f;
@@ -442,25 +441,6 @@ public static class Mathfs {
 		return roots;
 	}
 
-	// Random stuff (like, actually things of the category randomization, not, "various items")
-	public static class Random {
-		public static float Value => value;
-		public static float Sign => Value > 0.5f ? 1f : -1f;
-		public static float Direction1D => Sign;
-		public static float Range( float min, float max ) => UnityEngine.Random.Range( min, max );
-
-		public static Vector2 OnUnitCircle => AngToDir( Value * TAU );
-		public static Vector2 Direction2D => OnUnitCircle;
-		public static Vector2 InUnitCircle => insideUnitCircle;
-		public static Vector2 InUnitSquare => new Vector2( Value, Value );
-
-		public static Vector3 OnUnitSphere => onUnitSphere;
-		public static Vector3 Direction3D => OnUnitSphere;
-		public static Vector3 InUnitSphere => insideUnitSphere;
-		public static Vector3 InUnitCube => new Vector3( Value, Value, Value );
-
-		public static Quaternion Rotation => rotationUniform;
-	}
 
 
 	// Trajectory math
