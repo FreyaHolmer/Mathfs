@@ -48,6 +48,25 @@ public static partial class Mathfs {
 			return Min( angA, angB, angC );
 		}
 
+		// Right angle triangle math
+		public static float Area( float width, float height ) => ( width * height ) * 0.5f;
+
+		public static float AngleFromOppositeHypotenuse( float opposite, float hypotenuse ) => Asin( ( opposite / hypotenuse ).ClampNeg1to1() );
+		public static float AngleFromAdjacentHypotenuse( float adjacent, float hypotenuse ) => Acos( ( adjacent / hypotenuse ).ClampNeg1to1() );
+		public static float AngleFromOppositeAdjacent( float opposite, float adjacent ) => Atan( opposite / adjacent );
+
+		public static float HypotenuseFromAngleAdjacent( float angle, float adjacent ) => adjacent / Cos( angle );
+		public static float HypotenuseFromAngleOpposite( float angle, float opposite ) => opposite / Sin( angle );
+		public static float HypotenuseFromOppositeAdjacent( float opposite, float adjacent ) => Sqrt( adjacent.Square() + opposite.Square() );
+
+		public static float AdjacentFromAngleOpposite( float angle, float opposite ) => opposite / Tan( angle );
+		public static float AdjacentFromAngleHypotenuse( float angle, float hypotenuse ) => Cos( angle ) * hypotenuse;
+		public static float AdjacentFromOppositeHypotenuse( float opposite, float hypotenuse ) => Sqrt( hypotenuse.Square() - opposite.Square() );
+
+		public static float OppositeFromAngleAdjacent( float angle, float adjacent ) => Tan( angle ) * adjacent;
+		public static float OppositeFromAngleHypotenuse( float angle, float hypotenuse ) => Sin( angle ) * hypotenuse;
+		public static float OppositeFromAdjacentHypotenuse( float adjacent, float hypotenuse ) => Sqrt( hypotenuse.Square() - adjacent.Square() );
+
 	}
 
 
