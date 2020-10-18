@@ -17,6 +17,7 @@ public static class Mathfs {
 	public const float PI = 3.14159265359f;
 	public const float E = 2.71828182846f;
 	public const float GOLDEN_RATIO = 1.61803398875f;
+	public const float SQRT2 = 1.41421356237f;
 	public const float Infinity = Single.PositiveInfinity;
 	public const float NegativeInfinity = Single.NegativeInfinity;
 	public const float Deg2Rad = TAU / 360f;
@@ -569,10 +570,10 @@ public static class Mathfs {
 		float v = c.y;
 		float u2 = c.x * c.x;
 		float v2 = c.y * c.y;
-		const float SQ2 = 1.41421356237f;
+
 		Vector2 n = new Vector2( 1, -1 );
 		Vector2 p = new Vector2( 2, 2 ) + n * ( u2 - v2 );
-		Vector2 q = 2 * SQ2 * c;
+		Vector2 q = 2 * SQRT2 * c;
 		Vector2 smolVec = Vector2.one * 0.0001f;
 		Vector2 Sqrt( Vector2 noot ) => new Vector2( Mathf.Sqrt( noot.x ), Mathf.Sqrt( noot.y ) );
 		return 0.5f * ( Sqrt( Vector2.Max( smolVec, p + q ) ) - Sqrt( Vector2.Max( smolVec, p - q ) ) );
