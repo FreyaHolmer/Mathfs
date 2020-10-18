@@ -28,7 +28,7 @@ public static partial class Mathfs {
 		public static bool FromThreePoints( Vector2 a, Vector2 b, Vector2 c, out Circle circle ) {
 			Line2D lineA = LineSegment2D.GetBisectorFast( a, b );
 			Line2D lineB = LineSegment2D.GetBisectorFast( b, c );
-			if( Intersect.Lines( lineA.p, lineA.n, lineB.p, lineB.n, out circle.center ) ) {
+			if( Intersect.Lines( lineA, lineB, out circle.center ) ) {
 				circle.radius = Vector2.Distance( circle.center, a );
 				return true;
 			}
