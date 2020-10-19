@@ -209,7 +209,7 @@ public static partial class Mathfs {
 
 	public static float SmoothDamp( float current, float target, ref float currentVelocity, float smoothTime ) {
 		float deltaTime = Time.deltaTime;
-		float maxSpeed = Mathf.Infinity;
+		float maxSpeed = Infinity;
 		return SmoothDamp( current, target, ref currentVelocity, smoothTime, maxSpeed, deltaTime );
 	}
 
@@ -267,9 +267,11 @@ public static partial class Mathfs {
 #endif
 	public static Vector2 Rotate90CW( Vector2 v ) => new Vector2( v.y, -v.x );
 	public static Vector2 Rotate90CCW( Vector2 v ) => new Vector2( -v.y, v.x );
+#if UNITY_5_3_OR_NEWER
 	public static float DistanceSquared( Vector2 a, Vector2 b ) => ( a.x - b.x ).Square() + ( a.y - b.y ).Square();
 	public static float DistanceSquared( Vector3 a, Vector3 b ) => ( a.x - b.x ).Square() + ( a.y - b.y ).Square() + ( a.z - b.z ).Square();
 	public static float DistanceSquared( Vector4 a, Vector4 b ) => ( a.x - b.x ).Square() + ( a.y - b.y ).Square() + ( a.z - b.z ).Square() + ( a.w - b.w ).Square();
+#endif
 
 	// Angles & Rotation
 	public static Vector2 AngToDir( float aRad ) => new Vector2( Mathf.Cos( aRad ), Mathf.Sin( aRad ) );
@@ -316,7 +318,7 @@ public static partial class Mathfs {
 
 	public static float SmoothDampAngle( float current, float target, ref float currentVelocity, float smoothTime ) {
 		float deltaTime = Time.deltaTime;
-		float maxSpeed = Mathf.Infinity;
+		float maxSpeed = Infinity;
 		return SmoothDampAngle( current, target, ref currentVelocity, smoothTime, maxSpeed, deltaTime );
 	}
 
