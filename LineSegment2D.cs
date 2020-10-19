@@ -1,6 +1,10 @@
-﻿// collected and expended upon by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
+// collected and expended upon by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
+#if GODOT
+using Godot;
+#elif UNITY_5_3_OR_NEWER
 using UnityEngine;
+#endif
 
 public static partial class Mathfs {
 	public struct LineSegment2D {
@@ -14,7 +18,11 @@ public static partial class Mathfs {
 		}
 
 		/// <summary>Calculates the length</summary>
+#if GODOT
+		public float Length => start.DistanceTo(end);
+#elif UNITY_5_3_OR_NEWER
 		public float Length => Vector2.Distance( start, end );
+#endif
 
 		/// <summary>Returns the perpendicular bisector. Note: the returned normal is not normalized to save performance. Use Bisector() if you want to make sure it is normalized</summary>
 		public Line2D BisectorFast() => GetBisectorFast( start, end );
@@ -34,7 +42,11 @@ public static partial class Mathfs {
 		/// <param name="endPoint">Endpoint of the line segment</param>
 		public static Line2D GetBisector( Vector2 startPoint, Vector2 endPoint ) {
 			Line2D line = GetBisectorFast( startPoint, endPoint );
+#if GODOT
+			line.dir = line.dir.Normalized();
+#elif UNITY_5_3_OR_NEWER
 			line.dir = line.dir.normalized;
+#endif
 			return line;
 		}
 

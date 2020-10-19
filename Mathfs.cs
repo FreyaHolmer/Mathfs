@@ -1,13 +1,19 @@
-﻿// Lots of this code is similar to Unity's original Mathf source to match functionality.
+// Lots of this code is similar to Unity's original Mathf source to match functionality.
 // The original Mathf.cs source https://github.com/Unity-Technologies/UnityCsReference/blob/master/Runtime/Export/Math/Mathf.cs
 // ...and the trace amounts of it left in here is copyright (c) Unity Technologies with license: https://unity3d.com/legal/licenses/Unity_Reference_Only_License
-// 
+//
 // Collected and expanded upon to by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
-using System;
-using System.Collections.Generic;
+#if GODOT
+using Godot;
+using ExtraMath;
+using Rect = Godot.Rect2;
+#elif UNITY_5_3_OR_NEWER
 using UnityEngine;
 using Uei = UnityEngine.Internal;
+#endif
+using System;
+using System.Collections.Generic;
 using System.Linq; // used for arbitrary count min/max functions, so it's safe and won't allocate garbage don't worry~
 
 public static partial class Mathfs {
@@ -22,7 +28,11 @@ public static partial class Mathfs {
 	public const float NegativeInfinity = Single.NegativeInfinity;
 	public const float Deg2Rad = TAU / 360f;
 	public const float Rad2Deg = 360f / TAU;
+#if GODOT
+	public const float Epsilon = 1e-06f;
+#elif UNITY_5_3_OR_NEWER
 	public static readonly float Epsilon = UnityEngineInternal.MathfInternal.IsFlushToZeroEnabled ? UnityEngineInternal.MathfInternal.FloatMinNormal : UnityEngineInternal.MathfInternal.FloatMinDenormal;
+#endif
 
 	// Math operations
 	public static float Sqrt( float value ) => (float)Math.Sqrt( value );
@@ -156,7 +166,11 @@ public static partial class Mathfs {
 	public static Vector2 InverseLerp( Vector2 a, Vector2 b, Vector2 v ) => ( v - a ) / ( b - a );
 
 	public static Vector2 Remap( Rect iRect, Rect oRect, Vector2 iPos ) {
+#if GODOT
+		return Remap( iRect.Position, iRect.End, oRect.Position, oRect.End, iPos );
+#elif UNITY_5_3_OR_NEWER
 		return Remap( iRect.min, iRect.max, oRect.min, oRect.max, iPos );
+#endif
 	}
 
 	public static Vector2 Remap( Vector2 iMin, Vector2 iMax, Vector2 oMin, Vector2 oMax, Vector2 value ) {
@@ -187,6 +201,7 @@ public static partial class Mathfs {
 		return current + Mathf.Sign( target - current ) * maxDelta;
 	}
 
+#if UNITY_5_3_OR_NEWER
 	public static float SmoothDamp( float current, float target, ref float currentVelocity, float smoothTime, float maxSpeed ) {
 		float deltaTime = Time.deltaTime;
 		return SmoothDamp( current, target, ref currentVelocity, smoothTime, maxSpeed, deltaTime );
@@ -199,6 +214,9 @@ public static partial class Mathfs {
 	}
 
 	public static float SmoothDamp( float current, float target, ref float currentVelocity, float smoothTime, [Uei.DefaultValue( "Mathf.Infinity" )] float maxSpeed, [Uei.DefaultValue( "Time.deltaTime" )] float deltaTime ) {
+#elif GODOT
+	public static float SmoothDamp( float current, float target, ref float currentVelocity, float smoothTime, float maxSpeed, float deltaTime ) {
+#endif
 		// Based on Game Programming Gems 4 Chapter 1.10
 		smoothTime = Mathf.Max( 0.0001F, smoothTime );
 		float omega = 2F / smoothTime;
@@ -229,14 +247,24 @@ public static partial class Mathfs {
 
 	// Vector math
 	public static float Determinant /*or Cross*/( Vector2 a, Vector2 b ) => a.x * b.y - a.y * b.x; // 2D "cross product"
+#if GODOT
+	public static Vector2 Dir( Vector2 from, Vector2 to ) => ( to - from ).Normalized();
+	public static Vector3 Dir( Vector3 from, Vector3 to ) => ( to - from ).Normalized();
+#elif UNITY_5_3_OR_NEWER
 	public static Vector2 Dir( Vector2 from, Vector2 to ) => ( to - from ).normalized;
 	public static Vector3 Dir( Vector3 from, Vector3 to ) => ( to - from ).normalized;
+#endif
 	public static Vector2 FromTo( Vector2 from, Vector2 to ) => to - from;
 	public static Vector3 FromTo( Vector3 from, Vector3 to ) => to - from;
 	public static Vector2 CenterPos( Vector2 a, Vector2 b ) => ( a + b ) / 2f;
 	public static Vector3 CenterPos( Vector3 a, Vector3 b ) => ( a + b ) / 2f;
+#if GODOT
+	public static Vector2 CenterDir( Vector2 aDir, Vector2 bDir ) => ( aDir + bDir ).Normalized();
+	public static Vector3 CenterDir( Vector3 aDir, Vector3 bDir ) => ( aDir + bDir ).Normalized();
+#elif UNITY_5_3_OR_NEWER
 	public static Vector2 CenterDir( Vector2 aDir, Vector2 bDir ) => ( aDir + bDir ).normalized;
 	public static Vector3 CenterDir( Vector3 aDir, Vector3 bDir ) => ( aDir + bDir ).normalized;
+#endif
 	public static Vector2 Rotate90CW( Vector2 v ) => new Vector2( v.y, -v.x );
 	public static Vector2 Rotate90CCW( Vector2 v ) => new Vector2( -v.y, v.x );
 	public static float DistanceSquared( Vector2 a, Vector2 b ) => ( a.x - b.x ).Square() + ( a.y - b.y ).Square();
@@ -247,7 +275,11 @@ public static partial class Mathfs {
 	public static Vector2 AngToDir( float aRad ) => new Vector2( Mathf.Cos( aRad ), Mathf.Sin( aRad ) );
 	public static float DirToAng( Vector2 dir ) => Mathf.Atan2( dir.y, dir.x );
 	public static float SignedAngle( Vector2 a, Vector2 b ) => AngleBetween( a, b ) * Mathf.Sign( Determinant( a, b ) ); // -tau/2 to tau/2
+#if GODOT
+	public static float AngleBetween( Vector2 a, Vector2 b ) => Mathf.Acos( a.Normalized().Dot(b.Normalized()).ClampNeg1to1() );
+#elif UNITY_5_3_OR_NEWER
 	public static float AngleBetween( Vector2 a, Vector2 b ) => Mathf.Acos( Vector2.Dot( a.normalized, b.normalized ).ClampNeg1to1() );
+#endif
 	public static float AngleFromToCW( Vector2 from, Vector2 to ) => Determinant( from, to ) < 0 ? AngleBetween( from, to ) : TAU - AngleBetween( from, to );
 	public static float AngleFromToCCW( Vector2 from, Vector2 to ) => Determinant( from, to ) > 0 ? AngleBetween( from, to ) : TAU - AngleBetween( from, to );
 
@@ -276,6 +308,7 @@ public static partial class Mathfs {
 		return MoveTowards( current, target, maxDelta );
 	}
 
+#if UNITY_5_3_OR_NEWER
 	public static float SmoothDampAngle( float current, float target, ref float currentVelocity, float smoothTime, float maxSpeed ) {
 		float deltaTime = Time.deltaTime;
 		return SmoothDampAngle( current, target, ref currentVelocity, smoothTime, maxSpeed, deltaTime );
@@ -288,6 +321,9 @@ public static partial class Mathfs {
 	}
 
 	public static float SmoothDampAngle( float current, float target, ref float currentVelocity, float smoothTime, [Uei.DefaultValue( "Mathf.Infinity" )] float maxSpeed, [Uei.DefaultValue( "Time.deltaTime" )] float deltaTime ) {
+#elif GODOT
+	public static float SmoothDampAngle( float current, float target, ref float currentVelocity, float smoothTime, float maxSpeed, float deltaTime ) {
+#endif
 		target = current + DeltaAngle( current, target );
 		return SmoothDamp( current, target, ref currentVelocity, smoothTime, maxSpeed, deltaTime );
 	}
@@ -383,10 +419,20 @@ public static partial class Mathfs {
 		Vector2 n = new Vector2( 1, -1 );
 		Vector2 p = new Vector2( 2, 2 ) + n * ( u2 - v2 );
 		Vector2 q = 2 * SQRT2 * c;
+#if GODOT
+		Vector2 smolVec = Vector2.One * 0.0001f;
+#elif UNITY_5_3_OR_NEWER
 		Vector2 smolVec = Vector2.one * 0.0001f;
+#endif
 		Vector2 Sqrt( Vector2 noot ) => new Vector2( Mathf.Sqrt( noot.x ), Mathf.Sqrt( noot.y ) );
+#if GODOT
+		return 0.5f * (
+			Sqrt( new Vector2( Mathf.Max(smolVec.x, p.x + q.x), Mathf.Max(smolVec.y, p.y + q.y) ) ) -
+			Sqrt( new Vector2( Mathf.Max(smolVec.x, p.x - q.x), Mathf.Max(smolVec.y, p.y - q.y) ) )
+		);
+#elif UNITY_5_3_OR_NEWER
 		return 0.5f * ( Sqrt( Vector2.Max( smolVec, p + q ) ) - Sqrt( Vector2.Max( smolVec, p - q ) ) );
+#endif
 	}
-
 
 }

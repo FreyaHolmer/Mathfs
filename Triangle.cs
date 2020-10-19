@@ -1,27 +1,46 @@
-﻿// Collected and expanded upon to by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
+// Collected and expanded upon to by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
+#if GODOT
+using Godot;
+#elif UNITY_5_3_OR_NEWER
 using UnityEngine;
+#endif
 
 public static partial class Mathfs {
 
 	// Triangle math
 	public static class Triangle {
-
+#if GODOT
+		public static float SignedArea( Vector3 a, Vector3 b, Vector3 c ) => (b - a).Cross(c - a).Length() / 2f;
+#elif UNITY_5_3_OR_NEWER
 		public static float SignedArea( Vector3 a, Vector3 b, Vector3 c ) => Vector3.Cross( b - a, c - a ).magnitude / 2f;
+#endif
 		public static float Area( Vector3 a, Vector3 b, Vector3 c ) => Mathf.Abs( SignedArea( a, b, c ) );
 		public static Vector3 Centroid( Vector3 a, Vector3 b, Vector3 c ) => ( a + b + c ) / 3f;
 
 		public static Vector3 Incenter( Vector3 a, Vector3 b, Vector3 c ) {
+#if GODOT
+			float bc = b.DistanceTo(c);
+			float ca = c.DistanceTo(a);
+			float ab = a.DistanceTo(b);
+#elif UNITY_5_3_OR_NEWER
 			float bc = Vector3.Distance( b, c );
 			float ca = Vector3.Distance( c, a );
 			float ab = Vector3.Distance( a, b );
+#endif
 			return ( bc * a + ca * b + ab * c ) / ( bc + ca + ab );
 		}
 
 		public static Circle Incircle( Vector2 a, Vector2 b, Vector2 c ) {
+#if GODOT
+			float bc = b.DistanceTo(c);
+			float ca = c.DistanceTo(a);
+			float ab = a.DistanceTo(b);
+#elif UNITY_5_3_OR_NEWER
 			float bc = Vector2.Distance( b, c );
 			float ca = Vector2.Distance( c, a );
 			float ab = Vector2.Distance( a, b );
+#endif
 			float sideSum = bc + ca + ab;
 			Vector2 incenter = ( bc * a + ca * b + ab * c ) / sideSum;
 			float s = sideSum * 0.5f;
@@ -42,8 +61,13 @@ public static partial class Mathfs {
 		}
 
 		public static float SmallestAngle( Vector3 a, Vector3 b, Vector3 c ) {
+#if GODOT
+			float angA = (c - b).AngleTo(a - b);
+			float angB = (b - c).AngleTo(a - c);
+#elif UNITY_5_3_OR_NEWER
 			float angA = AngleBetween( c - b, a - b );
 			float angB = AngleBetween( b - c, a - c );
+#endif
 			float angC = PI - angA - angB;
 			return Min( angA, angB, angC );
 		}
@@ -68,6 +92,5 @@ public static partial class Mathfs {
 		public static float OppositeFromAdjacentHypotenuse( float adjacent, float hypotenuse ) => Sqrt( hypotenuse.Square() - adjacent.Square() );
 
 	}
-
 
 }

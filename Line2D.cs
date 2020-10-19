@@ -1,6 +1,10 @@
-﻿// collected and expended upon by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
+// collected and expended upon by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
+#if GODOT
+using Godot;
+#elif UNITY_5_3_OR_NEWER
 using UnityEngine;
+#endif
 
 public static partial class Mathfs {
 	// 2D line math
@@ -20,7 +24,11 @@ public static partial class Mathfs {
 		/// <param name="point">The point to project onto the line</param>
 		public static Vector2 ProjectPointToLine( Vector2 lineOrigin, Vector2 lineDir, Vector2 point ) {
 			Vector2 coord = point - lineOrigin;
+#if GODOT
+			float t = lineDir.Dot(coord) / lineDir.Dot(lineDir);
+#elif UNITY_5_3_OR_NEWER
 			float t = Vector2.Dot( lineDir, coord ) / Vector2.Dot( lineDir, lineDir );
+#endif
 			return lineOrigin + lineDir * t;
 		}
 
@@ -34,7 +42,11 @@ public static partial class Mathfs {
 		/// <param name="planeNormal">Plane normal (has to be normalized for a true distance)</param>
 		/// <param name="point">The point to use when checking distance to the plane</param>
 		public static float PointToPlaneSignedDistance( Vector2 planeOrigin, Vector2 planeNormal, Vector2 point ) {
+#if GODOT
+			return planeNormal.Dot(point - planeOrigin);
+#elif UNITY_5_3_OR_NEWER
 			return Vector2.Dot( point - planeOrigin, planeNormal );
+#endif
 		}
 
 		/// <summary>Returns the distance to a 2D plane</summary>

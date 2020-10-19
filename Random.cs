@@ -1,5 +1,6 @@
-﻿// Collected and expanded upon to by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
+// Collected and expanded upon to by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
+#if UNITY_5_3_OR_NEWER
 using UnityEngine;
 using static UnityEngine.Random;
 
@@ -35,3 +36,4 @@ public static partial class Mathfs {
 		public static Quaternion Rotation => rotationUniform;
 	}
 }
+#endif

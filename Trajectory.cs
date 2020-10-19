@@ -1,6 +1,10 @@
-﻿// collected and expended upon by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
+// collected and expended upon by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
+#if GODOT
+using Godot;
+#elif UNITY_5_3_OR_NEWER
 using UnityEngine;
+#endif
 
 public static partial class Mathfs {
 
@@ -70,7 +74,7 @@ public static partial class Mathfs {
 		}
 
 		/// <summary>
-		/// Returns the displacement given a launch speed, launch angle and a traversal time 
+		/// Returns the displacement given a launch speed, launch angle and a traversal time
 		/// </summary>
 		/// <param name="gravity">Gravitational acceleration in meters per second</param>
 		/// <param name="speed">Launch speed in meters per second</param>
@@ -114,5 +118,4 @@ public static partial class Mathfs {
 		}
 
 	}
-
 }

@@ -1,6 +1,11 @@
-﻿// collected and expended upon by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
+// collected and expended upon by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
+#if GODOT
+using Godot;
+using ExtraMath;
+#elif UNITY_5_3_OR_NEWER
 using UnityEngine;
+#endif
 
 public static class MathfsExtensions {
 
@@ -37,11 +42,20 @@ public static class MathfsExtensions {
 	public static float Max( this Vector3 v ) => Mathfs.Max( v.x, v.y, v.z );
 	public static float Max( this Vector4 v ) => Mathfs.Max( v.x, v.y, v.z, v.w );
 
+#if GODOT
+	public static Vector2 WithMagnitude( this Vector2 v, float mag ) => v.Normalized() * mag;
+	public static Vector3 WithMagnitude( this Vector3 v, float mag ) => v.Normalized() * mag;
+#elif UNITY_5_3_OR_NEWER
 	public static Vector2 WithMagnitude( this Vector2 v, float mag ) => v.normalized * mag;
 	public static Vector3 WithMagnitude( this Vector3 v, float mag ) => v.normalized * mag;
+#endif
 
 	public static Vector2 ClampMagnitude( this Vector2 v, float min, float max ) {
+#if GODOT
+		float mag = v.Length();
+#elif UNITY_5_3_OR_NEWER
 		float mag = v.magnitude;
+#endif
 		if( mag < min ) {
 			Vector2 dir = v / mag;
 			return dir * min;
@@ -56,7 +70,11 @@ public static class MathfsExtensions {
 	}
 
 	public static Vector3 ClampMagnitude( this Vector3 v, float min, float max ) {
+#if GODOT
+		float mag = v.Length();
+#elif UNITY_5_3_OR_NEWER
 		float mag = v.magnitude;
+#endif
 		if( mag < min ) {
 			Vector3 dir = v / mag;
 			return dir * min;
@@ -74,8 +92,10 @@ public static class MathfsExtensions {
 
 	public static Vector2 To( this Vector2 v, Vector2 target ) => target - v;
 	public static Vector3 To( this Vector3 v, Vector3 target ) => target - v;
+#if UNITY_5_3_OR_NEWER
 	public static Vector2 DirTo( this Vector2 v, Vector2 target ) => ( target - v ).normalized;
 	public static Vector3 DirTo( this Vector3 v, Vector3 target ) => ( target - v ).normalized;
+#endif
 
 	public static Vector2 Floor( this Vector2 v ) => new Vector2( Mathfs.Floor( v.x ), Mathfs.Floor( v.y ) );
 	public static Vector3 Floor( this Vector3 v ) => new Vector3( Mathfs.Floor( v.x ), Mathfs.Floor( v.y ), Mathfs.Floor( v.z ) );
@@ -84,10 +104,12 @@ public static class MathfsExtensions {
 	public static Vector3 Ceil( this Vector3 v ) => new Vector3( Mathfs.Ceil( v.x ), Mathfs.Ceil( v.y ), Mathfs.Ceil( v.z ) );
 	public static Vector4 Ceil( this Vector4 v ) => new Vector4( Mathfs.Ceil( v.x ), Mathfs.Ceil( v.y ), Mathfs.Ceil( v.z ), Mathfs.Ceil( v.w ) );
 	public static Vector2 Round( this Vector2 v ) => new Vector2( Mathfs.Round( v.x ), Mathfs.Round( v.y ) );
-	public static Vector2Int RoundToInt( this Vector2 v ) => new Vector2Int( Mathf.RoundToInt( v.x ), Mathf.RoundToInt( v.y ) );
 	public static Vector3 Round( this Vector3 v ) => new Vector3( Mathfs.Round( v.x ), Mathfs.Round( v.y ), Mathfs.Round( v.z ) );
-	public static Vector3Int RoundToInt( this Vector3 v ) => new Vector3Int( Mathf.RoundToInt( v.x ), Mathf.RoundToInt( v.y ), Mathf.RoundToInt( v.z ) );
 	public static Vector4 Round( this Vector4 v ) => new Vector4( Mathfs.Round( v.x ), Mathfs.Round( v.y ), Mathfs.Round( v.z ), Mathfs.Round( v.w ) );
+#if UNITY_5_3_OR_NEWER
+	public static Vector2Int RoundToInt( this Vector2 v ) => new Vector2Int( Mathf.RoundToInt( v.x ), Mathf.RoundToInt( v.y ) );
+	public static Vector3Int RoundToInt( this Vector3 v ) => new Vector3Int( Mathf.RoundToInt( v.x ), Mathf.RoundToInt( v.y ), Mathf.RoundToInt( v.z ) );
+#endif
 
 	public static Color WithAlpha( this Color c, float a ) => new Color( c.r, c.g, c.b, a );
 	public static Color MultiplyRGB( this Color c, float m ) => new Color( c.r * m, c.g * m, c.b * m, c.a );
@@ -112,6 +134,5 @@ public static class MathfsExtensions {
 	public static int RoundToInt( this float v ) => Mathfs.RoundToInt( v );
 	public static int FloorToInt( this float v ) => Mathfs.FloorToInt( v );
 	public static int CeilToInt( this float v ) => Mathfs.CeilToInt( v );
-
 
 }

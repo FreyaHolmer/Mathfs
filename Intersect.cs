@@ -1,6 +1,10 @@
-﻿// collected and expended upon by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
+// collected and expended upon by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
+#if GODOT
+using Godot;
+#elif UNITY_5_3_OR_NEWER
 using UnityEngine;
+#endif
 
 public static partial class Mathfs {
 	public static class Intersect {
