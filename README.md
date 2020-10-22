@@ -2,7 +2,7 @@
 Expanded Math Functionality for Unity
 
 ## Features
- - Line & Line Segment Intersection
+ - Intersection tests (Rays/LineSegments/Lines/Circles)
  - 2D Angle helpers (AngToDir, DirToAng...)
  - 2D Vector extension methods (Rotate90CCW/CW, Rotate, RotateAround...)
  - Trajectory Math helpers (GetLaunchSpeed, GetMaxRange, TryGetLaunchAngles...)
