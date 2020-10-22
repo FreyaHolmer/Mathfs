@@ -13,6 +13,8 @@ public static partial class Mathfs {
 			this.end = end;
 		}
 
+		public Vector2 GetPoint( float t ) => Vector2.LerpUnclamped( start, end, t );
+
 		/// <summary>Calculates the length</summary>
 		public float Length => Vector2.Distance( start, end );
 

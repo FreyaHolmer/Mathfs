@@ -14,6 +14,8 @@ public static partial class Mathfs {
 			this.dir = dir;
 		}
 
+		public Vector2 GetPoint( float t ) => origin + t * dir;
+
 		/// <summary>Projects a point onto an infinite line</summary>
 		/// <param name="lineOrigin">Line origin</param>
 		/// <param name="lineDir">Line direction (does not have to be normalized)</param>
