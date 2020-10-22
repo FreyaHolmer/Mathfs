@@ -31,7 +31,7 @@ Expanded Math Functionality for Unity
    - Area / SignedArea, given a list of points
    - IsClockwise, given a list of points
  - Circle math
-   - FromToPoints (get smallest circle passing through both points
+   - FromToPoints (get smallest circle passing through both points)
    - FromThreePoints (get unique circle passing through three points)
    - RadiusToArea / AreaToRadius
    - AreaToCircumference / CircumferenceToArea
