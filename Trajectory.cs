@@ -1,8 +1,9 @@
 ﻿// collected and expended upon by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
 using UnityEngine;
+using static Freya.Mathfs;
 
-public static partial class Mathfs {
+namespace Freya {
 
 	// Trajectory math
 	public static class Trajectory {

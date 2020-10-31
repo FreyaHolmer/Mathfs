@@ -2,7 +2,7 @@
 
 using UnityEngine;
 
-public static partial class Mathfs {
+namespace Freya {
 	public struct LineSegment2D {
 
 		public Vector2 start;

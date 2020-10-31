@@ -2,8 +2,8 @@
 
 using UnityEngine;
 
-public static partial class Mathfs {
-	
+namespace Freya {
+
 	/// <summary>
 	/// Similar to Unity's Ray2D, except this one allows you to not normalize the direction
 	/// which saves performance as well as allows you to work at different scales
@@ -24,4 +24,5 @@ public static partial class Mathfs {
 		public static implicit operator UnityEngine.Ray2D( Ray2D ray ) => new UnityEngine.Ray2D( ray.origin, ray.dir );
 
 	}
+
 }

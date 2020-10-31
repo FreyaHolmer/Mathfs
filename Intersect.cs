@@ -2,8 +2,10 @@
 
 using System;
 using UnityEngine;
+using static Freya.Mathfs;
 
-public static partial class Mathfs {
+namespace Freya {
+
 	public static class Intersect {
 
 		// These are used to see if an intersection t-value is valid for rays and line segments
