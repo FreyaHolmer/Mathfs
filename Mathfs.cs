@@ -306,10 +306,9 @@ namespace Freya {
 				for( int i = 0; i < count; i++ ) {
 					Vector2 a = pts[i];
 					Vector2 b = pts[( i + 1 ) % count];
-					sum += ( b.x - a.x ) * ( ( b.y + a.y ) * 0.5f );
+					sum += ( b.x - a.x ) * ( b.y + a.y );
 				}
-
-				return sum;
+				return sum * 0.5f;
 			}
 
 		}
