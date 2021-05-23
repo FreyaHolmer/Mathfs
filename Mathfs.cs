@@ -311,6 +311,7 @@ namespace Freya {
 					Vector2 b = pts[( i + 1 ) % count];
 					sum += ( b.x - a.x ) * ( b.y + a.y );
 				}
+
 				return sum * 0.5f;
 			}
 
