@@ -21,17 +21,19 @@ Expanded Math Functionality for Unity
    - GetHeightPotential, given gravity, current height and speed
    - GetSpeedFromHeightPotential, given gravity, current height and height potential
  - Triangle math
-   - Area / SignedArea, given three points or base and height)
-   - Contains check, given three triangle vertices and a point to test by)
+   - Area / SignedArea, given three points or base and height
+   - Contains check, given three triangle vertices and a point to test by
    - Right-angle trig functions to calculate Opposite/Adjacent/Hypotenuse/Angle
    - Incenter / Centroid
    - Incircle / Circumcircle
    - SmallestAngle
  - Polygon math
-   - Area / SignedArea, given a list of points
-   - IsClockwise, given a list of points
+   - Area / SignedArea
+   - IsClockwise
+   - WindingNumber
+   - Contains
  - Circle math
-   - FromToPoints (get smallest circle passing through both points)
+   - FromTwoPoints (get smallest circle passing through both points)
    - FromThreePoints (get unique circle passing through three points)
    - RadiusToArea / AreaToRadius
    - AreaToCircumference / CircumferenceToArea
