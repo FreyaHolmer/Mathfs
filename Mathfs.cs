@@ -28,6 +28,7 @@ namespace Freya {
 
 		// Math operations
 		public static float Sqrt( float value ) => (float)Math.Sqrt( value );
+		public static float Cbrt( float value ) => value < 0 ? -Pow( -value, 1f / 3f ) : Pow( value, 1f / 3f );
 		public static float Pow( float @base, float exponent ) => (float)Math.Pow( @base, exponent );
 		public static float Exp( float power ) => (float)Math.Exp( power );
 		public static float Log( float value, float @base ) => (float)Math.Log( value, @base );
