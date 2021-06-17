@@ -99,13 +99,20 @@ namespace Freya {
 		public static float Round( this float v, float snapInterval ) => Mathfs.Round( v, snapInterval );
 		public static bool Within( this float v, float min, float max ) => v >= min && v <= max;
 		public static bool Between( this float v, float min, float max ) => v > min && v < max;
+		public static bool Within( this int v, int min, int max ) => v >= min && v <= max;
+		public static bool Between( this int v, int min, int max ) => v > min && v < max;
 		public static float AtLeast( this float v, float min ) => Mathfs.Max( v, min );
 		public static float AtMost( this float v, float max ) => Mathfs.Min( v, max );
+		public static int AtLeast( this int v, int min ) => Mathfs.Max( v, min );
+		public static int AtMost( this int v, int max ) => Mathfs.Min( v, max );
 
 		public static float Square( this float v ) => v * v;
+		public static int Square( this int v ) => v * v;
 		public static float Abs( this float v ) => Mathfs.Abs( v );
+		public static int Abs( this int v ) => Mathfs.Abs( v );
 		public static float Magnitude( this float v ) => Mathfs.Abs( v );
 		public static float Clamp( this float v, float min, float max ) => Mathfs.Clamp( v, min, max );
+		public static int Clamp( this int v, int min, int max ) => Mathfs.Clamp( v, min, max );
 		public static float Remap( this float v, float iMin, float iMax, float oMin, float oMax ) => Mathfs.Remap( iMin, iMax, oMin, oMax, v );
 		public static float Repeat( this float v, float length ) => Mathfs.Repeat( v, length );
 		public static int Mod( this int value, int length ) => ( value % length + length ) % length; // modulo
