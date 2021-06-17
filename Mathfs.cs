@@ -51,6 +51,14 @@ namespace Freya {
 		public static float Cvs( float x ) => 1 - (float)Math.Sin( x );
 		public static float Crd( float x ) => 2 * (float)Math.Sin( x / 2 );
 
+		// Hyperbolic trig
+		public static float Cosh( float x ) => (float)Math.Cosh( x );
+		public static float Sinh( float x ) => (float)Math.Sinh( x );
+		public static float Tanh( float x ) => (float)Math.Tanh( x );
+		public static float Acosh( float x ) => (float)Math.Log( x + Mathf.Sqrt( x * x - 1 ) );
+		public static float Asinh( float x ) => (float)Math.Log( x + Mathf.Sqrt( x * x + 1 ) );
+		public static float Atanh( float x ) => (float)( 0.5 * Math.Log( ( 1 + x ) / ( 1 - x ) ) );
+
 		// Absolute values
 		public static float Abs( float value ) => Math.Abs( value );
 		public static int Abs( int value ) => Math.Abs( value );
