@@ -42,6 +42,16 @@ namespace Freya {
 		public static Vector2 WithMagnitude( this Vector2 v, float mag ) => v.normalized * mag;
 		public static Vector3 WithMagnitude( this Vector3 v, float mag ) => v.normalized * mag;
 
+		public static (Vector2 dir, float magnitude ) GetDirAndMagnitude( this Vector2 v ) {
+			float magnitude = v.magnitude;
+			return ( v / magnitude, magnitude );
+		}
+
+		public static (Vector3 dir, float magnitude ) GetDirAndMagnitude( this Vector3 v ) {
+			float magnitude = v.magnitude;
+			return ( v / magnitude, magnitude );
+		}
+
 		public static Vector2 ClampMagnitude( this Vector2 v, float min, float max ) {
 			float mag = v.magnitude;
 			if( mag < min ) {
