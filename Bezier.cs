@@ -398,6 +398,172 @@ namespace Freya {
 	}
 
 	#endregion
+
+	// Normals, Orientation & Angles
+
+	#region Normal
+
+	public partial struct BezierCubic2D {
+		/// <summary>Returns the normal direction at the given t-value on the curve.
+		/// This normal will point to the inner arc of the current curvature</summary>
+		public Vector2 GetNormal( float t ) => GetTangent( t ).Rotate90CCW();
+	}
+
+	public partial struct BezierCubic3D {
+		/// <summary>Returns the frenet-serret (curvature-based) normal direction at the given t-value on the curve</summary>
+		public Vector3 GetArcNormal( float t ) {
+			( Vector3 vel, Vector3 acc ) = GetFirstTwoDerivatives( t );
+			return Vector3.Cross( vel, Vector3.Cross( acc, vel ) ).normalized;
+		}
+
+		/// <summary>Returns a normal of the curve given a reference up vector and t-value on the curve.
+		/// The normal will be perpendicular to both the supplied up vector and the curve</summary>
+		public Vector3 GetNormal( float t, Vector3 up ) {
+			Vector3 vel = GetDerivative( t );
+			return Vector3.Cross( up, vel ).normalized;
+		}
+	}
+
+	#endregion
+
+	#region Binormal (3D only)
+
+	public partial struct BezierCubic3D {
+		/// <summary>Returns the frenet-serret (curvature-based) binormal direction at the given t-value on the curve</summary>
+		public Vector3 GetArcBinormal( float t ) {
+			( Vector3 vel, Vector3 acc ) = GetFirstTwoDerivatives( t );
+			return Vector3.Cross( vel, acc ).normalized;
+		}
+
+		/// <summary>Returns the binormal of the curve given a reference up vector and t-value on the curve.
+		/// The binormal will attempt to be as aligned with the reference vector as possible,
+		/// while still being perpendicular to the curve</summary>
+		public Vector3 GetBinormal( float t, Vector3 up ) {
+			Vector3 vel = GetDerivative( t );
+			Vector3 normal = Vector3.Cross( up, vel ).normalized;
+			return Vector3.Cross( vel.normalized, normal );
+		}
+	}
+
+	#endregion
+
+	#region Angle (2D only)
+
+	public partial struct BezierCubic2D {
+		/// <summary>Returns the 2D angle of the direction of the curve at the given point, in radians</summary>
+		public float GetAngle( float t ) => DirToAng( GetDerivative( t ) );
+	}
+
+	#endregion
+
+	#region Orientation
+
+	public partial struct BezierCubic2D {
+		/// <summary>Returns the orientation at the given point t, where the X axis is tangent to the curve</summary>
+		public Quaternion GetOrientation( float t ) {
+			Vector2 v = GetTangent( t );
+			v.x += 1;
+			v.Normalize();
+			return new Quaternion( 0, 0, v.y, v.x );
+		}
+	}
+
+	public partial struct BezierCubic3D {
+		/// <summary>Returns the orientation at the given point t, where the Z direction is tangent to the curve.
+		/// The Y axis will attempt to align with the supplied up vector</summary>
+		public Quaternion GetOrientation( float t, Vector3 up ) => Quaternion.LookRotation( GetDerivative( t ), up );
+
+		/// <summary>Returns the frenet-serret (curvature-based) orientation of curve at the given point t, where the Z direction is tangent to the curve.
+		/// The X axis will point to the inner arc of the current curvature</summary>
+		public Quaternion GetArcOrientation( float t ) {
+			( Vector3 vel, Vector3 acc ) = GetFirstTwoDerivatives( t );
+			Vector3 binormal = Vector3.Cross( vel, acc );
+			return Quaternion.LookRotation( vel, binormal );
+		}
+	}
+
+	#endregion
+
+	#region Pose
+
+	public partial struct BezierCubic2D {
+		/// <summary>Returns the position and orientation at the given t-value on the curve</summary>
+		public Pose GetPose( float t ) {
+			( Vector2 p, Vector2 v ) = GetPointAndTangent( t );
+			v.x += 1;
+			v.Normalize();
+			Quaternion rot = new Quaternion( 0, 0, v.y, v.x );
+			return new Pose( p, rot );
+		}
+	}
+
+	public partial struct BezierCubic3D {
+		/// <summary>Returns the position and orientation of curve at the given point t, where the Z direction is tangent to the curve.
+		/// The Y axis will attempt to align with the supplied up vector</summary>
+		public Pose GetPose( float t, Vector3 up ) {
+			( Vector2 p, Vector2 v ) = GetPointAndTangent( t );
+			return new Pose( p, Quaternion.LookRotation( v, up ) );
+		}
+
+		/// <summary>Returns the position and the frenet-serret (curvature-based) orientation of curve at the given point t, where the Z direction is tangent to the curve.
+		/// The X axis will point to the inner arc of the current curvature</summary>
+		public Pose GetArcPose( float t ) {
+			( Vector3 pt, Vector3 vel, Vector3 acc ) = GetPointAndFirstTwoDerivatives( t );
+			Vector3 binormal = Vector3.Cross( vel, acc );
+			return new Pose( pt, Quaternion.LookRotation( vel, binormal ) );
+		}
+	}
+
+	#endregion
+
+	#region Matrix
+
+	public partial struct BezierCubic2D {
+		/// <summary>Returns the position and orientation at the given t-value on the curve, expressed as a matrix</summary>
+		public Matrix4x4 GetMatrix( float t ) {
+			( Vector2 P, Vector2 T ) = GetPointAndTangent( t );
+			Vector2 N = T.Rotate90CCW();
+			return new Matrix4x4(
+				new Vector4( T.x, T.y, 0, 0 ),
+				new Vector4( N.x, N.y, 0, 0 ),
+				new Vector4( 0, 0, 1, 0 ),
+				new Vector4( P.x, P.y, 0, 1 )
+			);
+		}
+	}
+
+	public partial struct BezierCubic3D {
+		/// <summary>Returns the position and orientation of curve at the given point t, expressed as a matrix, where the Z direction is tangent to the curve.
+		/// The Y axis will attempt to align with the supplied up vector</summary>
+		public Matrix4x4 GetMatrix( float t, Vector3 up ) {
+			( Vector3 P, Vector3 T ) = GetPointAndTangent( t );
+			Vector3 N = Vector3.Cross( up, T ).normalized; // X axis
+			Vector3 B = Vector3.Cross( T, N ); // Y axis
+			return new Matrix4x4(
+				new Vector4( N.x, N.y, N.z, 0 ),
+				new Vector4( B.x, B.y, B.z, 0 ),
+				new Vector4( T.x, T.y, T.z, 0 ),
+				new Vector4( P.x, P.y, P.z, 1 )
+			);
+		}
+
+		/// <summary>Returns the position and the frenet-serret (curvature-based) orientation of curve at the given point t, expressed as a matrix, where the Z direction is tangent to the curve.
+		/// The X axis will point to the inner arc of the current curvature</summary>
+		public Matrix4x4 GetArcMatrix( float t ) {
+			( Vector3 P, Vector3 vel, Vector3 acc ) = GetPointAndFirstTwoDerivatives( t );
+			Vector3 T = vel.normalized;
+			Vector3 B = Vector3.Cross( vel, acc ).normalized;
+			Vector3 N = Vector3.Cross( B, T );
+			return new Matrix4x4(
+				new Vector4( N.x, N.y, N.z, 0 ),
+				new Vector4( B.x, B.y, B.z, 0 ),
+				new Vector4( T.x, T.y, T.z, 0 ),
+				new Vector4( P.x, P.y, P.z, 1 )
+			);
+		}
+	}
+
+	#endregion
 	#region Point & Derivative combo
 
 	public partial struct BezierCubic2D {
