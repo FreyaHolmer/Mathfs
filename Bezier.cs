@@ -999,4 +999,78 @@ namespace Freya {
 	}
 
 	#endregion
+
+	#region Local Extrema
+
+	public partial struct BezierCubic2D {
+
+		/// <summary>Returns the t values of extrema (local minima/maxima) on a given axis in the 0 &lt; t &lt; 1 range</summary>
+		/// <param name="axis">Either 0 (X) or 1 (Y)</param>
+		public ResultsMax2<float> GetLocalExtrema( int axis ) {
+			if( axis < 0 || axis > 1 )
+				throw new ArgumentOutOfRangeException( nameof(axis), "axis has to be either 0 or 1" );
+			float a, b, c;
+			if( axis == 0 ) // a little silly but the vec[] indexers are kinda expensive
+				( a, b, c ) = BezierUtils.GetCubicDerivativeFactors( p0.x, p1.x, p2.x, p3.x );
+			else
+				( a, b, c ) = BezierUtils.GetCubicDerivativeFactors( p0.y, p1.y, p2.y, p3.y );
+			ResultsMax2<float> roots = GetQuadraticRoots( a, b, c );
+			ResultsMax2<float> outPts = default;
+			for( int i = 0; i < roots.count; i++ ) {
+				float t = roots[i];
+				if( t.Between( 0, 1 ) )
+					outPts = outPts.Add( t );
+			}
+
+			return outPts;
+		}
+
+		/// <summary>Returns the extrema points (local minima/maxima points) on a given axis in the 0 &lt; t &lt; 1 range</summary>
+		/// <param name="axis">Either 0 (X) or 1 (Y)</param>
+		public ResultsMax2<float> GetLocalExtremaPoints( int axis ) {
+			ResultsMax2<float> t = GetLocalExtrema( axis );
+			ResultsMax2<float> pts = default;
+			for( int i = 0; i < t.count; i++ )
+				pts.Add( GetPointComponent( axis, t[i] ) );
+			return pts;
+		}
+	}
+
+	public partial struct BezierCubic3D {
+		/// <summary>Returns the t values of extrema (local minima/maxima) on a given axis in the 0 &lt; t &lt; 1 range</summary>
+		/// <param name="axis">Either 0 (X), 1 (Y) or 2 (Z)</param>
+		public ResultsMax2<float> GetLocalExtrema( int axis ) {
+			if( axis < 0 || axis > 2 )
+				throw new ArgumentOutOfRangeException( nameof(axis), "axis has to be either 0, 1 or 2" );
+			float a, b, c;
+			if( axis == 0 ) // a little silly but the vec[] indexers are kinda expensive
+				( a, b, c ) = BezierUtils.GetCubicDerivativeFactors( p0.x, p1.x, p2.x, p3.x );
+			else if( axis == 1 )
+				( a, b, c ) = BezierUtils.GetCubicDerivativeFactors( p0.y, p1.y, p2.y, p3.y );
+			else
+				( a, b, c ) = BezierUtils.GetCubicDerivativeFactors( p0.z, p1.z, p2.z, p3.z );
+			ResultsMax2<float> roots = GetQuadraticRoots( a, b, c );
+			ResultsMax2<float> outPts = default;
+			for( int i = 0; i < roots.count; i++ ) {
+				float t = roots[i];
+				if( t.Between( 0, 1 ) )
+					outPts = outPts.Add( t );
+			}
+
+			return outPts;
+		}
+
+		/// <summary>Returns the extrema points (local minima/maxima points) on a given axis in the 0 &lt; t &lt; 1 range</summary>
+		/// <param name="axis">Either 0 (X), 1 (Y) or 2 (Z)</param>
+		public ResultsMax2<float> GetLocalExtremaPoints( int axis ) {
+			ResultsMax2<float> t = GetLocalExtrema( axis );
+			ResultsMax2<float> pts = default;
+			for( int i = 0; i < t.count; i++ )
+				pts.Add( GetPointComponent( axis, t[i] ) );
+			return pts;
+		}
+	}
+
+	#endregion
+
 }
