@@ -1,4 +1,4 @@
-﻿// Collected and expanded upon to by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
+﻿// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
 using System.Collections.Generic;
 using UnityEngine;

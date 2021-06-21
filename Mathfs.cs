@@ -1,4 +1,4 @@
-﻿// Lots of this code is similar to Unity's original Mathf source to match functionality.
+﻿// Some of this code is similar to Unity's original Mathf source to match functionality.
 // The original Mathf.cs source https://github.com/Unity-Technologies/UnityCsReference/blob/master/Runtime/Export/Math/Mathf.cs
 // ...and the trace amounts of it left in here is copyright (c) Unity Technologies with license: https://unity3d.com/legal/licenses/Unity_Reference_Only_License
 // 
