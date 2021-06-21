@@ -1,7 +1,6 @@
 ﻿// Collected and expanded upon to by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
 using UnityEngine;
-using static Freya.Mathfs;
 
 namespace Freya {
 

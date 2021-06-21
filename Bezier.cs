@@ -78,7 +78,6 @@ namespace Freya {
 		}
 	}
 
-
 	// Base properties - Points, Derivatives & Tangents
 
 	#region Point
@@ -664,103 +663,183 @@ namespace Freya {
 	public partial struct BezierCubic2D {
 		/// <summary>Returns the (approximate) point on the curve closest to the input point</summary>
 		/// <param name="point">The point to project against the curve</param>
-		/// <param name="accuracy">How many iterations to run for the initial guess and the refinement iterations, respectively. Higher numbers are more precise but more expensive to calculate</param>
-		public Vector2 ProjectPoint( Vector2 point, int accuracy = 16 ) => ProjectPoint( point, out _, accuracy );
+		/// <param name="initialSubdivisions">Recommended range: [8-32]. More subdivisions will be more accurate, but more expensive.
+		/// This is how many subdivisions to split the curve into, to find candidates for the closest point.
+		/// If your curves are complex, you might need to use around 16 subdivisions.
+		/// If they are usually very simple, then around 8 subdivisions is likely fine</param>
+		/// <param name="refinementIterations">Recommended range: [3-6]. More iterations will be more accurate, but more expensive.
+		/// This is how many times to refine the initial guesses, using Newton's method. This converges rapidly, so high numbers are generally not necessary</param>
+		public Vector2 ProjectPoint( Vector2 point, int initialSubdivisions = 16, int refinementIterations = 4 ) => ProjectPoint( point, out _, initialSubdivisions, refinementIterations );
+
+		struct PointProjectSample {
+			public float t;
+			public float distDeltaSq;
+			public Vector2 f;
+			public Vector2 fp;
+		}
+
+		static PointProjectSample[] pointProjectGuesses = { default, default, default };
 
 		/// <summary>Returns the (approximate) point on the curve closest to the input point</summary>
 		/// <param name="point">The point to project against the curve</param>
 		/// <param name="t">The t-value at the projected point on the curve</param>
-		/// <param name="accuracy">How many iterations to run for the initial guess and the refinement iterations, respectively. Higher numbers are more precise but more expensive to calculate</param>
-		public Vector2 ProjectPoint( Vector2 point, out float t, int accuracy = 16 ) {
-			accuracy = accuracy.AtLeast( 3 );
-			float sqDistStart = Vector2.SqrMagnitude( point - p0 );
-			float sqDistEnd = Vector2.SqrMagnitude( point - p3 );
+		/// <param name="initialSubdivisions">Recommended range: [8-32]. More subdivisions will be more accurate, but more expensive.
+		/// This is how many subdivisions to split the curve into, to find candidates for the closest point.
+		/// If your curves are complex, you might need to use around 16 subdivisions.
+		/// If they are usually very simple, then around 8 subdivisions is likely fine</param>
+		/// <param name="refinementIterations">Recommended range: [3-6]. More iterations will be more accurate, but more expensive.
+		/// This is how many times to refine the initial guesses, using Newton's method. This converges rapidly, so high numbers are generally not necessary</param>
+		public Vector2 ProjectPoint( Vector2 point, out float t, int initialSubdivisions = 16, int refinementIterations = 4 ) {
+			// define a bezier relative to the test point
+			BezierCubic2D bez = new BezierCubic2D( p0 - point, p1 - point, p2 - point, p3 - point );
 
-			Vector2 ptNearest = sqDistStart < sqDistEnd ? p0 : p3;
-			float tNearest = sqDistStart < sqDistEnd ? 0 : 1;
-			float sqDistNearest = Mathf.Min( sqDistStart, sqDistEnd );
+			PointProjectSample SampleDistSqDelta( float tSmp ) {
+				PointProjectSample s = new PointProjectSample { t = tSmp };
+				( s.f, s.fp ) = bez.GetPointAndDerivative( tSmp );
+				s.distDeltaSq = Vector2.Dot( s.f, s.fp );
+				return s;
+			}
 
-			void TestTvalue( float tTest, ref BezierCubic2D bez ) {
-				Vector2 curvePt = bez.GetPoint( tTest );
-				float sqDist = Vector2.SqrMagnitude( point - curvePt );
-				if( sqDist < sqDistNearest ) {
-					sqDistNearest = sqDist;
-					tNearest = tTest;
-					ptNearest = curvePt;
+
+			// find initial candidates
+			int candidatesFound = 0;
+			PointProjectSample prevSmp = SampleDistSqDelta( 0 );
+
+			for( int i = 1; i < initialSubdivisions; i++ ) {
+				float ti = i / ( initialSubdivisions - 1f );
+				PointProjectSample smp = SampleDistSqDelta( ti );
+				if( Sign( smp.distDeltaSq ) != Sign( prevSmp.distDeltaSq ) ) {
+					pointProjectGuesses[candidatesFound++] = SampleDistSqDelta( ( prevSmp.t + smp.t ) / 2 );
+					if( candidatesFound == 3 ) break; // no more than three possible candidates because of the polynomial degree
+				}
+
+				prevSmp = smp;
+			}
+
+			// refine each guess w. Newton-Raphson iterations
+			void Refine( ref PointProjectSample smp ) {
+				Vector2 fpp = bez.GetSecondDerivative( smp.t );
+				float tNew = smp.t - Vector2.Dot( smp.f, smp.fp ) / ( Vector2.Dot( smp.f, fpp ) + Vector2.Dot( smp.fp, smp.fp ) );
+				smp = SampleDistSqDelta( tNew );
+			}
+
+			for( int p = 0; p < candidatesFound; p++ )
+				for( int i = 0; i < refinementIterations; i++ )
+					Refine( ref pointProjectGuesses[p] );
+
+			// Now find closest. First include the endpoints
+			float sqDist0 = bez.p0.sqrMagnitude; // include endpoints
+			float sqDist1 = bez.p3.sqrMagnitude;
+			bool firstClosest = sqDist0 < sqDist1;
+			float tClosest = firstClosest ? 0 : 1;
+			Vector2 ptClosest = firstClosest ? p0 : p3;
+			float distSqClosest = firstClosest ? sqDist0 : sqDist1;
+
+			// then check internal roots
+			for( int i = 0; i < candidatesFound; i++ ) {
+				float pSqmag = pointProjectGuesses[i].f.sqrMagnitude;
+				if( pSqmag < distSqClosest ) {
+					distSqClosest = pSqmag;
+					tClosest = pointProjectGuesses[i].t;
+					ptClosest = pointProjectGuesses[i].f + point;
 				}
 			}
 
-			// find initial guess
-			for( int i = 1; i < accuracy - 1; i++ ) {
-				float tPt = i / ( accuracy - 1f );
-				TestTvalue( tPt, ref this );
-			}
-
-			// binary search-like refinement iterations
-			float stepSize = 0.5f / accuracy;
-			for( int i = 0; i < accuracy; i++ ) {
-				float tFwd = Clamp01( tNearest + stepSize );
-				float tBack = Clamp01( tNearest - stepSize );
-				TestTvalue( tFwd, ref this );
-				TestTvalue( tBack, ref this );
-				stepSize *= 0.5f;
-			}
-
-			t = tNearest;
-			return ptNearest;
+			t = tClosest;
+			return ptClosest;
 		}
 
 	}
 
 	public partial struct BezierCubic3D {
+
 		/// <summary>Returns the (approximate) point on the curve closest to the input point</summary>
 		/// <param name="point">The point to project against the curve</param>
-		/// <param name="accuracy">How many iterations to run for the initial guess and the refinement iterations, respectively. Higher numbers are more precise but more expensive to calculate</param>
-		public Vector3 ProjectPoint( Vector3 point, int accuracy = 16 ) => ProjectPoint( point, out _, accuracy );
+		/// <param name="initialSubdivisions">Recommended range: [8-32]. More subdivisions will be more accurate, but more expensive.
+		/// This is how many subdivisions to split the curve into, to find candidates for the closest point.
+		/// If your curves are complex, you might need to use around 16 subdivisions.
+		/// If they are usually very simple, then around 8 subdivisions is likely fine</param>
+		/// <param name="refinementIterations">Recommended range: [3-6]. More iterations will be more accurate, but more expensive.
+		/// This is how many times to refine the initial guesses, using Newton's method. This converges rapidly, so high numbers are generally not necessary</param>
+		public Vector3 ProjectPoint( Vector3 point, int initialSubdivisions = 16, int refinementIterations = 4 ) => ProjectPoint( point, out _, initialSubdivisions, refinementIterations );
+
+		struct PointProjectSample {
+			public float t;
+			public float distDeltaSq;
+			public Vector3 f;
+			public Vector3 fp;
+		}
+
+		static PointProjectSample[] pointProjectGuesses = { default, default, default };
 
 		/// <summary>Returns the (approximate) point on the curve closest to the input point</summary>
 		/// <param name="point">The point to project against the curve</param>
 		/// <param name="t">The t-value at the projected point on the curve</param>
-		/// <param name="accuracy">How many iterations to run for the initial guess and the refinement iterations, respectively. Higher numbers are more precise but more expensive to calculate</param>
-		public Vector3 ProjectPoint( Vector3 point, out float t, int accuracy = 16 ) {
-			accuracy = accuracy.AtLeast( 3 );
-			float sqDistStart = Vector3.SqrMagnitude( point - p0 );
-			float sqDistEnd = Vector3.SqrMagnitude( point - p3 );
+		/// <param name="initialSubdivisions">Recommended range: [8-32]. More subdivisions will be more accurate, but more expensive.
+		/// This is how many subdivisions to split the curve into, to find candidates for the closest point.
+		/// If your curves are complex, you might need to use around 16 subdivisions.
+		/// If they are usually very simple, then around 8 subdivisions is likely fine</param>
+		/// <param name="refinementIterations">Recommended range: [3-6]. More iterations will be more accurate, but more expensive.
+		/// This is how many times to refine the initial guesses, using Newton's method. This converges rapidly, so high numbers are generally not necessary</param>
+		public Vector3 ProjectPoint( Vector3 point, out float t, int initialSubdivisions = 16, int refinementIterations = 4 ) {
+			// define a bezier relative to the test point
+			BezierCubic3D bez = new BezierCubic3D( p0 - point, p1 - point, p2 - point, p3 - point );
 
-			Vector3 ptNearest = sqDistStart < sqDistEnd ? p0 : p3;
-			float tNearest = sqDistStart < sqDistEnd ? 0 : 1;
-			float sqDistNearest = Mathf.Min( sqDistStart, sqDistEnd );
+			PointProjectSample SampleDistSqDelta( float tSmp ) {
+				PointProjectSample s = new PointProjectSample { t = tSmp };
+				( s.f, s.fp ) = bez.GetPointAndDerivative( tSmp );
+				s.distDeltaSq = Vector3.Dot( s.f, s.fp );
+				return s;
+			}
 
-			void TestTvalue( float tTest, ref BezierCubic3D bez ) {
-				Vector3 curvePt = bez.GetPoint( tTest );
-				float sqDist = Vector3.SqrMagnitude( point - curvePt );
-				if( sqDist < sqDistNearest ) {
-					sqDistNearest = sqDist;
-					tNearest = tTest;
-					ptNearest = curvePt;
+
+			// find initial candidates
+			int candidatesFound = 0;
+			PointProjectSample prevSmp = SampleDistSqDelta( 0 );
+
+			for( int i = 1; i < initialSubdivisions; i++ ) {
+				float ti = i / ( initialSubdivisions - 1f );
+				PointProjectSample smp = SampleDistSqDelta( ti );
+				if( Sign( smp.distDeltaSq ) != Sign( prevSmp.distDeltaSq ) ) {
+					pointProjectGuesses[candidatesFound++] = SampleDistSqDelta( ( prevSmp.t + smp.t ) / 2 );
+					if( candidatesFound == 3 ) break; // no more than three possible candidates because of the polynomial degree
+				}
+
+				prevSmp = smp;
+			}
+
+			// refine each guess w. Newton-Raphson iterations
+			void Refine( ref PointProjectSample smp ) {
+				Vector3 fpp = bez.GetSecondDerivative( smp.t );
+				float tNew = smp.t - Vector3.Dot( smp.f, smp.fp ) / ( Vector3.Dot( smp.f, fpp ) + Vector3.Dot( smp.fp, smp.fp ) );
+				smp = SampleDistSqDelta( tNew );
+			}
+
+			for( int p = 0; p < candidatesFound; p++ )
+				for( int i = 0; i < refinementIterations; i++ )
+					Refine( ref pointProjectGuesses[p] );
+
+			// Now find closest. First include the endpoints
+			float sqDist0 = bez.p0.sqrMagnitude; // include endpoints
+			float sqDist1 = bez.p3.sqrMagnitude;
+			bool firstClosest = sqDist0 < sqDist1;
+			float tClosest = firstClosest ? 0 : 1;
+			Vector3 ptClosest = firstClosest ? p0 : p3;
+			float distSqClosest = firstClosest ? sqDist0 : sqDist1;
+
+			// then check internal roots
+			for( int i = 0; i < candidatesFound; i++ ) {
+				float pSqmag = pointProjectGuesses[i].f.sqrMagnitude;
+				if( pSqmag < distSqClosest ) {
+					distSqClosest = pSqmag;
+					tClosest = pointProjectGuesses[i].t;
+					ptClosest = pointProjectGuesses[i].f + point;
 				}
 			}
 
-			// find initial guess
-			for( int i = 1; i < accuracy - 1; i++ ) {
-				float tPt = i / ( accuracy - 1f );
-				TestTvalue( tPt, ref this );
-			}
-
-			// binary search-like refinement iterations
-			float stepSize = 0.5f / accuracy;
-			for( int i = 0; i < accuracy; i++ ) {
-				float tFwd = Clamp01( tNearest + stepSize );
-				float tBack = Clamp01( tNearest - stepSize );
-				TestTvalue( tFwd, ref this );
-				TestTvalue( tBack, ref this );
-				stepSize *= 0.5f;
-			}
-
-			t = tNearest;
-			return ptNearest;
+			t = tClosest;
+			return ptClosest;
 		}
-
 
 	}
 
@@ -949,7 +1028,7 @@ namespace Freya {
 	}
 
 	#endregion
-	
+
 	#region Derivative & Second Derivative combo
 
 	public partial struct BezierCubic2D {
