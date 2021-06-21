@@ -656,6 +656,57 @@ namespace Freya {
 	}
 
 	#endregion
+	// Combo functions to save performance
+
+	#region Point & Tangent combo
+
+	public partial struct BezierCubic2D {
+		/// <summary>Returns the point and the tangent direction at the given t-value on the curve. This is more performant than calling GetPoint and GetTangent separately</summary>
+		public (Vector2, Vector2) GetPointAndTangent( float t ) { // GetPoint(t) and GetTangent(t) unrolled shared code
+			float ax = p0.x + ( p1.x - p0.x ) * t; // a = lerp( p0, p1, t );
+			float ay = p0.y + ( p1.y - p0.y ) * t;
+			float bx = p1.x + ( p2.x - p1.x ) * t; // b = lerp( p1, p2, t );
+			float by = p1.y + ( p2.y - p1.y ) * t;
+			float cx = p2.x + ( p3.x - p2.x ) * t; // c = lerp( p2, p3, t );
+			float cy = p2.y + ( p3.y - p2.y ) * t;
+			float dx = ax + ( bx - ax ) * t; // d = lerp( a, b, t );
+			float dy = ay + ( by - ay ) * t;
+			float ex = bx + ( cx - bx ) * t; // e = lerp( b, c, t );
+			float ey = by + ( cy - by ) * t;
+			return (
+				new Vector2( dx + ( ex - dx ) * t, dy + ( ey - dy ) * t ), // point
+				new Vector2( ex - dx, ey - dy ).normalized // tangent. factor of 3 not needed
+			);
+		}
+	}
+
+	public partial struct BezierCubic3D {
+		/// <summary>Returns the point and the tangent direction at the given t-value on the curve. This is more performant than calling GetPoint and GetTangent separately</summary>
+		public (Vector3, Vector3) GetPointAndTangent( float t ) { // GetPoint(t) and GetTangent(t) unrolled shared code
+			float ax = p0.x + ( p1.x - p0.x ) * t; // a = lerp( p0, p1, t );
+			float ay = p0.y + ( p1.y - p0.y ) * t;
+			float az = p0.z + ( p1.z - p0.z ) * t;
+			float bx = p1.x + ( p2.x - p1.x ) * t; // b = lerp( p1, p2, t );
+			float by = p1.y + ( p2.y - p1.y ) * t;
+			float bz = p1.z + ( p2.z - p1.z ) * t;
+			float cx = p2.x + ( p3.x - p2.x ) * t; // c = lerp( p2, p3, t );
+			float cy = p2.y + ( p3.y - p2.y ) * t;
+			float cz = p2.z + ( p3.z - p2.z ) * t;
+			float dx = ax + ( bx - ax ) * t; // d = lerp( a, b, t );
+			float dy = ay + ( by - ay ) * t;
+			float dz = az + ( bz - az ) * t;
+			float ex = bx + ( cx - bx ) * t; // e = lerp( b, c, t );
+			float ey = by + ( cy - by ) * t;
+			float ez = bz + ( cz - bz ) * t;
+			return (
+				new Vector3( dx + ( ex - dx ) * t, dy + ( ey - dy ) * t, dz + ( ez - dz ) * t ), // point
+				new Vector3( ex - dx, ey - dy, ez - dz ).normalized // tangent. factor of 3 not needed
+			);
+		}
+	}
+
+	#endregion
+
 	#region Point & Derivative combo
 
 	public partial struct BezierCubic2D {
@@ -904,6 +955,7 @@ namespace Freya {
 	}
 
 	#endregion
+
 	// Misc esoteric mathy stuff
 
 	#region Polynomial Factors
