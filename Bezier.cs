@@ -700,7 +700,6 @@ namespace Freya {
 				return s;
 			}
 
-
 			// find initial candidates
 			int candidatesFound = 0;
 			PointProjectSample prevSmp = SampleDistSqDelta( 0 );
@@ -791,7 +790,6 @@ namespace Freya {
 				s.distDeltaSq = Vector3.Dot( s.f, s.fp );
 				return s;
 			}
-
 
 			// find initial candidates
 			int candidatesFound = 0;
