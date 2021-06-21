@@ -317,6 +317,87 @@ namespace Freya {
 	}
 
 	#endregion
+
+	#region Tangent
+
+	public partial struct BezierCubic2D {
+		/// <summary>Returns the normalized tangent direction at the given t-value on the curve</summary>
+		public Vector2 GetTangent( float t ) => GetDerivative( t ).normalized;
+	}
+
+	public partial struct BezierCubic3D {
+		/// <summary>Returns the normalized tangent direction at the given t-value on the curve</summary>
+		public Vector3 GetTangent( float t ) => GetDerivative( t ).normalized;
+	}
+
+	#endregion
+
+	// Curvature & Torsion
+
+	#region Curvature
+
+	public partial struct BezierCubic2D {
+		/// <summary>Returns the signed curvature at the given t-value on the curve, in radians per distance unit (equivalent to the reciprocal radius of the osculating circle)</summary>
+		public float GetCurvature( float t ) {
+			( Vector2 vel, Vector2 acc ) = GetFirstTwoDerivatives( t );
+			float dMag = vel.magnitude;
+			return Determinant( vel, acc ) / ( dMag * dMag * dMag );
+		}
+	}
+
+	public partial struct BezierCubic3D {
+		/// <summary>Returns a pseudovector at the given t-value on the curve, where the magnitude is the curvature in radians per distance unit, and the direction is the axis of curvature</summary>
+		public Vector3 GetCurvature( float t ) {
+			( Vector3 vel, Vector3 acc ) = GetFirstTwoDerivatives( t );
+			float dMag = vel.magnitude;
+			return Vector3.Cross( vel, acc ) / ( dMag * dMag * dMag );
+		}
+	}
+
+	#endregion
+
+	#region Torsion (3D only)
+
+	public partial struct BezierCubic3D {
+		/// <summary>Returns the torsion at the given t-value on the curve, in radians per distance unit</summary>
+		public float GetTorsion( float t ) {
+			( Vector3 vel, Vector3 acc, Vector3 jerk ) = GetAllThreeDerivatives( t );
+			Vector3 cVector = Vector3.Cross( vel, acc );
+			return Vector3.Dot( cVector, jerk ) / cVector.sqrMagnitude;
+		}
+	}
+
+	#endregion
+
+	#region Osculating Circle
+
+	public partial struct BezierCubic2D {
+		/// <summary>Returns the osculating circle at the given t-value in the curve, if possible. Osculating circles are defined everywhere except on inflection points, where curvature is 0</summary>
+		public Circle GetOsculatingCircle( float t ) {
+			( Vector2 point, Vector2 delta, Vector2 deltaDelta ) = GetPointAndFirstTwoDerivatives( t );
+			float dMag = delta.magnitude;
+			float curvature = Determinant( delta, deltaDelta ) / ( dMag * dMag * dMag );
+			Vector2 tangent = delta.normalized;
+			Vector2 normal = tangent.Rotate90CCW();
+			float signedRadius = 1f / curvature;
+			return new Circle( point + normal * signedRadius, Abs( signedRadius ) );
+		}
+	}
+
+	public partial struct BezierCubic3D {
+		/// <summary>Returns the osculating circle at the given t-value in the curve, if possible. Osculating circles are defined everywhere except on inflection points, where curvature is 0</summary>
+		public Circle3D GetOsculatingCircle( float t ) {
+			( Vector3 point, Vector3 vel, Vector3 acc ) = GetPointAndFirstTwoDerivatives( t );
+			float dMag = vel.magnitude;
+			Vector3 curvatureVector = Vector3.Cross( vel, acc ) / ( dMag * dMag * dMag );
+			( Vector3 axis, float curvature ) = curvatureVector.GetDirAndMagnitude();
+			Vector3 normal = Vector3.Cross( vel, Vector3.Cross( acc, vel ) ).normalized;
+			float signedRadius = 1f / curvature;
+			return new Circle3D( point + normal * signedRadius, axis, Abs( signedRadius ) );
+		}
+	}
+
+	#endregion
 	#region Point & Derivative combo
 
 	public partial struct BezierCubic2D {
