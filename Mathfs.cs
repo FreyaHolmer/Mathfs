@@ -166,7 +166,7 @@ namespace Freya {
 		public static float Eerp( float a, float b, float t ) => Mathf.Pow( a, 1 - t ) * Mathf.Pow( b, t );
 		public static float InverseEerp( float a, float b, float v ) => Mathf.Log( a / v ) / Mathf.Log( a / b );
 
-		public static Vector2 Lerp( Vector2 a, Vector2 b, Vector2 t ) => new Vector2( Mathf.Lerp( a.x, b.x, t.x ), Mathf.Lerp( a.y, b.y, t.y ) );
+		public static Vector2 Lerp( Vector2 a, Vector2 b, Vector2 t ) => new Vector2( Lerp( a.x, b.x, t.x ), Lerp( a.y, b.y, t.y ) );
 		public static Vector2 InverseLerp( Vector2 a, Vector2 b, Vector2 v ) => ( v - a ) / ( b - a );
 
 		public static Vector2 Remap( Rect iRect, Rect oRect, Vector2 iPos ) {
