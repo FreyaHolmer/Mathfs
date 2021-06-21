@@ -1,4 +1,4 @@
-﻿// collected and expended upon by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
+﻿// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
 using UnityEngine;
 

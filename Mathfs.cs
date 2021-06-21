@@ -5,7 +5,7 @@
 // Collected and expanded upon to by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
 using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 using Uei = UnityEngine.Internal;
 using System.Linq; // used for arbitrary count min/max functions, so it's safe and won't allocate garbage don't worry~
@@ -320,58 +320,127 @@ namespace Freya {
 		}
 
 		// Root Finding
-		/// <summary>Finds the root (x-intercept) of a linear equation of the form ax+b</summary>
-		public static float GetLinearRoot( float a, float b ) => -b / a;
-
-		/// <summary>Tries to find the root (x-intercept) of a linear equation of the form ax+b</summary>
-		public static bool TryGetLinearRoot( float a, float b, out float root ) {
-			if( Mathf.Abs( a ) > 0.00001f ) {
-				root = -b / a;
-				return true;
-			}
-
-			root = default;
-			return false;
-		}
-
 		public enum PolynomialType {
 			Constant,
 			Linear,
-			Quadratic
+			Quadratic,
+			Cubic
 		}
 
-		/// <summary>Get the net polynomial type, accounting for values very close to 0, of a polynomial of the form ax²+bx+c</summary>
-		public static PolynomialType GetPolynomialType( float a, float b, float c ) {
-			if( Mathf.Abs( a ) < 0.00001f )
-				return Mathf.Abs( b ) < 0.00001f ? PolynomialType.Constant : PolynomialType.Linear;
-			return PolynomialType.Quadratic;
+		static bool FactorAlmost0( float v ) => v.Abs() < 0.00001f;
+
+		/// <summary>Given ax³+bx²+cx+d, returns the net polynomial type/degree, accounting for values very close to 0</summary>
+		public static PolynomialType GetPolynomialType( float a, float b, float c, float d ) => FactorAlmost0( a ) ? GetPolynomialType( b, c, d ) : PolynomialType.Cubic;
+
+		/// <summary>Given ax²+bx+c, returns the net polynomial type/degree, accounting for values very close to 0</summary>
+		public static PolynomialType GetPolynomialType( float a, float b, float c ) => FactorAlmost0( a ) ? GetPolynomialType( b, c ) : PolynomialType.Quadratic;
+
+		/// <summary>Given ax+b, returns the net polynomial type/degree, accounting for values very close to 0</summary>
+		public static PolynomialType GetPolynomialType( float a, float b ) => FactorAlmost0( a ) ? PolynomialType.Constant : PolynomialType.Linear;
+
+		/// <summary>Returns the root/solution of ax+b = 0. Returns null if there is no root</summary>
+		public static float? GetLinearRoots( float a, float b ) {
+			if( GetPolynomialType( a, b ) == PolynomialType.Constant )
+				return null;
+			return -b / a;
 		}
 
-		/// <summary>Finds the roots, if any, of a quadratic polynomial of the form ax²+bx+c</summary>
-		public static List<float> GetQuadraticRoots( float a, float b, float c ) {
-			List<float> roots = new List<float>();
-
+		/// <summary>Returns the roots/solutions of ax²+bx+c = 0. There's either 0, 1 or 2 roots, filled in left to right among the return values</summary>
+		public static ResultsMax2<float> GetQuadraticRoots( float a, float b, float c ) {
 			switch( GetPolynomialType( a, b, c ) ) {
-				case PolynomialType.Constant:
-					break; // either no roots or infinite roots if c == 0
-				case PolynomialType.Linear:
-					roots.Add( -c / b );
-					break;
-				case PolynomialType.Quadratic:
-					float rootContent = b * b - 4 * a * c;
-					if( Mathf.Abs( rootContent ) < 0.0001f ) {
-						roots.Add( -b / ( 2 * a ) ); // two equivalent solutions at one point
-					} else if( rootContent >= 0 ) {
-						float root = Mathf.Sqrt( rootContent );
-						roots.Add( ( -b + root ) / ( 2 * a ) ); // crosses at two points
-						roots.Add( ( -b - root ) / ( 2 * a ) );
-					} // else no roots
+				case PolynomialType.Constant:  return default; // either no roots or infinite roots if c == 0
+				case PolynomialType.Linear:    return new ResultsMax2<float>( SolveLinearRoot( b, c ) );
+				case PolynomialType.Quadratic: return SolveQuadraticRoots( a, b, c );
+				default:                       throw new InvalidEnumArgumentException();
+			}
+		}
 
-					break;
+		/// <summary>Returns the roots/solutions of ax³+bx²+cx+d = 0. There's either 0, 1, 2 or 3 roots, filled in left to right among the return values</summary>
+		public static ResultsMax3<float> GetCubicRoots( float a, float b, float c, float d ) {
+			switch( GetPolynomialType( a, b, c, d ) ) {
+				case PolynomialType.Constant:  return default; // either no roots or infinite roots if c == 0
+				case PolynomialType.Linear:    return new ResultsMax3<float>( SolveLinearRoot( c, d ) );
+				case PolynomialType.Quadratic: return SolveQuadraticRoots( b, c, d );
+				case PolynomialType.Cubic:     return SolveCubicRoots( a, b, c, d );
+				default:                       throw new InvalidEnumArgumentException();
+			}
+		}
+
+		#region Internal root solvers
+
+		// These functions lack safety checks (division by zero etc.) for lower degree equivalency - they presume "a" is always nonzero.
+		// These are private to avoid people mistaking them for the more stable/safe functions you are more likely to want to use
+
+		static float SolveLinearRoot( float a, float b ) => -b / a;
+
+		static ResultsMax2<float> SolveQuadraticRoots( float a, float b, float c ) {
+			float rootContent = b * b - 4 * a * c;
+			if( FactorAlmost0( rootContent ) )
+				return new ResultsMax2<float>( -b / ( 2 * a ) ); // two equivalent solutions at one point
+
+			if( rootContent >= 0 ) {
+				float root = Sqrt( rootContent );
+				float r0 = ( -b - root ) / ( 2 * a ); // crosses at two points
+				float r1 = ( -b + root ) / ( 2 * a );
+				return new ResultsMax2<float>( Min( r0, r1 ), Max( r0, r1 ) );
 			}
 
-			return roots;
+			return default; // no roots
 		}
+
+		static ResultsMax3<float> SolveCubicRoots( float a, float b, float c, float d ) {
+			// first, depress the cubic to make it easier to solve
+			float p = ( 3 * a * c - b * b ) / ( 3 * a * a );
+			float q = ( 2 * b * b * b - 9 * a * b * c + 27 * a * a * d ) / ( 27 * a * a * a );
+
+			ResultsMax3<float> dpr = SolveDepressedCubicRoots( p, q );
+			
+			// we now have the roots of the depressed cubic, now convert back to the normal cubic
+			float UndepressRoot( float r ) => r - b / ( 3 * a );
+			switch( dpr.count ) {
+				case 1:  return new ResultsMax3<float>( UndepressRoot( dpr.a ) );
+				case 2:  return new ResultsMax3<float>( UndepressRoot( dpr.a ), UndepressRoot( dpr.b ) );
+				case 3:  return new ResultsMax3<float>( UndepressRoot( dpr.a ), UndepressRoot( dpr.b ), UndepressRoot( dpr.c ) );
+				default: return default;
+			}
+		}
+
+		// t³+pt+q = 0
+		static ResultsMax3<float> SolveDepressedCubicRoots( float p, float q ) {
+			if( FactorAlmost0( p ) ) // triple root - one solution. solve x³+q = 0 => x = cr(-q)
+				return new ResultsMax3<float>( Cbrt( -q ) );
+			float discriminant = 4 * p * p * p + 27 * q * q;
+			if( discriminant < 0.00001 ) { // two or three roots guaranteed, use trig solution
+				float pre = 2 * Sqrt( -p / 3 );
+				float acosInner = ( ( 3 * q ) / ( 2 * p ) ) * Sqrt( -3 / p );
+
+				float GetRoot( int k ) => pre * Cos( ( 1f / 3f ) * Acos( acosInner.ClampNeg1to1() ) - ( TAU / 3f ) * k );
+				// if acos hits 0 or TAU/2, the offsets will have the same value,
+				// which means we have a double root plus one regular root on our hands
+				if( acosInner >= 0.9999f )
+					return new ResultsMax3<float>( GetRoot( 0 ), GetRoot( 2 ) ); // two roots - one single and one double root
+				if( acosInner <= -0.9999f )
+					return new ResultsMax3<float>( GetRoot( 1 ), GetRoot( 2 ) ); // two roots - one single and one double root
+				return new ResultsMax3<float>( GetRoot( 0 ), GetRoot( 1 ), GetRoot( 2 ) ); // three roots
+			}
+
+			if( discriminant > 0 && p < 0 ) { // one root
+				float coshInner = ( 1f / 3f ) * Acosh( ( -3 * q.Abs() / ( 2 * p ) ) * Sqrt( -3 / p ) );
+				float r = -2 * Sign( q ) * Sqrt( -p / 3 ) * Cosh( coshInner );
+				return new ResultsMax3<float>( r );
+			}
+
+			if( p > 0 ) { // one root
+				float sinhInner = ( 1f / 3f ) * Asinh( ( ( 3 * q ) / ( 2 * p ) ) * Sqrt( 3 / p ) );
+				float r = ( -2 * Sqrt( p / 3 ) ) * Sinh( sinhInner );
+				return new ResultsMax3<float>( r );
+			}
+
+			// no roots
+			return default;
+		}
+
+		#endregion
 
 
 		// coordinate shenanigans
