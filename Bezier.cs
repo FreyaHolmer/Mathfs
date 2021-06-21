@@ -564,6 +564,56 @@ namespace Freya {
 	}
 
 	#endregion
+
+	// Whole-curve properties
+
+	#region Bounds
+
+	public partial struct BezierCubic2D {
+		/// <summary>Returns the tight axis-aligned bounds of the curve</summary>
+		public Rect GetBounds() {
+			// first and last points are always included
+			Vector2 min = Vector2.Min( p0, p3 );
+			Vector2 max = Vector2.Max( p0, p3 );
+
+			void Encapsulate( int axis, float value ) {
+				min[axis] = Min( min[axis], value );
+				max[axis] = Max( max[axis], value );
+			}
+
+			for( int i = 0; i < 2; i++ ) {
+				ResultsMax2<float> extrema = GetLocalExtremaPoints( i );
+				for( int j = 0; j < extrema.count; j++ )
+					Encapsulate( i, extrema[j] );
+			}
+
+			return new Rect( min.x, min.y, max.x - min.x, max.y - min.y );
+		}
+	}
+
+	public partial struct BezierCubic3D {
+		/// <summary>Returns the tight axis-aligned bounds of the curve</summary>
+		public Bounds GetBounds() {
+			// first and last points are always included
+			Vector3 min = Vector3.Min( p0, p3 );
+			Vector3 max = Vector3.Max( p0, p3 );
+
+			void Encapsulate( int axis, float value ) {
+				min[axis] = Min( min[axis], value );
+				max[axis] = Max( max[axis], value );
+			}
+
+			for( int i = 0; i < 3; i++ ) {
+				ResultsMax2<float> extrema = GetLocalExtremaPoints( i );
+				for( int j = 0; j < extrema.count; j++ )
+					Encapsulate( i, extrema[j] );
+			}
+
+			return new Bounds( ( max + min ) * 0.5f, max - min );
+		}
+	}
+
+	#endregion
 	#region Point & Derivative combo
 
 	public partial struct BezierCubic2D {
