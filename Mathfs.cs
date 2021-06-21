@@ -240,6 +240,19 @@ namespace Freya {
 			return output;
 		}
 
+		// Weighted sums
+		public static float WeightedSum( Vector2 w, float a, float b ) => a * w.x + b * w.y;
+		public static float WeightedSum( Vector3 w, float a, float b, float c ) => a * w.x + b * w.y + c * w.z;
+		public static float WeightedSum( Vector4 w, float a, float b, float c, float d ) => a * w.x + b * w.y + c * w.z + d * w.w;
+		public static Vector2 WeightedSum( Vector2 w, Vector2 a, Vector2 b ) => a * w.x + b * w.y;
+		public static Vector2 WeightedSum( Vector3 w, Vector2 a, Vector2 b, Vector2 c ) => a * w.x + b * w.y + c * w.z;
+		public static Vector2 WeightedSum( Vector4 w, Vector2 a, Vector2 b, Vector2 c, Vector2 d ) => a * w.x + b * w.y + c * w.z + d * w.w;
+		public static Vector3 WeightedSum( Vector3 w, Vector3 a, Vector3 b ) => a * w.x + b * w.y;
+		public static Vector3 WeightedSum( Vector3 w, Vector3 a, Vector3 b, Vector3 c ) => a * w.x + b * w.y + c * w.z;
+		public static Vector3 WeightedSum( Vector4 w, Vector3 a, Vector3 b, Vector3 c, Vector3 d ) => a * w.x + b * w.y + c * w.z + d * w.w;
+		public static Vector4 WeightedSum( Vector4 w, Vector4 a, Vector4 b ) => a * w.x + b * w.y;
+		public static Vector4 WeightedSum( Vector4 w, Vector4 a, Vector4 b, Vector4 c ) => a * w.x + b * w.y + c * w.z;
+		public static Vector4 WeightedSum( Vector4 w, Vector4 a, Vector4 b, Vector4 c, Vector4 d ) => a * w.x + b * w.y + c * w.z + d * w.w;
 
 		// Vector math
 		public static float Determinant /*or Cross*/( Vector2 a, Vector2 b ) => a.x * b.y - a.y * b.x; // 2D "cross product"
