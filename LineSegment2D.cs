@@ -3,6 +3,7 @@
 using UnityEngine;
 
 namespace Freya {
+
 	public struct LineSegment2D {
 
 		public Vector2 start;
@@ -17,6 +18,15 @@ namespace Freya {
 
 		/// <summary>Calculates the length</summary>
 		public float Length => Vector2.Distance( start, end );
+
+		/// <summary>Calculates the length squared (faster than calculating the actual length)</summary>
+		public float LengthSquared {
+			get {
+				float dx = end.x - start.x;
+				float dy = end.y - start.y;
+				return dx * dx + dy * dy;
+			}
+		}
 
 		/// <summary>Returns the perpendicular bisector. Note: the returned normal is not normalized to save performance. Use Bisector() if you want to make sure it is normalized</summary>
 		public Line2D BisectorFast() => GetBisectorFast( start, end );
@@ -41,4 +51,5 @@ namespace Freya {
 		}
 
 	}
+
 }
