@@ -16,8 +16,8 @@ namespace Freya {
 			this.radius = radius;
 		}
 
-		float Area => RadiusToArea( radius );
-		float Circumference => RadiusToCircumference( radius );
+		public float Area => RadiusToArea( radius );
+		public float Circumference => RadiusToCircumference( radius );
 
 		public static float RadiusToArea( float r ) => r * r * ( 0.5f * TAU );
 		public static float AreaToRadius( float area ) => Sqrt( 2 * area / TAU );

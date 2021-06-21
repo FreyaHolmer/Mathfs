@@ -17,8 +17,8 @@ namespace Freya {
 			this.radius = radius;
 		}
 
-		float Area => Circle.RadiusToArea( radius );
-		float Circumference => Circle.RadiusToCircumference( radius );
+		public float Area => Circle.RadiusToArea( radius );
+		public float Circumference => Circle.RadiusToCircumference( radius );
 
 	}
 
