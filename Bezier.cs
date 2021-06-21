@@ -614,6 +614,48 @@ namespace Freya {
 	}
 
 	#endregion
+
+	#region Length
+
+	public partial struct BezierCubic2D {
+		/// <summary>Returns the approximate length of the curve. Higher values are more accurate, but more expensive to calculate</summary>
+		public float GetLength( int accuracy = 8 ) {
+			if( accuracy <= 2 )
+				return ( p0 - p3 ).magnitude;
+
+			float totalDist = 0;
+			Vector2 prev = p0;
+			for( int i = 1; i < accuracy; i++ ) {
+				float t = i / ( accuracy - 1f );
+				Vector2 p = GetPoint( t );
+				totalDist += Vector2.Distance( prev, p );
+				prev = p;
+			}
+
+			return totalDist / accuracy;
+		}
+	}
+
+	public partial struct BezierCubic3D {
+		/// <summary>Returns the approximate length of the curve. Higher values are more accurate, but more expensive to calculate</summary>
+		public float GetLength( int accuracy = 8 ) {
+			if( accuracy <= 2 )
+				return ( p0 - p3 ).magnitude;
+
+			float totalDist = 0;
+			Vector3 prev = p0;
+			for( int i = 1; i < accuracy; i++ ) {
+				float t = i / ( accuracy - 1f );
+				Vector3 p = GetPoint( t );
+				totalDist += Vector3.Distance( prev, p );
+				prev = p;
+			}
+
+			return totalDist / accuracy;
+		}
+	}
+
+	#endregion
 	#region Point & Derivative combo
 
 	public partial struct BezierCubic2D {
