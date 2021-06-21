@@ -656,6 +656,116 @@ namespace Freya {
 	}
 
 	#endregion
+
+	// Point projection & Intersection tests
+
+	#region Project Point
+
+	public partial struct BezierCubic2D {
+		/// <summary>Returns the (approximate) point on the curve closest to the input point</summary>
+		/// <param name="point">The point to project against the curve</param>
+		/// <param name="accuracy">How many iterations to run for the initial guess and the refinement iterations, respectively. Higher numbers are more precise but more expensive to calculate</param>
+		public Vector2 ProjectPoint( Vector2 point, int accuracy = 16 ) => ProjectPoint( point, out _, accuracy );
+
+		/// <summary>Returns the (approximate) point on the curve closest to the input point</summary>
+		/// <param name="point">The point to project against the curve</param>
+		/// <param name="t">The t-value at the projected point on the curve</param>
+		/// <param name="accuracy">How many iterations to run for the initial guess and the refinement iterations, respectively. Higher numbers are more precise but more expensive to calculate</param>
+		public Vector2 ProjectPoint( Vector2 point, out float t, int accuracy = 16 ) {
+			accuracy = accuracy.AtLeast( 3 );
+			float sqDistStart = Vector2.SqrMagnitude( point - p0 );
+			float sqDistEnd = Vector2.SqrMagnitude( point - p3 );
+
+			Vector2 ptNearest = sqDistStart < sqDistEnd ? p0 : p3;
+			float tNearest = sqDistStart < sqDistEnd ? 0 : 1;
+			float sqDistNearest = Mathf.Min( sqDistStart, sqDistEnd );
+
+			void TestTvalue( float tTest, ref BezierCubic2D bez ) {
+				Vector2 curvePt = bez.GetPoint( tTest );
+				float sqDist = Vector2.SqrMagnitude( point - curvePt );
+				if( sqDist < sqDistNearest ) {
+					sqDistNearest = sqDist;
+					tNearest = tTest;
+					ptNearest = curvePt;
+				}
+			}
+
+			// find initial guess
+			for( int i = 1; i < accuracy - 1; i++ ) {
+				float tPt = i / ( accuracy - 1f );
+				TestTvalue( tPt, ref this );
+			}
+
+			// binary search-like refinement iterations
+			float stepSize = 0.5f / accuracy;
+			for( int i = 0; i < accuracy; i++ ) {
+				float tFwd = Clamp01( tNearest + stepSize );
+				float tBack = Clamp01( tNearest - stepSize );
+				TestTvalue( tFwd, ref this );
+				TestTvalue( tBack, ref this );
+				stepSize *= 0.5f;
+			}
+
+			t = tNearest;
+			return ptNearest;
+		}
+
+	}
+
+	public partial struct BezierCubic3D {
+		/// <summary>Returns the (approximate) point on the curve closest to the input point</summary>
+		/// <param name="point">The point to project against the curve</param>
+		/// <param name="accuracy">How many iterations to run for the initial guess and the refinement iterations, respectively. Higher numbers are more precise but more expensive to calculate</param>
+		public Vector3 ProjectPoint( Vector3 point, int accuracy = 16 ) => ProjectPoint( point, out _, accuracy );
+
+		/// <summary>Returns the (approximate) point on the curve closest to the input point</summary>
+		/// <param name="point">The point to project against the curve</param>
+		/// <param name="t">The t-value at the projected point on the curve</param>
+		/// <param name="accuracy">How many iterations to run for the initial guess and the refinement iterations, respectively. Higher numbers are more precise but more expensive to calculate</param>
+		public Vector3 ProjectPoint( Vector3 point, out float t, int accuracy = 16 ) {
+			accuracy = accuracy.AtLeast( 3 );
+			float sqDistStart = Vector3.SqrMagnitude( point - p0 );
+			float sqDistEnd = Vector3.SqrMagnitude( point - p3 );
+
+			Vector3 ptNearest = sqDistStart < sqDistEnd ? p0 : p3;
+			float tNearest = sqDistStart < sqDistEnd ? 0 : 1;
+			float sqDistNearest = Mathf.Min( sqDistStart, sqDistEnd );
+
+			void TestTvalue( float tTest, ref BezierCubic3D bez ) {
+				Vector3 curvePt = bez.GetPoint( tTest );
+				float sqDist = Vector3.SqrMagnitude( point - curvePt );
+				if( sqDist < sqDistNearest ) {
+					sqDistNearest = sqDist;
+					tNearest = tTest;
+					ptNearest = curvePt;
+				}
+			}
+
+			// find initial guess
+			for( int i = 1; i < accuracy - 1; i++ ) {
+				float tPt = i / ( accuracy - 1f );
+				TestTvalue( tPt, ref this );
+			}
+
+			// binary search-like refinement iterations
+			float stepSize = 0.5f / accuracy;
+			for( int i = 0; i < accuracy; i++ ) {
+				float tFwd = Clamp01( tNearest + stepSize );
+				float tBack = Clamp01( tNearest - stepSize );
+				TestTvalue( tFwd, ref this );
+				TestTvalue( tBack, ref this );
+				stepSize *= 0.5f;
+			}
+
+			t = tNearest;
+			return ptNearest;
+		}
+
+
+	}
+
+	#endregion
+
 	#region Intersection Tests (2D only)
 
 	public partial struct BezierCubic2D {
