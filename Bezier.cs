@@ -656,6 +656,90 @@ namespace Freya {
 	}
 
 	#endregion
+	#region Intersection Tests (2D only)
+
+	public partial struct BezierCubic2D {
+
+		// Internal - used by all other intersections
+		private ResultsMax3<float> Intersect( Vector2 origin, Vector2 direction, bool rangeLimited = false, float minRayT = float.NaN, float maxRayT = float.NaN ) {
+			Vector2 p0rel = this.p0 - origin;
+			Vector2 p1rel = this.p1 - origin;
+			Vector2 p2rel = this.p2 - origin;
+			Vector2 p3rel = this.p3 - origin;
+			float y0 = Determinant( p0rel, direction ); // transform bezier point components into the line space y components
+			float y1 = Determinant( p1rel, direction );
+			float y2 = Determinant( p2rel, direction );
+			float y3 = Determinant( p3rel, direction );
+			( float ay, float by, float cy, float dy ) = BezierUtils.GetCubicFactors( y0, y1, y2, y3 );
+			ResultsMax3<float> roots = GetCubicRoots( ay, by, cy, dy ); // t values of the function
+
+
+			float ax = 0, bx = 0, cx = 0, dx = 0;
+			if( rangeLimited ) {
+				// if we're range limited, we need to verify position along the ray/line/lineSegment
+				// and if we do, we need to be able to go from t -> x coord
+				float x0 = Vector2.Dot( p0rel, direction ); // transform bezier point components into the line space x components
+				float x1 = Vector2.Dot( p1rel, direction );
+				float x2 = Vector2.Dot( p2rel, direction );
+				float x3 = Vector2.Dot( p3rel, direction );
+				( ax, bx, cx, dx ) = BezierUtils.GetCubicFactors( x0, x1, x2, x3 );
+			}
+
+			float CurveTtoRayT( float t ) => t * t * t * ax + t * t * bx + t * cx + dx;
+
+			ResultsMax3<float> returnVals = default;
+
+			for( int i = 0; i < roots.count; i++ ) {
+				if( roots[i].Between( 0, 1 ) && ( rangeLimited == false || CurveTtoRayT( roots[i] ).Within( minRayT, maxRayT ) ) )
+					returnVals = returnVals.Add( roots[i] );
+			}
+
+			return returnVals;
+		}
+
+		// Internal - to unpack from curve t values to points
+		private ResultsMax3<Vector2> TtoPoints( ResultsMax3<float> tVals ) {
+			ResultsMax3<Vector2> pts = default;
+			for( int i = 0; i < tVals.count; i++ )
+				pts = pts.Add( GetPoint( tVals[i] ) );
+			return pts;
+		}
+
+
+		public ResultsMax3<float> Intersect( Line2D line ) => Intersect( line.origin, line.dir );
+		public ResultsMax3<float> Intersect( Ray2D ray ) => Intersect( ray.origin, ray.dir, rangeLimited: true, 0, float.MaxValue );
+		public ResultsMax3<float> Intersect( LineSegment2D lineSegment ) => Intersect( lineSegment.start, lineSegment.end - lineSegment.start, rangeLimited: true, 0, lineSegment.LengthSquared );
+
+		public ResultsMax3<Vector2> IntersectionPoints( Line2D line ) => TtoPoints( Intersect( line.origin, line.dir ) );
+		public ResultsMax3<Vector2> IntersectionPoints( Ray2D ray ) => TtoPoints( Intersect( ray.origin, ray.dir, rangeLimited: true, 0, float.MaxValue ) );
+		public ResultsMax3<Vector2> IntersectionPoints( LineSegment2D lineSegment ) => TtoPoints( Intersect( lineSegment.start, lineSegment.end - lineSegment.start, rangeLimited: true, 0, lineSegment.LengthSquared ) );
+
+		public bool Raycast( Ray2D ray, out Vector2 hitPoint, float maxDist = float.MaxValue ) {
+			float closestDist = float.MaxValue;
+			ResultsMax3<Vector2> iPts = IntersectionPoints( ray );
+
+			// find closest point
+			// possible todo: this is a little wasteful since I could refactor the internal intersect one to get t-values instead of recalculating them out here
+			bool didHit = false;
+			Vector2 closestPt = default;
+			for( int i = 0; i < iPts.count; i++ ) {
+				Vector2 pt = iPts[i];
+				float dist = Vector2.Dot( ray.dir, pt - ray.origin );
+				if( dist < closestDist && dist <= maxDist ) {
+					closestDist = dist;
+					closestPt = pt;
+					didHit = true;
+				}
+			}
+
+			hitPoint = closestPt;
+			return didHit;
+		}
+
+	}
+
+	#endregion
+
 	// Combo functions to save performance
 
 	#region Point & Tangent combo
