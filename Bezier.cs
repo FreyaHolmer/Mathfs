@@ -1158,16 +1158,16 @@ namespace Freya {
 		/// <summary>Returns the factors of the derivative polynomials, per-component, in the form at²+bt+c</summary>
 		public (Vector2 a, Vector2 b, Vector2 c) GetDerivativeFactors() {
 			Vector2 a, b, c;
-			( a.x, b.x, c.x ) = BezierUtils.GetCubicDerivativeFactors( p0.x, p1.x, p2.x, p3.x );
-			( a.y, b.y, c.y ) = BezierUtils.GetCubicDerivativeFactors( p0.y, p1.y, p2.y, p3.y );
+			( a.x, b.x, c.x ) = BezierUtils.GetCubicFactorsDerivative( p0.x, p1.x, p2.x, p3.x );
+			( a.y, b.y, c.y ) = BezierUtils.GetCubicFactorsDerivative( p0.y, p1.y, p2.y, p3.y );
 			return ( a, b, c );
 		}
 
 		/// <summary>Returns the factors of the second derivative polynomials, per-component, in the form at+b</summary>
 		public (Vector2 a, Vector2 b) GetSecondDerivativeFactors() {
 			Vector2 a, b;
-			( a.x, b.x ) = BezierUtils.GetCubicSecondDerivativeFactors( p0.x, p1.x, p2.x, p3.x );
-			( a.y, b.y ) = BezierUtils.GetCubicSecondDerivativeFactors( p0.y, p1.y, p2.y, p3.y );
+			( a.x, b.x ) = BezierUtils.GetCubicFactorsSecondDerivative( p0.x, p1.x, p2.x, p3.x );
+			( a.y, b.y ) = BezierUtils.GetCubicFactorsSecondDerivative( p0.y, p1.y, p2.y, p3.y );
 			return ( a, b );
 		}
 	}
@@ -1176,18 +1176,18 @@ namespace Freya {
 		/// <summary>Returns the factors of the derivative polynomials, per-component, in the form at²+bt+c</summary>
 		public (Vector3 a, Vector3 b, Vector3 c) GetDerivativeFactors() {
 			Vector3 a, b, c;
-			( a.x, b.x, c.x ) = BezierUtils.GetCubicDerivativeFactors( p0.x, p1.x, p2.x, p3.x );
-			( a.y, b.y, c.y ) = BezierUtils.GetCubicDerivativeFactors( p0.y, p1.y, p2.y, p3.y );
-			( a.z, b.z, c.z ) = BezierUtils.GetCubicDerivativeFactors( p0.z, p1.z, p2.z, p3.z );
+			( a.x, b.x, c.x ) = BezierUtils.GetCubicFactorsDerivative( p0.x, p1.x, p2.x, p3.x );
+			( a.y, b.y, c.y ) = BezierUtils.GetCubicFactorsDerivative( p0.y, p1.y, p2.y, p3.y );
+			( a.z, b.z, c.z ) = BezierUtils.GetCubicFactorsDerivative( p0.z, p1.z, p2.z, p3.z );
 			return ( a, b, c );
 		}
 
 		/// <summary>Returns the factors of the second derivative polynomials, per-component, in the form at+b</summary>
 		public (Vector3 a, Vector3 b) GetSecondDerivativeFactors() {
 			Vector3 a, b;
-			( a.x, b.x ) = BezierUtils.GetCubicSecondDerivativeFactors( p0.x, p1.x, p2.x, p3.x );
-			( a.y, b.y ) = BezierUtils.GetCubicSecondDerivativeFactors( p0.y, p1.y, p2.y, p3.y );
-			( a.z, b.z ) = BezierUtils.GetCubicSecondDerivativeFactors( p0.z, p1.z, p2.z, p3.z );
+			( a.x, b.x ) = BezierUtils.GetCubicFactorsSecondDerivative( p0.x, p1.x, p2.x, p3.x );
+			( a.y, b.y ) = BezierUtils.GetCubicFactorsSecondDerivative( p0.y, p1.y, p2.y, p3.y );
+			( a.z, b.z ) = BezierUtils.GetCubicFactorsSecondDerivative( p0.z, p1.z, p2.z, p3.z );
 			return ( a, b );
 		}
 	}
@@ -1205,9 +1205,9 @@ namespace Freya {
 				throw new ArgumentOutOfRangeException( nameof(axis), "axis has to be either 0 or 1" );
 			float a, b, c;
 			if( axis == 0 ) // a little silly but the vec[] indexers are kinda expensive
-				( a, b, c ) = BezierUtils.GetCubicDerivativeFactors( p0.x, p1.x, p2.x, p3.x );
+				( a, b, c ) = BezierUtils.GetCubicFactorsDerivative( p0.x, p1.x, p2.x, p3.x );
 			else
-				( a, b, c ) = BezierUtils.GetCubicDerivativeFactors( p0.y, p1.y, p2.y, p3.y );
+				( a, b, c ) = BezierUtils.GetCubicFactorsDerivative( p0.y, p1.y, p2.y, p3.y );
 			ResultsMax2<float> roots = GetQuadraticRoots( a, b, c );
 			ResultsMax2<float> outPts = default;
 			for( int i = 0; i < roots.count; i++ ) {
@@ -1238,11 +1238,11 @@ namespace Freya {
 				throw new ArgumentOutOfRangeException( nameof(axis), "axis has to be either 0, 1 or 2" );
 			float a, b, c;
 			if( axis == 0 ) // a little silly but the vec[] indexers are kinda expensive
-				( a, b, c ) = BezierUtils.GetCubicDerivativeFactors( p0.x, p1.x, p2.x, p3.x );
+				( a, b, c ) = BezierUtils.GetCubicFactorsDerivative( p0.x, p1.x, p2.x, p3.x );
 			else if( axis == 1 )
-				( a, b, c ) = BezierUtils.GetCubicDerivativeFactors( p0.y, p1.y, p2.y, p3.y );
+				( a, b, c ) = BezierUtils.GetCubicFactorsDerivative( p0.y, p1.y, p2.y, p3.y );
 			else
-				( a, b, c ) = BezierUtils.GetCubicDerivativeFactors( p0.z, p1.z, p2.z, p3.z );
+				( a, b, c ) = BezierUtils.GetCubicFactorsDerivative( p0.z, p1.z, p2.z, p3.z );
 			ResultsMax2<float> roots = GetQuadraticRoots( a, b, c );
 			ResultsMax2<float> outPts = default;
 			for( int i = 0; i < roots.count; i++ ) {
