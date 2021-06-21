@@ -78,4 +78,137 @@ namespace Freya {
 		}
 	}
 
+
+	// Base properties - Points, Derivatives & Tangents
+
+	#region Point
+
+	public partial struct BezierCubic2D {
+		/// <summary>Returns the point at the given t-value on the curve</summary>
+		public Vector2 GetPoint( float t ) {
+			float ax = p0.x + ( p1.x - p0.x ) * t; // a = lerp( p0, p1, t );
+			float ay = p0.y + ( p1.y - p0.y ) * t;
+			float bx = p1.x + ( p2.x - p1.x ) * t; // b = lerp( p1, p2, t );
+			float by = p1.y + ( p2.y - p1.y ) * t;
+			float cx = p2.x + ( p3.x - p2.x ) * t; // c = lerp( p2, p3, t );
+			float cy = p2.y + ( p3.y - p2.y ) * t;
+			float dx = ax + ( bx - ax ) * t; // d = lerp( a, b, t );
+			float dy = ay + ( by - ay ) * t;
+			float ex = bx + ( cx - bx ) * t; // e = lerp( b, c, t );
+			float ey = by + ( cy - by ) * t;
+			return new Vector2( // ret lerp( d, e, t );
+				dx + ( ex - dx ) * t,
+				dy + ( ey - dy ) * t
+			);
+		}
+	}
+
+	public partial struct BezierCubic3D {
+		/// <summary>Returns the point at the given t-value on the curve</summary>
+		public Vector3 GetPoint( float t ) {
+			float ax = p0.x + ( p1.x - p0.x ) * t; // a = lerp( p0, p1, t );
+			float ay = p0.y + ( p1.y - p0.y ) * t;
+			float az = p0.z + ( p1.z - p0.z ) * t;
+			float bx = p1.x + ( p2.x - p1.x ) * t; // b = lerp( p1, p2, t );
+			float by = p1.y + ( p2.y - p1.y ) * t;
+			float bz = p1.z + ( p2.z - p1.z ) * t;
+			float cx = p2.x + ( p3.x - p2.x ) * t; // c = lerp( p2, p3, t );
+			float cy = p2.y + ( p3.y - p2.y ) * t;
+			float cz = p2.z + ( p3.z - p2.z ) * t;
+			float dx = ax + ( bx - ax ) * t; // d = lerp( a, b, t );
+			float dy = ay + ( by - ay ) * t;
+			float dz = az + ( bz - az ) * t;
+			float ex = bx + ( cx - bx ) * t; // e = lerp( b, c, t );
+			float ey = by + ( cy - by ) * t;
+			float ez = bz + ( cz - bz ) * t;
+			return new Vector3( // ret Vector3.LerpUnclamped( d, e, t );
+				dx + ( ex - dx ) * t,
+				dy + ( ey - dy ) * t,
+				dz + ( ez - dz ) * t
+			);
+		}
+	}
+
+	#endregion
+
+	#region Point Components
+
+	public partial struct BezierCubic2D {
+		/// <summary>Returns the X coordinate at the given t-value on the curve</summary>
+		public float GetPointX( float t ) {
+			float a = p0.x + ( p1.x - p0.x ) * t; // a = lerp( p0, p1, t );
+			float b = p1.x + ( p2.x - p1.x ) * t; // b = lerp( p1, p2, t );
+			float c = p2.x + ( p3.x - p2.x ) * t; // c = lerp( p2, p3, t );
+			float d = a + ( b - a ) * t; // d = lerp( a, b, t );
+			float e = b + ( c - b ) * t; // e = lerp( b, c, t );
+			return d + ( e - d ) * t; // ret lerp( d, e, t );
+		}
+
+		/// <summary>Returns the Y coordinate at the given t-value on the curve</summary>
+		public float GetPointY( float t ) {
+			float a = p0.y + ( p1.y - p0.y ) * t; // a = lerp( p0, p1, t );
+			float b = p1.y + ( p2.y - p1.y ) * t; // b = lerp( p1, p2, t );
+			float c = p2.y + ( p3.y - p2.y ) * t; // c = lerp( p2, p3, t );
+			float d = a + ( b - a ) * t; // d = lerp( a, b, t );
+			float e = b + ( c - b ) * t; // e = lerp( b, c, t );
+			return d + ( e - d ) * t; // ret lerp( d, e, t );
+		}
+
+		//// <summary>Returns a component of the coordinate at the given t-value on the curve</summary>
+		/// <param name="component">Which component of the coordinate to return. 0 is X, 1 is Y</param>
+		/// <param name="t">A value from 0 to 1 representing a normalized coordinate along the curve</param>
+		public float GetPointComponent( int component, float t ) {
+			switch( component ) {
+				case 0:  return GetPointX( t );
+				case 1:  return GetPointY( t );
+				default: throw new ArgumentOutOfRangeException( nameof(component), "component has to be either 0 or 1" );
+			}
+		}
+	}
+
+	public partial struct BezierCubic3D {
+		/// <summary>Returns the X coordinate at the given t-value on the curve</summary>
+		public float GetPointX( float t ) {
+			float a = p0.x + ( p1.x - p0.x ) * t; // a = lerp( p0, p1, t );
+			float b = p1.x + ( p2.x - p1.x ) * t; // b = lerp( p1, p2, t );
+			float c = p2.x + ( p3.x - p2.x ) * t; // c = lerp( p2, p3, t );
+			float d = a + ( b - a ) * t; // d = lerp( a, b, t );
+			float e = b + ( c - b ) * t; // e = lerp( b, c, t );
+			return d + ( e - d ) * t; // ret lerp( d, e, t );
+		}
+
+		/// <summary>Returns the Y coordinate at the given t-value on the curve</summary>
+		public float GetPointY( float t ) {
+			float a = p0.y + ( p1.y - p0.y ) * t; // a = lerp( p0, p1, t );
+			float b = p1.y + ( p2.y - p1.y ) * t; // b = lerp( p1, p2, t );
+			float c = p2.y + ( p3.y - p2.y ) * t; // c = lerp( p2, p3, t );
+			float d = a + ( b - a ) * t; // d = lerp( a, b, t );
+			float e = b + ( c - b ) * t; // e = lerp( b, c, t );
+			return d + ( e - d ) * t; // ret lerp( d, e, t );
+		}
+
+		/// <summary>Returns the Z coordinate at the given t-value on the curve</summary>
+		public float GetPointZ( float t ) {
+			float a = p0.z + ( p1.z - p0.z ) * t; // a = lerp( p0, p1, t );
+			float b = p1.z + ( p2.z - p1.z ) * t; // b = lerp( p1, p2, t );
+			float c = p2.z + ( p3.z - p2.z ) * t; // c = lerp( p2, p3, t );
+			float d = a + ( b - a ) * t; // d = lerp( a, b, t );
+			float e = b + ( c - b ) * t; // e = lerp( b, c, t );
+			return d + ( e - d ) * t; // ret lerp( d, e, t );
+		}
+
+		//// <summary>Returns a component of the coordinate at the given t-value on the curve</summary>
+		/// <param name="component">Which component of the coordinate to return. 0 is X, 1 is Y, 2 is Z</param>
+		/// <param name="t">A value from 0 to 1 representing a normalized coordinate along the curve</param>
+		public float GetPointComponent( int component, float t ) {
+			switch( component ) {
+				case 0:  return GetPointX( t );
+				case 1:  return GetPointY( t );
+				case 2:  return GetPointZ( t );
+				default: throw new ArgumentOutOfRangeException( nameof(component), "component has to be either 0, 1 or 2" );
+			}
+		}
+	}
+
+	#endregion
 }
