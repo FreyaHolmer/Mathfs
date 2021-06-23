@@ -18,8 +18,13 @@ namespace Freya {
 			return new Vector2( ca * v.x - sa * v.y, sa * v.x + ca * v.y );
 		}
 
+		// swizzling
+		public static Vector2 YX( this Vector2 v ) => new Vector2( v.y, v.x );
 		public static Vector2 XZ( this Vector3 v ) => new Vector2( v.x, v.z );
 		public static Vector3 XZtoXYZ( this Vector2 v, float y = 0 ) => new Vector3( v.x, y, v.y );
+		public static Vector3 FlattenX( this Vector3 v ) => new Vector3( 0f, v.y, v.z );
+		public static Vector3 FlattenY( this Vector3 v ) => new Vector3( v.x, 0f, v.z );
+		public static Vector3 FlattenZ( this Vector3 v ) => new Vector3( v.x, v.y, 0f );
 
 		public static float Frac( this float v ) => v - Mathfs.Floor( v );
 		public static Vector2 Frac( this Vector2 v ) => v - v.Floor();
@@ -82,7 +87,6 @@ namespace Freya {
 			return v;
 		}
 
-		public static Vector3 FlattenY( this Vector3 v ) => new Vector3( v.x, 0f, v.z );
 
 		public static Vector2 To( this Vector2 v, Vector2 target ) => target - v;
 		public static Vector3 To( this Vector3 v, Vector3 target ) => target - v;
