@@ -25,8 +25,14 @@ namespace Freya {
 		public static Vector3 FlattenX( this Vector3 v ) => new Vector3( 0f, v.y, v.z );
 		public static Vector3 FlattenY( this Vector3 v ) => new Vector3( v.x, 0f, v.z );
 		public static Vector3 FlattenZ( this Vector3 v ) => new Vector3( v.x, v.y, 0f );
+		// float easing & smoothing
+		public static float Smooth01( this float v ) => Mathfs.Smooth01( v );
+		public static float Smoother01( this float v ) => Mathfs.Smoother01( v );
+		public static float SmoothCos01( this float v ) => Mathfs.SmoothCos01( v );
 
 		// per-component math operations
+		public static float Cbrt( this float v ) => Mathfs.Cbrt( v );
+		public static float Sqrt( this float v ) => Mathfs.Sqrt( v );
 		public static float Frac( this float v ) => v - Mathfs.Floor( v );
 		public static Vector2 Frac( this Vector2 v ) => v - v.Floor();
 		public static Vector3 Frac( this Vector3 v ) => v - v.Floor();
@@ -47,15 +53,18 @@ namespace Freya {
 
 		public static int Abs( this int v ) => Mathfs.Abs( v );
 		public static float Abs( this float v ) => Mathfs.Abs( v );
+		public static float Floor( this float v ) => Mathfs.Floor( v );
 		public static Vector2 Floor( this Vector2 v ) => new Vector2( Mathfs.Floor( v.x ), Mathfs.Floor( v.y ) );
 		public static Vector3 Floor( this Vector3 v ) => new Vector3( Mathfs.Floor( v.x ), Mathfs.Floor( v.y ), Mathfs.Floor( v.z ) );
 		public static Vector4 Floor( this Vector4 v ) => new Vector4( Mathfs.Floor( v.x ), Mathfs.Floor( v.y ), Mathfs.Floor( v.z ), Mathfs.Floor( v.w ) );
 		public static int FloorToInt( this float v ) => Mathfs.FloorToInt( v );
+		public static float Ceil( this float v ) => Mathfs.Ceil( v );
 		public static Vector2 Ceil( this Vector2 v ) => new Vector2( Mathfs.Ceil( v.x ), Mathfs.Ceil( v.y ) );
 		public static Vector3 Ceil( this Vector3 v ) => new Vector3( Mathfs.Ceil( v.x ), Mathfs.Ceil( v.y ), Mathfs.Ceil( v.z ) );
 		public static Vector4 Ceil( this Vector4 v ) => new Vector4( Mathfs.Ceil( v.x ), Mathfs.Ceil( v.y ), Mathfs.Ceil( v.z ), Mathfs.Ceil( v.w ) );
 		public static int CeilToInt( this float v ) => Mathfs.CeilToInt( v );
 		public static float Round( this float v, float snapInterval ) => Mathfs.Round( v, snapInterval );
+		public static float Round( this float v ) => Mathfs.Round( v );
 		public static Vector2 Round( this Vector2 v ) => new Vector2( Mathfs.Round( v.x ), Mathfs.Round( v.y ) );
 		public static Vector3 Round( this Vector3 v ) => new Vector3( Mathfs.Round( v.x ), Mathfs.Round( v.y ), Mathfs.Round( v.z ) );
 		public static Vector4 Round( this Vector4 v ) => new Vector4( Mathfs.Round( v.x ), Mathfs.Round( v.y ), Mathfs.Round( v.z ), Mathfs.Round( v.w ) );
