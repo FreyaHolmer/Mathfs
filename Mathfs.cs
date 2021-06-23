@@ -20,13 +20,11 @@ namespace Freya {
 		public const float E = 2.71828182846f;
 		public const float GOLDEN_RATIO = 1.61803398875f;
 		public const float SQRT2 = 1.41421356237f;
-		public const float Infinity = Single.PositiveInfinity;
-		public const float NegativeInfinity = Single.NegativeInfinity;
 		public const float Deg2Rad = TAU / 360f;
 		public const float Rad2Deg = 360f / TAU;
-		public static readonly float Epsilon = UnityEngineInternal.MathfInternal.IsFlushToZeroEnabled ? UnityEngineInternal.MathfInternal.FloatMinNormal : UnityEngineInternal.MathfInternal.FloatMinDenormal;
 
-		// Math operations
+		#region Math operations
+
 		public static float Sqrt( float value ) => (float)Math.Sqrt( value );
 		public static float Cbrt( float value ) => value < 0 ? -Pow( -value, 1f / 3f ) : Pow( value, 1f / 3f );
 		public static float Pow( float @base, float exponent ) => (float)Math.Pow( @base, exponent );
@@ -34,7 +32,19 @@ namespace Freya {
 		public static float Log( float value, float @base ) => (float)Math.Log( value, @base );
 		public static float Log( float value ) => (float)Math.Log( value );
 		public static float Log10( float value ) => (float)Math.Log10( value );
+
+		#endregion
+
+		#region Floating point shenanigans
+
+		public static readonly float Epsilon = UnityEngineInternal.MathfInternal.IsFlushToZeroEnabled ? UnityEngineInternal.MathfInternal.FloatMinNormal : UnityEngineInternal.MathfInternal.FloatMinDenormal;
+		public const float Infinity = float.PositiveInfinity;
+		public const float NegativeInfinity = float.NegativeInfinity;
 		public static bool Approximately( float a, float b ) => Abs( b - a ) < Max( 0.000001f * Max( Abs( a ), Abs( b ) ), Epsilon * 8 );
+
+		#endregion
+
+		#region Trigonometry
 
 		// Trig
 		public static float Sin( float angRad ) => (float)Math.Sin( angRad );
@@ -59,7 +69,10 @@ namespace Freya {
 		public static float Asinh( float x ) => (float)Math.Log( x + Mathf.Sqrt( x * x + 1 ) );
 		public static float Atanh( float x ) => (float)( 0.5 * Math.Log( ( 1 + x ) / ( 1 - x ) ) );
 
-		// Absolute values
+		#endregion
+
+		#region Value clamping
+
 		public static float Abs( float value ) => Math.Abs( value );
 		public static int Abs( int value ) => Math.Abs( value );
 		public static Vector2 Abs( Vector2 v ) => new Vector2( Abs( v.x ), Abs( v.y ) );
@@ -67,29 +80,10 @@ namespace Freya {
 		public static Vector4 Abs( Vector4 v ) => new Vector4( Abs( v.x ), Abs( v.y ), Abs( v.z ), Abs( v.w ) );
 
 		// Clamping
-		public static float Clamp( float value, float min, float max ) {
-			if( value < min ) value = min;
-			if( value > max ) value = max;
-			return value;
-		}
-
-		public static int Clamp( int value, int min, int max ) {
-			if( value < min ) value = min;
-			if( value > max ) value = max;
-			return value;
-		}
-
-		public static float Clamp01( float value ) {
-			if( value < 0f ) value = 0f;
-			if( value > 1f ) value = 1f;
-			return value;
-		}
-
-		public static float ClampNeg1to1( float value ) {
-			if( value < -1f ) value = -1f;
-			if( value > 1f ) value = 1f;
-			return value;
-		}
+		public static float Clamp( float value, float min, float max ) => value < min ? min : value > max ? max : value;
+		public static int Clamp( int value, int min, int max ) => value < min ? min : value > max ? max : value;
+		public static float Clamp01( float value ) => value < 0f ? 0f : value > 1f ? 1f : value;
+		public static float ClampNeg1to1( float value ) => value < -1f ? -1f : value > 1f ? 1f : value;
 
 		// Min & Max
 		public static float Min( float a, float b ) => a < b ? a : b;
@@ -108,7 +102,10 @@ namespace Freya {
 		public static int Min( params int[] values ) => values.Min();
 		public static int Max( params int[] values ) => values.Max();
 
-		// Rounding
+		#endregion
+
+		#region Rounding & Repeating
+
 		public static int Sign( float value ) => value >= 0f ? 1 : -1;
 		public static int Sign( int value ) => value >= 0 ? 1 : -1;
 		public static int SignWithZero( int value ) => value == 0 ? 0 : Sign( value );
@@ -124,7 +121,6 @@ namespace Freya {
 		public static int CeilToInt( float value ) => (int)Math.Ceiling( value );
 		public static int RoundToInt( float value ) => (int)Math.Round( value );
 
-		// Repeating
 		public static float Frac( float x ) => x - Floor( x );
 		public static Vector2 Frac( Vector2 x ) => x - Floor( x );
 		public static Vector3 Frac( Vector3 x ) => x - Floor( x );
@@ -137,7 +133,10 @@ namespace Freya {
 			return length - Abs( t - length );
 		}
 
-		// Smoothing & Curves
+		#endregion
+
+		#region Smoothing & Easing Curves
+
 		public static float Smooth01( float x ) => x * x * ( 3 - 2 * x );
 		public static float Smoother01( float x ) => x * x * x * ( x * ( x * 6 - 15 ) + 10 );
 		public static float SmoothCos01( float x ) => Cos( x * PI ) * -0.5f + 0.5f;
@@ -152,48 +151,32 @@ namespace Freya {
 			return negative ? -result : result;
 		}
 
+		#endregion
 
-		// Interpolation & Remapping
-		public static float InverseLerp( float a, float b, float value ) => ( value - a ) / ( b - a );
-		public static float InverseLerpClamped( float a, float b, float value ) => Clamp01( ( value - a ) / ( b - a ) );
+		#region Value & Vector interpolation
+
 		public static float Lerp( float a, float b, float t ) => ( 1f - t ) * a + t * b;
-
-		public static float LerpClamped( float a, float b, float t ) {
-			t = Clamp01( t );
-			return ( 1f - t ) * a + t * b;
-		}
+		public static float LerpClamped( float a, float b, float t ) => Lerp( a, b, Clamp01( t ) );
+		public static float LerpSmooth( float a, float b, float t ) => Lerp( a, b, Smooth01( Clamp01( t ) ) );
 
 		public static float Eerp( float a, float b, float t ) => Mathf.Pow( a, 1 - t ) * Mathf.Pow( b, t );
 		public static float InverseEerp( float a, float b, float v ) => Mathf.Log( a / v ) / Mathf.Log( a / b );
 
 		public static Vector2 Lerp( Vector2 a, Vector2 b, Vector2 t ) => new Vector2( Lerp( a.x, b.x, t.x ), Lerp( a.y, b.y, t.y ) );
-		public static Vector2 InverseLerp( Vector2 a, Vector2 b, Vector2 v ) => ( v - a ) / ( b - a );
 
-		public static Vector2 Remap( Rect iRect, Rect oRect, Vector2 iPos ) {
-			return Remap( iRect.min, iRect.max, oRect.min, oRect.max, iPos );
-		}
-
-		public static Vector2 Remap( Vector2 iMin, Vector2 iMax, Vector2 oMin, Vector2 oMax, Vector2 value ) {
-			Vector2 t = InverseLerp( iMin, iMax, value );
-			return Lerp( oMin, oMax, t );
-		}
-
-		public static float Remap( float iMin, float iMax, float oMin, float oMax, float value ) {
-			float t = InverseLerp( iMin, iMax, value );
-			return Lerp( oMin, oMax, t );
-		}
-
-		public static float RemapClamped( float iMin, float iMax, float oMin, float oMax, float value ) {
-			float t = InverseLerpClamped( iMin, iMax, value );
-			return Lerp( oMin, oMax, t );
-		}
-
+		public static float InverseLerp( float a, float b, float value ) => ( value - a ) / ( b - a );
+		public static float InverseLerpClamped( float a, float b, float value ) => Clamp01( ( value - a ) / ( b - a ) );
 		public static float InverseLerpSmooth( float a, float b, float value ) => Smooth01( Clamp01( ( value - a ) / ( b - a ) ) );
 
-		public static float LerpSmooth( float a, float b, float t ) {
-			t = Smooth01( Clamp01( t ) );
-			return ( 1f - t ) * a + t * b;
-		}
+		public static float Remap( float iMin, float iMax, float oMin, float oMax, float value ) => Lerp( oMin, oMax, InverseLerp( iMin, iMax, value ) );
+		public static float RemapClamped( float iMin, float iMax, float oMin, float oMax, float value ) => Lerp( oMin, oMax, InverseLerpClamped( iMin, iMax, value ) );
+
+		public static Vector2 Remap( Rect iRect, Rect oRect, Vector2 iPos ) => Remap( iRect.min, iRect.max, oRect.min, oRect.max, iPos );
+		public static Vector2 Remap( Vector2 iMin, Vector2 iMax, Vector2 oMin, Vector2 oMax, Vector2 value ) => Lerp( oMin, oMax, InverseLerp( iMin, iMax, value ) );
+
+		#endregion
+
+		#region Movement helpers
 
 		public static float MoveTowards( float current, float target, float maxDelta ) {
 			if( Mathf.Abs( target - current ) <= maxDelta )
@@ -240,7 +223,10 @@ namespace Freya {
 			return output;
 		}
 
-		// Weighted sums
+		#endregion
+
+		#region Weighted sums
+
 		public static float WeightedSum( Vector2 w, float a, float b ) => a * w.x + b * w.y;
 		public static float WeightedSum( Vector3 w, float a, float b, float c ) => a * w.x + b * w.y + c * w.z;
 		public static float WeightedSum( Vector4 w, float a, float b, float c, float d ) => a * w.x + b * w.y + c * w.z + d * w.w;
@@ -254,7 +240,10 @@ namespace Freya {
 		public static Vector4 WeightedSum( Vector4 w, Vector4 a, Vector4 b, Vector4 c ) => a * w.x + b * w.y + c * w.z;
 		public static Vector4 WeightedSum( Vector4 w, Vector4 a, Vector4 b, Vector4 c, Vector4 d ) => a * w.x + b * w.y + c * w.z + d * w.w;
 
-		// Vector math
+		#endregion
+
+		#region Vector math
+
 		public static float Determinant /*or Cross*/( Vector2 a, Vector2 b ) => a.x * b.y - a.y * b.x; // 2D "cross product"
 		public static Vector2 Dir( Vector2 from, Vector2 to ) => ( to - from ).normalized;
 		public static Vector3 Dir( Vector3 from, Vector3 to ) => ( to - from ).normalized;
@@ -270,7 +259,10 @@ namespace Freya {
 		public static float DistanceSquared( Vector3 a, Vector3 b ) => ( a.x - b.x ).Square() + ( a.y - b.y ).Square() + ( a.z - b.z ).Square();
 		public static float DistanceSquared( Vector4 a, Vector4 b ) => ( a.x - b.x ).Square() + ( a.y - b.y ).Square() + ( a.z - b.z ).Square() + ( a.w - b.w ).Square();
 
-		// Angles & Rotation
+		#endregion
+
+		#region Angles & Rotation
+
 		public static Vector2 AngToDir( float aRad ) => new Vector2( Mathf.Cos( aRad ), Mathf.Sin( aRad ) );
 		public static float DirToAng( Vector2 dir ) => Mathf.Atan2( dir.y, dir.x );
 		public static float SignedAngle( Vector2 a, Vector2 b ) => AngleBetween( a, b ) * Mathf.Sign( Determinant( a, b ) ); // -tau/2 to tau/2
@@ -295,7 +287,11 @@ namespace Freya {
 			return InverseLerpClamped( a, b, v );
 		}
 
-		static public float MoveTowardsAngle( float current, float target, float maxDelta ) {
+		#endregion
+
+		#region Angular movement helpers
+
+		public static float MoveTowardsAngle( float current, float target, float maxDelta ) {
 			float deltaAngle = DeltaAngle( current, target );
 			if( -maxDelta < deltaAngle && deltaAngle < maxDelta )
 				return target;
@@ -319,7 +315,10 @@ namespace Freya {
 			return SmoothDamp( current, target, ref currentVelocity, smoothTime, maxSpeed, deltaTime );
 		}
 
-		// Root Finding
+		#endregion
+
+		#region Root Finding
+
 		public enum PolynomialType {
 			Constant,
 			Linear,
@@ -394,7 +393,7 @@ namespace Freya {
 			float q = ( 2 * b * b * b - 9 * a * b * c + 27 * a * a * d ) / ( 27 * a * a * a );
 
 			ResultsMax3<float> dpr = SolveDepressedCubicRoots( p, q );
-			
+
 			// we now have the roots of the depressed cubic, now convert back to the normal cubic
 			float UndepressRoot( float r ) => r - b / ( 3 * a );
 			switch( dpr.count ) {
@@ -442,8 +441,10 @@ namespace Freya {
 
 		#endregion
 
+		#endregion
 
-		// coordinate shenanigans
+		#region Shape coordinate remapping
+
 		public static Vector2 SquareToDisc( Vector2 c ) {
 			float u = c.x * Sqrt( 1 - ( c.y * c.y ) / 2 );
 			float v = c.y * Sqrt( 1 - ( c.x * c.x ) / 2 );
@@ -451,19 +452,16 @@ namespace Freya {
 		}
 
 		public static Vector2 DiscToSquare( Vector2 c ) {
-			float u = c.x;
-			float v = c.y;
 			float u2 = c.x * c.x;
 			float v2 = c.y * c.y;
-
 			Vector2 n = new Vector2( 1, -1 );
 			Vector2 p = new Vector2( 2, 2 ) + n * ( u2 - v2 );
 			Vector2 q = 2 * SQRT2 * c;
 			Vector2 smolVec = Vector2.one * 0.0001f;
-			Vector2 Sqrt( Vector2 noot ) => new Vector2( Mathf.Sqrt( noot.x ), Mathf.Sqrt( noot.y ) );
-			return 0.5f * ( Sqrt( Vector2.Max( smolVec, p + q ) ) - Sqrt( Vector2.Max( smolVec, p - q ) ) );
+			return 0.5f * ( Vector2.Max( smolVec, p + q ).Sqrt() - Vector2.Max( smolVec, p - q ).Sqrt() );
 		}
 
+		#endregion
 
 	}
 
