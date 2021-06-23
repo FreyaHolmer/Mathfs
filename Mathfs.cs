@@ -163,16 +163,24 @@ namespace Freya {
 		public static float InverseEerp( float a, float b, float v ) => Mathf.Log( a / v ) / Mathf.Log( a / b );
 
 		public static Vector2 Lerp( Vector2 a, Vector2 b, Vector2 t ) => new Vector2( Lerp( a.x, b.x, t.x ), Lerp( a.y, b.y, t.y ) );
+		public static Vector3 Lerp( Vector3 a, Vector3 b, Vector3 t ) => new Vector3( Lerp( a.x, b.x, t.x ), Lerp( a.y, b.y, t.y ), Lerp( a.z, b.z, t.z ) );
+		public static Vector4 Lerp( Vector4 a, Vector4 b, Vector4 t ) => new Vector4( Lerp( a.x, b.x, t.x ), Lerp( a.y, b.y, t.y ), Lerp( a.z, b.z, t.z ), Lerp( a.w, b.w, t.w ) );
 
 		public static float InverseLerp( float a, float b, float value ) => ( value - a ) / ( b - a );
 		public static float InverseLerpClamped( float a, float b, float value ) => Clamp01( ( value - a ) / ( b - a ) );
 		public static float InverseLerpSmooth( float a, float b, float value ) => Smooth01( Clamp01( ( value - a ) / ( b - a ) ) );
+		public static Vector2 InverseLerp( Vector2 a, Vector2 b, Vector2 v ) => new Vector2( ( v.x - a.x ) / ( b.x - a.x ), ( v.y - a.y ) / ( b.y - a.y ) );
+		public static Vector3 InverseLerp( Vector3 a, Vector3 b, Vector3 v ) => new Vector3( ( v.x - a.x ) / ( b.x - a.x ), ( v.y - a.y ) / ( b.y - a.y ), ( v.z - a.z ) / ( b.z - a.z ) );
+		public static Vector4 InverseLerp( Vector4 a, Vector4 b, Vector4 v ) => new Vector4( ( v.x - a.x ) / ( b.x - a.x ), ( v.y - a.y ) / ( b.y - a.y ), ( v.z - a.z ) / ( b.z - a.z ), ( v.w - a.w ) / ( b.w - a.w ) );
 
 		public static float Remap( float iMin, float iMax, float oMin, float oMax, float value ) => Lerp( oMin, oMax, InverseLerp( iMin, iMax, value ) );
 		public static float RemapClamped( float iMin, float iMax, float oMin, float oMax, float value ) => Lerp( oMin, oMax, InverseLerpClamped( iMin, iMax, value ) );
 
 		public static Vector2 Remap( Rect iRect, Rect oRect, Vector2 iPos ) => Remap( iRect.min, iRect.max, oRect.min, oRect.max, iPos );
 		public static Vector2 Remap( Vector2 iMin, Vector2 iMax, Vector2 oMin, Vector2 oMax, Vector2 value ) => Lerp( oMin, oMax, InverseLerp( iMin, iMax, value ) );
+		public static Vector3 Remap( Bounds iBounds, Bounds oBounds, Vector3 iPos ) => Remap( iBounds.min, iBounds.max, oBounds.min, oBounds.max, iPos );
+		public static Vector3 Remap( Vector3 iMin, Vector3 iMax, Vector3 oMin, Vector3 oMax, Vector3 value ) => Lerp( oMin, oMax, InverseLerp( iMin, iMax, value ) );
+		public static Vector4 Remap( Vector4 iMin, Vector4 iMax, Vector4 oMin, Vector4 oMax, Vector4 value ) => Lerp( oMin, oMax, InverseLerp( iMin, iMax, value ) );
 
 		#endregion
 
