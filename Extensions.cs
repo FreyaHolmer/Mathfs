@@ -25,6 +25,7 @@ namespace Freya {
 		public static Vector3 FlattenX( this Vector3 v ) => new Vector3( 0f, v.y, v.z );
 		public static Vector3 FlattenY( this Vector3 v ) => new Vector3( v.x, 0f, v.z );
 		public static Vector3 FlattenZ( this Vector3 v ) => new Vector3( v.x, v.y, 0f );
+		
 		// float easing & smoothing
 		public static float Smooth01( this float v ) => Mathfs.Smooth01( v );
 		public static float Smoother01( this float v ) => Mathfs.Smoother01( v );
@@ -33,6 +34,10 @@ namespace Freya {
 		// per-component math operations
 		public static float Cbrt( this float v ) => Mathfs.Cbrt( v );
 		public static float Sqrt( this float v ) => Mathfs.Sqrt( v );
+		public static Vector2 Sqrt( this Vector2 v ) => new Vector2( Mathfs.Sqrt( v.x ), Mathfs.Sqrt( v.y ) );
+		public static Vector3 Sqrt( this Vector3 v ) => new Vector3( Mathfs.Sqrt( v.x ), Mathfs.Sqrt( v.y ), Mathfs.Sqrt( v.z ) );
+		public static Vector4 Sqrt( this Vector4 v ) => new Vector4( Mathfs.Sqrt( v.x ), Mathfs.Sqrt( v.y ), Mathfs.Sqrt( v.z ), Mathfs.Sqrt( v.w ) );
+
 		public static float Frac( this float v ) => v - Mathfs.Floor( v );
 		public static Vector2 Frac( this Vector2 v ) => v - v.Floor();
 		public static Vector3 Frac( this Vector3 v ) => v - v.Floor();
@@ -53,16 +58,26 @@ namespace Freya {
 
 		public static int Abs( this int v ) => Mathfs.Abs( v );
 		public static float Abs( this float v ) => Mathfs.Abs( v );
+		public static Vector2 Abs( this Vector2 v ) => new Vector2( Mathfs.Abs( v.x ), Mathfs.Abs( v.y ) );
+		public static Vector3 Abs( this Vector3 v ) => new Vector3( Mathfs.Abs( v.x ), Mathfs.Abs( v.y ), Mathfs.Abs( v.z ) );
+		public static Vector4 Abs( this Vector4 v ) => new Vector4( Mathfs.Abs( v.x ), Mathfs.Abs( v.y ), Mathfs.Abs( v.z ), Mathfs.Abs( v.w ) );
+
 		public static float Floor( this float v ) => Mathfs.Floor( v );
 		public static Vector2 Floor( this Vector2 v ) => new Vector2( Mathfs.Floor( v.x ), Mathfs.Floor( v.y ) );
 		public static Vector3 Floor( this Vector3 v ) => new Vector3( Mathfs.Floor( v.x ), Mathfs.Floor( v.y ), Mathfs.Floor( v.z ) );
 		public static Vector4 Floor( this Vector4 v ) => new Vector4( Mathfs.Floor( v.x ), Mathfs.Floor( v.y ), Mathfs.Floor( v.z ), Mathfs.Floor( v.w ) );
 		public static int FloorToInt( this float v ) => Mathfs.FloorToInt( v );
+		public static Vector2Int FloorToInt( this Vector2 v ) => new Vector2Int( Mathfs.FloorToInt( v.x ), Mathfs.FloorToInt( v.y ) );
+		public static Vector3Int FloorToInt( this Vector3 v ) => new Vector3Int( Mathfs.FloorToInt( v.x ), Mathfs.FloorToInt( v.y ), Mathfs.FloorToInt( v.z ) );
+
 		public static float Ceil( this float v ) => Mathfs.Ceil( v );
 		public static Vector2 Ceil( this Vector2 v ) => new Vector2( Mathfs.Ceil( v.x ), Mathfs.Ceil( v.y ) );
 		public static Vector3 Ceil( this Vector3 v ) => new Vector3( Mathfs.Ceil( v.x ), Mathfs.Ceil( v.y ), Mathfs.Ceil( v.z ) );
 		public static Vector4 Ceil( this Vector4 v ) => new Vector4( Mathfs.Ceil( v.x ), Mathfs.Ceil( v.y ), Mathfs.Ceil( v.z ), Mathfs.Ceil( v.w ) );
 		public static int CeilToInt( this float v ) => Mathfs.CeilToInt( v );
+		public static Vector2Int CeilToInt( this Vector2 v ) => new Vector2Int( Mathfs.CeilToInt( v.x ), Mathfs.CeilToInt( v.y ) );
+		public static Vector3Int CeilToInt( this Vector3 v ) => new Vector3Int( Mathfs.CeilToInt( v.x ), Mathfs.CeilToInt( v.y ), Mathfs.CeilToInt( v.z ) );
+
 		public static float Round( this float v, float snapInterval ) => Mathfs.Round( v, snapInterval );
 		public static float Round( this float v ) => Mathfs.Round( v );
 		public static Vector2 Round( this Vector2 v ) => new Vector2( Mathfs.Round( v.x ), Mathfs.Round( v.y ) );
@@ -71,7 +86,11 @@ namespace Freya {
 		public static int RoundToInt( this float v ) => Mathfs.RoundToInt( v );
 		public static Vector2Int RoundToInt( this Vector2 v ) => new Vector2Int( Mathf.RoundToInt( v.x ), Mathf.RoundToInt( v.y ) );
 		public static Vector3Int RoundToInt( this Vector3 v ) => new Vector3Int( Mathf.RoundToInt( v.x ), Mathf.RoundToInt( v.y ), Mathf.RoundToInt( v.z ) );
+
 		public static float Remap( this float v, float iMin, float iMax, float oMin, float oMax ) => Mathfs.Remap( iMin, iMax, oMin, oMax, v );
+		public static Vector2 Remap( this Vector2 v, Vector2 iMin, Vector2 iMax, Vector2 oMin, Vector2 oMax ) => Mathfs.Remap( iMin, iMax, oMin, oMax, v );
+		public static Vector3 Remap( this Vector3 v, Vector3 iMin, Vector3 iMax, Vector3 oMin, Vector3 oMax ) => Mathfs.Remap( iMin, iMax, oMin, oMax, v );
+
 		// vector direction & magnitude functions
 		public static float Magnitude( this float v ) => Mathfs.Abs( v );
 		public static Vector2 WithMagnitude( this Vector2 v, float mag ) => v.normalized * mag;
