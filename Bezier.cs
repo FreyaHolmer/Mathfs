@@ -707,7 +707,7 @@ namespace Freya {
 			for( int i = 1; i < initialSubdivisions; i++ ) {
 				float ti = i / ( initialSubdivisions - 1f );
 				PointProjectSample smp = SampleDistSqDelta( ti );
-				if( Sign( smp.distDeltaSq ) != Sign( prevSmp.distDeltaSq ) ) {
+				if( SignAsInt( smp.distDeltaSq ) != SignAsInt( prevSmp.distDeltaSq ) ) {
 					pointProjectGuesses[candidatesFound++] = SampleDistSqDelta( ( prevSmp.t + smp.t ) / 2 );
 					if( candidatesFound == 3 ) break; // no more than three possible candidates because of the polynomial degree
 				}
