@@ -8,9 +8,7 @@ namespace Freya {
 	// Trajectory math
 	public static class Trajectory {
 
-		/// <summary>
-		/// Outputs the launch speed required to traverse a given lateral distance when launched at a given angle, if one exists
-		/// </summary>
+		/// <summary>Outputs the launch speed required to traverse a given lateral distance when launched at a given angle, if one exists</summary>
 		/// <param name="gravity">Gravitational acceleration in meters per second</param>
 		/// <param name="lateralDistance">Target lateral distance in meters</param>
 		/// <param name="angle">Launch angle in radians (0 = flat)</param>
@@ -34,9 +32,7 @@ namespace Freya {
 			return true;
 		}
 
-		/// <summary>
-		/// Outputs the two launch angles given a lateral distance and launch speed, if they exist
-		/// </summary>
+		/// <summary>Outputs the two launch angles given a lateral distance and launch speed, if they exist</summary>
 		/// <param name="gravity">Gravitational acceleration in meters per second</param>
 		/// <param name="lateralDistance">Target lateral distance in meters</param>
 		/// <param name="speed">Launch speed in meters per second</param>
@@ -60,19 +56,13 @@ namespace Freya {
 			return true;
 		}
 
-		/// <summary>
-		/// Returns the maximum lateral range a trajectory could reach, when launched at the optimal angle of 45°
-		/// </summary>
+		/// <summary>Returns the maximum lateral range a trajectory could reach, when launched at the optimal angle of 45°</summary>
 		/// <param name="gravity">Gravitational acceleration in meters per second</param>
 		/// <param name="speed">Launch speed in meters per second</param>
 		/// <returns>Maximum lateral range in meters per second</returns>
-		public static float GetMaxRange( float gravity, float speed ) {
-			return speed * speed / gravity;
-		}
+		public static float GetMaxRange( float gravity, float speed ) => speed * speed / gravity;
 
-		/// <summary>
-		/// Returns the displacement given a launch speed, launch angle and a traversal time 
-		/// </summary>
+		/// <summary>Returns the displacement given a launch speed, launch angle and a traversal time</summary>
 		/// <param name="gravity">Gravitational acceleration in meters per second</param>
 		/// <param name="speed">Launch speed in meters per second</param>
 		/// <param name="angle">Launch angle in radians (0 = flat)</param>
@@ -84,9 +74,7 @@ namespace Freya {
 			return new Vector2( xDisp, yDisp );
 		}
 
-		/// <summary>
-		/// Returns the maximum height that can possibly be reached if speed was redirected upwards, given a current height and speed
-		/// </summary>
+		/// <summary>Returns the maximum height that can possibly be reached if speed was redirected upwards, given a current height and speed</summary>
 		/// <param name="gravity">Gravitational acceleration in meters per second</param>
 		/// <param name="currentHeight">Current height in meters</param>
 		/// <param name="speed">Launch speed in meters per second</param>
@@ -95,9 +83,7 @@ namespace Freya {
 			return currentHeight + ( speed * speed ) / ( 2 * -gravity );
 		}
 
-		/// <summary>
-		/// Outputs the speed of an object with a given height potential and current height, if it exists
-		/// </summary>
+		/// <summary>Outputs the speed of an object with a given height potential and current height, if it exists</summary>
 		/// <param name="gravity">Gravitational acceleration in meters per second</param>
 		/// <param name="currentHeight">Current height in meters</param>
 		/// <param name="heightPotential">Potential height in meters</param>
