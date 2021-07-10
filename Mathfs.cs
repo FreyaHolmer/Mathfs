@@ -875,6 +875,9 @@ namespace Freya {
 		/// <summary>Returns the shortest angle between <c>a</c> and <c>b</c>, in the range 0 to tau/2 (0 to pi)</summary>
 		[MethodImpl( INLINE )] public static float AngleBetween( Vector2 a, Vector2 b ) => Mathf.Acos( Vector2.Dot( a.normalized, b.normalized ).ClampNeg1to1() );
 
+		/// <inheritdoc cref="AngleBetween(Vector2,Vector2)"/>
+		[MethodImpl( INLINE )] public static float AngleBetween( Vector3 a, Vector3 b ) => Mathf.Acos( Vector3.Dot( a.normalized, b.normalized ).ClampNeg1to1() );
+
 		/// <summary>Returns the clockwise angle between <c>from</c> and <c>to</c>, in the range 0 to tau (0 to 2*pi)</summary>
 		[MethodImpl( INLINE )] public static float AngleFromToCW( Vector2 from, Vector2 to ) => Determinant( from, to ) < 0 ? AngleBetween( from, to ) : TAU - AngleBetween( from, to );
 
