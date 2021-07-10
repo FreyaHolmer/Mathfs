@@ -6,7 +6,7 @@ using static Freya.Mathfs;
 
 namespace Freya {
 
-	/// <summary>Polygon math functions</summary>
+	/// <summary>Polygon with various math functions to test if a point is inside, calculate area, etc.</summary>
 	public struct Polygon {
 
 		/// <summary>The points in this polygon</summary>
@@ -34,6 +34,41 @@ namespace Freya {
 				}
 
 				return sum * 0.5f;
+			}
+		}
+
+		/// <summary>Returns the length of the perimeter of the polygon</summary>
+		public float Perimeter {
+			get {
+				int count = points.Count;
+				float totalDist = 0f;
+				for( int i = 0; i < count; i++ ) {
+					Vector2 a = points[i];
+					Vector2 b = points[( i + 1 ) % count];
+					float dx = a.x - b.x;
+					float dy = a.y - b.y;
+					totalDist += Mathf.Sqrt( dx * dx + dy * dy ); // unrolled for speed
+				}
+
+				return totalDist;
+			}
+		}
+
+		/// <summary>Returns the axis-aligned bounding box of this polygon</summary>
+		public Rect Bounds {
+			get {
+				int count = points.Count;
+				Vector2 p = points[0];
+				float xMin = p.x, xMax = p.x, yMin = p.y, yMax = p.y;
+				for( int i = 1; i < count; i++ ) {
+					p = points[i];
+					xMin = Mathf.Min( xMin, p.x );
+					xMax = Mathf.Max( xMax, p.x );
+					yMin = Mathf.Min( yMin, p.y );
+					yMax = Mathf.Max( yMax, p.y );
+				}
+
+				return new Rect( xMin, yMin, xMax - xMin, yMax - yMin );
 			}
 		}
 
