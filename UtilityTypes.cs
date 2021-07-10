@@ -3,11 +3,13 @@
 // by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Freya {
 
 	/// <summary>Contains either 0, 1, 2 or 3 valid return values</summary>
-	public readonly struct ResultsMax3<T> where T : struct {
+	public readonly struct ResultsMax3<T> : IEnumerable<T> where T : struct {
 
 		/// <summary>The number of valid values</summary>
 		public readonly int count;
@@ -55,33 +57,16 @@ namespace Freya {
 		/// <param name="value">The value to add</param>
 		public ResultsMax3<T> Add( T value ) {
 			switch( count ) {
-				case 0: return new ResultsMax3<T>( value );
-				case 1: return new ResultsMax3<T>( a, value );
-				case 2: return new ResultsMax3<T>( a, b, value );
-				default: throw new IndexOutOfRangeException("Can't add more than three values to ResultsMax3");
-			}
-		}
-
-		public ResultsMax3<T> Where( Func<T, bool> validate ) {
-			int validCount = 0;
-			bool aIsValid = count > 0 && validate( a );
-			if( aIsValid ) validCount++;
-			bool bIsValid = count > 1 && validate( b );
-			if( bIsValid ) validCount++;
-			bool cIsValid = count > 2 && validate( c );
-			if( cIsValid ) validCount++;
-
-			switch( validCount ) {
-				case 1:  return new ResultsMax3<T>( aIsValid ? a : bIsValid ? b : c );
-				case 2:  return new ResultsMax3<T>( aIsValid ? a : b, bIsValid ? b : c );
-				case 3:  return this; // all three passed, no change
-				default: return default;
+				case 0:  return new ResultsMax3<T>( value );
+				case 1:  return new ResultsMax3<T>( a, value );
+				case 2:  return new ResultsMax3<T>( a, b, value );
+				default: throw new IndexOutOfRangeException( "Can't add more than three values to ResultsMax3" );
 			}
 		}
 
 		public static implicit operator ResultsMax3<T>( (T?, T?, T?) tuple ) {
 			int validCount = 0;
-			(T? a, T? b, T? c) = tuple;
+			( T? a, T? b, T? c ) = tuple;
 			bool aIsValid = a.HasValue;
 			if( aIsValid ) validCount++;
 			bool bIsValid = b.HasValue;
@@ -109,10 +94,34 @@ namespace Freya {
 			throw new InvalidCastException( "Failed to cast ResultsMax2 to ResultsMax3" );
 		}
 
+
+		IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
+
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+		public struct ResultsMax3Enumerator : IEnumerator<T> {
+
+			int currentIndex;
+			readonly ResultsMax3<T> value;
+
+			public ResultsMax3Enumerator( ResultsMax3<T> value ) {
+				this.value = value;
+				currentIndex = -1;
+			}
+
+			public bool MoveNext() => ++currentIndex < value.count;
+			public void Reset() => currentIndex = -1;
+			public T Current => value[currentIndex];
+			object IEnumerator.Current => Current;
+			public void Dispose() => _ = 0;
+		}
+
+		public ResultsMax3Enumerator GetEnumerator() => new ResultsMax3Enumerator( this );
+
 	}
 
 	/// <summary>Contains either 0, 1 or 2 valid return values</summary>
-	public readonly struct ResultsMax2<T> where T : struct {
+	public readonly struct ResultsMax2<T> : IEnumerable<T> where T : struct {
 
 		/// <summary>The number of valid values</summary>
 		public readonly int count;
@@ -147,18 +156,40 @@ namespace Freya {
 				throw new IndexOutOfRangeException();
 			}
 		}
-		
+
 		/// <summary>Returns a version of these results with one more element added to it. Note: this does not mutate the original struct</summary>
 		/// <param name="value">The value to add</param>
 		public ResultsMax2<T> Add( T value ) {
 			switch( count ) {
 				case 0:  return new ResultsMax2<T>( value );
 				case 1:  return new ResultsMax2<T>( a, value );
-				default: throw new IndexOutOfRangeException("Can't add more than two values to ResultsMax2");
+				default: throw new IndexOutOfRangeException( "Can't add more than two values to ResultsMax2" );
 			}
 		}
 
 
+		IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
+
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+		public struct ResultsMax2Enumerator : IEnumerator<T> {
+
+			int currentIndex;
+			readonly ResultsMax2<T> value;
+
+			public ResultsMax2Enumerator( ResultsMax2<T> value ) {
+				this.value = value;
+				currentIndex = -1;
+			}
+
+			public bool MoveNext() => ++currentIndex < value.count;
+			public void Reset() => currentIndex = -1;
+			public T Current => value[currentIndex];
+			object IEnumerator.Current => Current;
+			public void Dispose() => _ = 0;
+		}
+
+		public ResultsMax2Enumerator GetEnumerator() => new ResultsMax2Enumerator( this );
 	}
 
 }
