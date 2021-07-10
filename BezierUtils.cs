@@ -2,9 +2,14 @@
 
 namespace Freya {
 
+	/// <summary>Various utility functions for bezier curves</summary>
 	public static class BezierUtils {
 
 		/// <summary>Returns the cubic factors of the polynomials, of a single component, in the form at³+bt²+ct+d</summary>
+		/// <param name="p0">The starting point of the curve</param>
+		/// <param name="p1">The second control point of the curve, sometimes called the start tangent point</param>
+		/// <param name="p2">The third control point of the curve, sometimes called the end tangent point</param>
+		/// <param name="p3">The end point of the curve</param>
 		public static (float a, float b, float c, float d) GetCubicFactors( float p0, float p1, float p2, float p3 ) =>
 		(
 			-p0 + 3 * ( p1 - p2 ) + p3,
@@ -14,6 +19,10 @@ namespace Freya {
 		);
 
 		/// <summary>Returns the cubic factors of the derivative polynomials, of a single component, in the form at²+bt+c</summary>
+		/// <param name="p0">The starting point of the curve</param>
+		/// <param name="p1">The second control point of the curve, sometimes called the start tangent point</param>
+		/// <param name="p2">The third control point of the curve, sometimes called the end tangent point</param>
+		/// <param name="p3">The end point of the curve</param>
 		public static (float a, float b, float c) GetCubicFactorsDerivative( float p0, float p1, float p2, float p3 ) =>
 		(
 			3 * ( -p0 + 3 * ( p1 - p2 ) + p3 ),
@@ -22,6 +31,10 @@ namespace Freya {
 		);
 
 		/// <summary>Returns the cubic factors of the second derivative polynomials, of a single component, in the form at+b</summary>
+		/// <param name="p0">The starting point of the curve</param>
+		/// <param name="p1">The second control point of the curve, sometimes called the start tangent point</param>
+		/// <param name="p2">The third control point of the curve, sometimes called the end tangent point</param>
+		/// <param name="p3">The end point of the curve</param>
 		public static (float a, float b) GetCubicFactorsSecondDerivative( float p0, float p1, float p2, float p3 ) =>
 		(
 			6 * ( -p0 + 3 * ( p1 - p2 ) + p3 ),
@@ -29,6 +42,7 @@ namespace Freya {
 		);
 
 		/// <summary>Returns the bernstein polynomial weights for positions in the curve at the given point t</summary>
+		/// <param name="t">The t-value along the curve to sample</param>
 		public static Vector4 GetBernsteinPolynomialWeights( float t ) {
 			float omt = 1f - t;
 			float omt2 = omt * omt;
@@ -42,6 +56,7 @@ namespace Freya {
 		}
 
 		/// <summary>Returns the bernstein polynomial weights for the derivative of the curve at the given point t</summary>
+		/// <param name="t">The t-value along the curve to sample</param>
 		public static Vector4 GetBernsteinPolynomialWeightsDerivative( float t ) {
 			float omt = 1f - t;
 			float omt2 = omt * omt;
@@ -55,6 +70,7 @@ namespace Freya {
 		}
 
 		/// <summary>Returns the bernstein polynomial weights for the second derivative of the curve at the given point t</summary>
+		/// <param name="t">The t-value along the curve to sample</param>
 		public static Vector4 GetBernsteinPolynomialWeightsSecondDerivative( float t ) {
 			return new Vector4( 6 - 6 * t, 18 * t - 12, 6 - 18 * t, 6 * t );
 		}

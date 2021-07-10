@@ -6,6 +6,7 @@ using static Freya.Mathfs;
 namespace Freya {
 
 	// Trajectory math
+	/// <summary>Various trajectory methods to calculate displacement, angles, max ranges, and more </summary>
 	public static class Trajectory {
 
 		/// <summary>Outputs the launch speed required to traverse a given lateral distance when launched at a given angle, if one exists</summary>

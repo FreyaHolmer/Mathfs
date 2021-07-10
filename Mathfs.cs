@@ -957,13 +957,6 @@ namespace Freya {
 
 		#region Root Finding
 
-		public enum PolynomialType {
-			Constant,
-			Linear,
-			Quadratic,
-			Cubic
-		}
-
 		static bool FactorAlmost0( float v ) => v.Abs() < 0.00001f;
 
 		/// <summary>Given ax³+bx²+cx+d, returns the net polynomial type/degree, accounting for values very close to 0</summary>
