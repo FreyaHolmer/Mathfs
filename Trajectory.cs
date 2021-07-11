@@ -6,7 +6,7 @@ using static Freya.Mathfs;
 namespace Freya {
 
 	// Trajectory math
-	/// <summary>Various trajectory methods to calculate displacement, angles, max ranges, and more </summary>
+	/// <summary>Various trajectory methods to calculate displacement, angles, max ranges, and more</summary>
 	public static class Trajectory {
 
 		/// <summary>Outputs the launch speed required to traverse a given lateral distance when launched at a given angle, if one exists</summary>
@@ -57,10 +57,9 @@ namespace Freya {
 			return true;
 		}
 
-		/// <summary>Returns the maximum lateral range a trajectory could reach, when launched at the optimal angle of 45°</summary>
+		/// <summary>Returns the maximum lateral range a trajectory could reach, in meters, when launched at the optimal angle of 45°</summary>
 		/// <param name="gravity">Gravitational acceleration in meters per second</param>
 		/// <param name="speed">Launch speed in meters per second</param>
-		/// <returns>Maximum lateral range in meters per second</returns>
 		public static float GetMaxRange( float gravity, float speed ) => speed * speed / gravity;
 
 		/// <summary>Returns the displacement given a launch speed, launch angle and a traversal time</summary>
