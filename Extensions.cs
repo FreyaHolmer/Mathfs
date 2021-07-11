@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace Freya {
 
+	/// <summary>Various extensions for floats, vectors and colors</summary>
 	public static class MathfsExtensions {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
@@ -24,11 +25,13 @@ namespace Freya {
 		[MethodImpl( INLINE )] public static Vector2 Rotate90CCW( this Vector2 v ) => new Vector2( -v.y, v.x );
 
 		/// <summary>Rotates the vector around <c>pivot</c> with the given angle (in radians)</summary>
+		/// <param name="v">The vector to rotate</param>
 		/// <param name="pivot">The point to rotate around</param>
 		/// <param name="angRad">The angle to rotate by, in radians</param>
 		[MethodImpl( INLINE )] public static Vector2 RotateAround( this Vector2 v, Vector2 pivot, float angRad ) => Rotate( v - pivot, angRad ) + pivot;
 
 		/// <summary>Rotates the vector around <c>(0,0)</c> with the given angle (in radians)</summary>
+		/// <param name="v">The vector to rotate</param>
 		/// <param name="angRad">The angle to rotate by, in radians</param>
 		public static Vector2 Rotate( this Vector2 v, float angRad ) {
 			float ca = Mathf.Cos( angRad );
@@ -37,9 +40,11 @@ namespace Freya {
 		}
 
 		/// <summary>Converts an angle in degrees to radians</summary>
+		/// <param name="angDegrees">The angle, in degrees, to convert to radians</param>
 		[MethodImpl( INLINE )] public static float DegToRad( this float angDegrees ) => angDegrees * Mathfs.Deg2Rad;
 
 		/// <summary>Converts an angle in radians to degrees</summary>
+		/// <param name="angRadians">The angle, in radians, to convert to degrees</param>
 		[MethodImpl( INLINE )] public static float RadToDeg( this float angRadians ) => angRadians * Mathfs.Rad2Deg;
 
 		#endregion
@@ -111,18 +116,22 @@ namespace Freya {
 		#region Color manipulation
 
 		/// <summary>Returns the same color, but with the specified alpha value</summary>
+		/// <param name="c">The source color</param>
 		/// <param name="a">The new alpha value</param>
 		[MethodImpl( INLINE )] public static Color WithAlpha( this Color c, float a ) => new Color( c.r, c.g, c.b, a );
 
 		/// <summary>Returns the same color and alpha, but with RGB multiplied by the given value</summary>
+		/// <param name="c">The source color</param>
 		/// <param name="m">The multiplier for the RGB channels</param>
 		[MethodImpl( INLINE )] public static Color MultiplyRGB( this Color c, float m ) => new Color( c.r * m, c.g * m, c.b * m, c.a );
 
 		/// <summary>Returns the same color and alpha, but with the RGB values multiplief by another color</summary>
+		/// <param name="c">The source color</param>
 		/// <param name="m">The color to multiply RGB by</param>
 		[MethodImpl( INLINE )] public static Color MultiplyRGB( this Color c, Color m ) => new Color( c.r * m.r, c.g * m.g, c.b * m.b, c.a );
 
 		/// <summary>Returns the same color, but with the alpha channel multiplied by the given value</summary>
+		/// <param name="c">The source color</param>
 		/// <param name="m">The multiplier for the alpha</param>
 		[MethodImpl( INLINE )] public static Color MultiplyA( this Color c, float m ) => new Color( c.r, c.g, c.b, c.a * m );
 

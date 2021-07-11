@@ -13,6 +13,7 @@ using System.Runtime.CompilerServices;
 
 namespace Freya {
 
+	/// <summary>The core math helper class. It has functions mostly for single values, but also vector helpers</summary>
 	public static class Mathfs {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
@@ -78,9 +79,19 @@ namespace Freya {
 
 		#region Floating point shenanigans
 
+		/// <summary>A very small value, used for various floating point inaccuracy thresholds</summary>
 		public static readonly float Epsilon = UnityEngineInternal.MathfInternal.IsFlushToZeroEnabled ? UnityEngineInternal.MathfInternal.FloatMinNormal : UnityEngineInternal.MathfInternal.FloatMinDenormal;
+
+		/// <summary>float.PositiveInfinity</summary>
 		public const float Infinity = float.PositiveInfinity;
+
+		/// <summary>float.NegativeInfinity</summary>
 		public const float NegativeInfinity = float.NegativeInfinity;
+
+		/// <summary>Returns whether or not two values are approximately equal.
+		/// They are considered equal if they are within a <c>Mathfs.Epsilon*8</c> or <c>max(a,b)*0.000001f</c> range of each other</summary>
+		/// <param name="a">The first value to compare</param>
+		/// <param name="b">The second value to compare</param>
 		[MethodImpl( INLINE )] public static bool Approximately( float a, float b ) => Abs( b - a ) < Max( 0.000001f * Max( Abs( a ), Abs( b ) ), Epsilon * 8 );
 
 		#endregion
