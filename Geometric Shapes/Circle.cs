@@ -173,11 +173,12 @@ namespace Freya {
 		/// <param name="circle">The circle passing through the start with a given tangent direction, and the end point, if possible</param>
 		public static bool FromPointTangentPoint( Vector2 startPt, Vector2 startTangent, Vector2 endPt, out Circle2D circle ) {
 			Line2D lineA = new Line2D( startPt, startTangent.Rotate90CW() );
-			Line2D lineB = LineSegment2D.GetBisectorFast( startPt, endPt );
+			Line2D lineB = LineSegment2D.GetBisector( startPt, endPt );
 			if( lineA.Intersect( lineB, out Vector2 pt ) ) {
 				circle = new Circle2D( pt, Vector2.Distance( pt, startPt ) );
 				return true;
 			}
+
 
 			circle = default;
 			return false;
