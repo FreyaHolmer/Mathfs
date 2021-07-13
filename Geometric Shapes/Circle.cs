@@ -144,8 +144,8 @@ namespace Freya {
 		/// <param name="c">The third point on the circle</param>
 		/// <param name="circle">The circle passing through all three points</param>
 		public static bool FromThreePoints( Vector2 a, Vector2 b, Vector2 c, out Circle2D circle ) {
-			Line2D lineA = LineSegment2D.GetBisectorFast( a, b );
-			Line2D lineB = LineSegment2D.GetBisectorFast( b, c );
+			Line2D lineA = LineSegment2D.GetBisector( a, b );
+			Line2D lineB = LineSegment2D.GetBisector( b, c );
 			if( lineA.Intersect( lineB, out circle.center ) ) {
 				circle.radius = Vector2.Distance( circle.center, a );
 				return true;

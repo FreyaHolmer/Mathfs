@@ -50,27 +50,16 @@ namespace Freya {
 		/// <param name="point">The point to project</param>
 		[MethodImpl( INLINE )] public Vector2 ProjectPoint( Vector2 point ) => GetPoint( ProjectPointTValue( point ) );
 
-		/// <summary>Returns the perpendicular bisector. Note: the returned normal is not normalized to save performance. Use Bisector() if you want to make sure it is normalized</summary>
-		[MethodImpl( INLINE )] public Line2D BisectorFast() => GetBisectorFast( start, end );
 
-		/// <summary>Returns the perpendicular bisector</summary>
-		[MethodImpl( INLINE )] public Line2D Bisector() => GetBisector( start, end );
 
-		/// <summary>Returns the perpendicular bisector of the input line segment. Note: the returned normal is not normalized to save performance. Use GetBisector() if you want to make sure it is normalized</summary>
-		/// <param name="startPoint">Starting point of the line segment</param>
-		/// <param name="endPoint">Endpoint of the line segment</param>
-		[MethodImpl( INLINE )] public static Line2D GetBisectorFast( Vector2 startPoint, Vector2 endPoint ) {
-			return new Line2D( ( startPoint + endPoint ) * 0.5f, ( startPoint - endPoint ).Rotate90CCW() );
+		/// <summary>Returns the perpendicular bisector. Note: the returned normal is not normalized to save performance. Use <c>Bisector.Normalized</c> if you want to make sure it is normalized</summary>
+		public Line2D Bisector {
+			[MethodImpl( INLINE )] get => GetBisector( start, end );
 		}
 
-		/// <summary>Returns the perpendicular bisector of the input line segment</summary>
+		/// <summary>Returns the perpendicular bisector of the input line segment. Note: the returned line is not normalized to save performance. Use <c>GetBisector().Normalized</c> if you want to make sure it is normalized</summary>
 		/// <param name="startPoint">Starting point of the line segment</param>
 		/// <param name="endPoint">Endpoint of the line segment</param>
-		public static Line2D GetBisector( Vector2 startPoint, Vector2 endPoint ) {
-			Line2D line = GetBisectorFast( startPoint, endPoint );
-			line.dir = line.dir.normalized;
-			return line;
-		}
 
 		#region Intersection tests
 
@@ -110,6 +99,7 @@ namespace Freya {
 		[MethodImpl( INLINE )] public ResultsMax2<Vector2> Intersect( Circle2D circle ) => IntersectionTest.LinearCircleIntersectionPoints( this, circle );
 
 		#endregion
+		[MethodImpl( INLINE )] public static Line2D GetBisector( Vector2 startPoint, Vector2 endPoint ) => new Line2D( ( startPoint + endPoint ) * 0.5f, ( startPoint - endPoint ).Rotate90CCW() );
 
 		#region Interface stuff for generic line tests
 
