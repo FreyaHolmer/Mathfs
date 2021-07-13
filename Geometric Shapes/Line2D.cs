@@ -19,6 +19,9 @@ namespace Freya {
 		/// <summary>The direction of the ray. Note: Line2D allows non-normalized direction vectors</summary>
 		public Vector2 dir;
 
+		/// <summary>Returns a normalized version of this line. Normalized lines ensure t-values correspond to distance</summary>
+		public Line2D Normalized => new Line2D( origin, dir );
+
 		/// <summary>Creates an infinitely long 2D line, given an origin and a direction</summary>
 		/// <param name="origin">The origin of the line</param>
 		/// <param name="dir">The direction of the line. It does not have to be normalized, but if it is, the t-value when sampling will correspond to distance along the ray</param>
