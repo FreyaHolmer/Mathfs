@@ -195,33 +195,17 @@ namespace Freya {
 
 	public partial struct Circle2D {
 
-		/// <summary>Returns whether or not this circle intersects a ray</summary>
-		/// <param name="ray">The ray to test intersection against</param>
-		[MethodImpl( INLINE )] public bool Intersects( Ray2D ray ) => IntersectionTest.LinearCircleIntersects( ray, this );
-
-		/// <summary>Returns whether or not this circle intersects a line segment</summary>
-		/// <param name="lineSeg">The line segment to test intersection against</param>
-		[MethodImpl( INLINE )] public bool Intersects( LineSegment2D lineSeg ) => IntersectionTest.LinearCircleIntersects( lineSeg, this );
-
-		/// <summary>Returns whether or not this circle intersects a line</summary>
-		/// <param name="line">The line to test intersection against</param>
-		[MethodImpl( INLINE )] public bool Intersects( Line2D line ) => IntersectionTest.LinearCircleIntersects( line, this );
+		/// <summary>Returns whether or not this circle intersects a linear object</summary>
+		/// <param name="linear">The linear object to test intersection against (Ray2D, Line2D or LineSegment2D)</param>
+		[MethodImpl( INLINE )] public bool Intersects<T>( T linear ) where T : ILinear2D => IntersectionTest.LinearCircleIntersects( linear, this );
 
 		/// <summary>Returns whether or not this circle intersects another circle</summary>
 		/// <param name="circle">The circle to test intersection against</param>
 		[MethodImpl( INLINE )] public bool Intersects( Circle2D circle ) => IntersectionTest.CirclesOverlap( this.center, this.radius, circle.center, circle.radius );
 
-		/// <summary>Returns the intersections this circle has with a ray (if any)</summary>
-		/// <param name="ray">The ray to test intersection against</param>
-		[MethodImpl( INLINE )] public ResultsMax2<Vector2> Intersect( Ray2D ray ) => IntersectionTest.LinearCircleIntersectionPoints( ray, this );
-
-		/// <summary>Returns the intersections this circle has with a line segment (if any)</summary>
-		/// <param name="lineSeg">The line segment to test intersection against</param>
-		[MethodImpl( INLINE )] public ResultsMax2<Vector2> Intersect( LineSegment2D lineSeg ) => IntersectionTest.LinearCircleIntersectionPoints( lineSeg, this );
-
-		/// <summary>Returns the intersections this circle has with a line (if any)</summary>
-		/// <param name="line">The line to test intersection against</param>
-		[MethodImpl( INLINE )] public ResultsMax2<Vector2> Intersect( Line2D line ) => IntersectionTest.LinearCircleIntersectionPoints( line, this );
+		/// <summary>Returns the intersections this circle has with a linear object (if any)</summary>
+		/// <param name="linear">The linear object to test intersection against (Ray2D, Line2D or LineSegment2D)</param>
+		[MethodImpl( INLINE )] public ResultsMax2<Vector2> Intersect<T>( T linear ) where T : ILinear2D => IntersectionTest.LinearCircleIntersectionPoints( linear, this );
 
 		/// <summary>Returns the intersections this circle has with another circle (if any)</summary>
 		/// <param name="circle">The circle to test intersection against</param>
@@ -231,7 +215,7 @@ namespace Freya {
 
 	#endregion
 
-	#region Static circle functions
+	#region Static general circle functions
 
 	public partial struct Circle2D {
 
