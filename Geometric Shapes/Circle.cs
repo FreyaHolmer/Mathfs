@@ -105,7 +105,13 @@ namespace Freya {
 	}
 
 	public partial struct Circle3D {
-		// todo
+		/// <inheritdoc cref="Circle2D.ProjectPoint"/>
+		public Vector3 ProjectPoint( Vector3 point ) {
+			Vector3 v = point - center;
+			Vector3 flattened = v - Vector3.Dot( v, normal ) * normal;
+			float mag = flattened.magnitude;
+			return center + flattened * ( radius / mag );
+		}
 	}
 
 	#endregion
@@ -157,7 +163,34 @@ namespace Freya {
 	}
 
 	public partial struct Circle3D {
-		// todo:
+
+		/// <inheritdoc cref="Circle2D.FromThreePoints"/>
+		public static bool FromThreePoints( Vector3 a, Vector3 b, Vector3 c, out Circle3D circle ) {
+			// todo: this is effectively:
+			// • bisector plane-plane intersection -> Line
+			// • plane-line intersection for center
+			// • vector length check for radius
+			// which might be cheaper than the below:
+
+			Vector3 bRel = b - a;
+			( Vector3 xAxis, float bx2D ) = bRel.GetDirAndMagnitude();
+			Vector3 cRel = c - a;
+			Vector3 normal = Vector3.Cross( bRel, cRel ).normalized;
+			Vector3 yAxis = Vector3.Cross( normal, xAxis );
+
+			Vector2 b2D = new Vector2( bx2D, 0 );
+			Vector2 c2D = new Vector2( Vector3.Dot( xAxis, cRel ), Vector3.Dot( yAxis, cRel ) );
+
+			if( Circle2D.FromThreePoints( default, b2D, c2D, out Circle2D circle2D ) ) {
+				Vector3 origin = xAxis * circle2D.center.x + yAxis * circle2D.center.y;
+				circle = new Circle3D( origin, normal, circle2D.radius );
+				return true;
+			}
+
+			circle = default;
+			return false;
+		}
+
 	}
 
 	#endregion
@@ -186,7 +219,27 @@ namespace Freya {
 	}
 
 	public partial struct Circle3D {
-		// todo:
+		/// <inheritdoc cref="Circle2D.FromPointTangentPoint"/>
+		public static bool FromPointTangentPoint( Vector3 startPt, Vector3 startTangent, Vector3 endPt, out Circle3D circle ) {
+			Vector3 delta = endPt - startPt;
+			( Vector3 xAxis, float d ) = delta.GetDirAndMagnitude();
+			if( Vector3.Dot( xAxis, startTangent ).Abs() < 0.9999f ) {
+				float h = d / 2;
+				float ang = AngleBetween( xAxis, startTangent );
+				float fh = h * Mathf.Tan( ang + TAU / 4 );
+				float x2D = h;
+				float y2D = fh;
+				float r = Mathf.Sqrt( h * h + fh * fh );
+				Vector3 normal = Vector3.Cross( xAxis, startTangent ).normalized;
+				Vector3 yAxis = Vector3.Cross( normal, xAxis );
+				Vector3 center = startPt + xAxis * x2D + yAxis * y2D;
+				circle = new Circle3D( center, normal, r );
+				return true;
+			}
+
+			circle = default;
+			return false;
+		}
 	}
 
 	#endregion
