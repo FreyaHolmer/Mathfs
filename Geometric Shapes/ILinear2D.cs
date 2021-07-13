@@ -11,14 +11,14 @@ namespace Freya {
 		/// <summary>The origin of this linear 2D object (Ray2D, Line2D or LineSegment2D)</summary>
 		Vector2 Origin { get; }
 
-		/// <summary>The direction of this linear 2D object (Ray2D, Line2D or LineSegment2D)</summary>
+		/// <summary>The direction of this linear 2D object (Ray2D, Line2D or LineSegment2D). Note: this vector may or may not be normalized</summary>
 		Vector2 Dir { get; }
 
 		/// <summary>Returns whether or not this t-value is within this linear 2D object (Ray2D, Line2D or LineSegment2D)</summary>
 		/// <param name="t">The t-value along the linear 2D object</param>
 		bool IsValidTValue( float t );
 
-		/// <summary>Clamps the value into the range of linear 2D object (Ray2D, Line2D or LineSegment2D)</summary>
+		/// <summary>Clamps the value into the range of this linear 2D object (Ray2D, Line2D or LineSegment2D)</summary>
 		/// <param name="t">The t-value along the linear 2D object</param>
 		float ClampTValue( float t );
 	}
