@@ -25,9 +25,7 @@ namespace Freya {
 		/// <summary>Creates an infinitely long 2D line, given an origin and a direction</summary>
 		/// <param name="origin">The origin of the line</param>
 		/// <param name="dir">The direction of the line. It does not have to be normalized, but if it is, the t-value when sampling will correspond to distance along the ray</param>
-		public Line2D( Vector2 origin, Vector2 dir ) {
-			this.origin = origin;
-			this.dir = dir;
+		public Line2D( Vector2 origin, Vector2 dir ) => ( this.origin, this.dir ) = ( origin, dir );
 		}
 
 		/// <summary>Gets a point along the line</summary>

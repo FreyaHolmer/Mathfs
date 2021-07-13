@@ -20,9 +20,7 @@ namespace Freya {
 		/// <summary>Creates a line segment with a defined start and end point</summary>
 		/// <param name="start">The start point of the line segment</param>
 		/// <param name="end">The end point of the line segment</param>
-		public LineSegment2D( Vector2 start, Vector2 end ) {
-			this.start = start;
-			this.end = end;
+		public LineSegment2D( Vector2 start, Vector2 end ) => ( this.start, this.end ) = ( start, end );
 		}
 
 		/// <summary>Gets a point along the line segment</summary>

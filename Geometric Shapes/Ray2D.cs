@@ -24,10 +24,6 @@ namespace Freya {
 		/// <summary>Creates a 2D Ray. Note: direction does not have to be normalized, but if it is, the t-value will correspond to distance along the ray</summary>
 		/// <param name="origin">The origin of the ray</param>
 		/// <param name="dir">The direction of the ray. It does not have to be normalized, but if it is, the t-value when sampling will correspond to distance along the ray</param>
-		public Ray2D( Vector2 origin, Vector2 dir ) {
-			this.origin = origin;
-			this.dir = dir;
-		}
 
 		/// <summary>Gets a point along the ray</summary>
 		/// <param name="t">The t-value along the ray to get the point of. If the ray direction is normalized, t is equivalent to distance</param>
@@ -40,6 +36,7 @@ namespace Freya {
 		/// <summary>Projects a point onto this ray</summary>
 		/// <param name="point">The point to project</param>
 		[MethodImpl( INLINE )] public Vector2 ProjectPoint( Vector2 point ) => GetPoint( ProjectPointTValue( point ) );
+		public Ray2D( Vector2 origin, Vector2 dir ) => ( this.origin, this.dir ) = ( origin, dir );
 
 		/// <summary>Implicitly casts a Unity ray to a Mathfs ray</summary>
 		/// <param name="ray">The ray to cast to a Unity ray</param>
