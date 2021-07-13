@@ -34,7 +34,11 @@ namespace Freya {
 
 		/// <summary>Calculates the length of the line segment</summary>
 		public float Length {
-			[MethodImpl( INLINE )] get => Vector2.Distance( start, end );
+			[MethodImpl( INLINE )] get {
+				float dx = end.x - start.x;
+				float dy = end.y - start.y;
+				return (float)Math.Sqrt( dx * dx + dy * dy );
+			}
 		}
 
 		/// <summary>Calculates the length squared (faster than calculating the actual length)</summary>
