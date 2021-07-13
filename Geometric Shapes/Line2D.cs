@@ -1,5 +1,6 @@
 ﻿// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
+using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using static Freya.Mathfs;
@@ -8,7 +9,7 @@ namespace Freya {
 
 	// 2D line math
 	/// <summary>A structure representing an infinitely long 2D line</summary>
-	public struct Line2D : ILinear2D {
+	[Serializable] public struct Line2D : ILinear2D {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 

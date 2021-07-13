@@ -1,5 +1,6 @@
-﻿// collected and expended upon by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
+﻿// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
+using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
@@ -7,7 +8,7 @@ namespace Freya {
 
 	/// <summary>Similar to Unity's Ray2D, except this one allows you to not normalize the direction
 	/// which saves performance as well as allows you to work at different scales</summary>
-	public struct Ray2D : ILinear2D {
+	[Serializable] public struct Ray2D : ILinear2D {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 

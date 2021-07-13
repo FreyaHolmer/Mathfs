@@ -5,7 +5,6 @@
 // Collected and expanded upon to by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
 using System;
-using System.ComponentModel;
 using UnityEngine;
 using Uei = UnityEngine.Internal;
 using System.Linq; // used for arbitrary count min/max functions, so it's safe and won't allocate garbage don't worry~

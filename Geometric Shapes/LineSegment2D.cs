@@ -1,12 +1,13 @@
 ﻿// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
+using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace Freya {
 
 	/// <summary>Represents a line segment, similar to a line but with a defined start and end</summary>
-	public struct LineSegment2D : ILinear2D {
+	[Serializable] public struct LineSegment2D : ILinear2D {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 
