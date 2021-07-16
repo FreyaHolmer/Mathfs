@@ -103,6 +103,14 @@ namespace Freya {
 			return Mathf.Abs( dist - maxRad ) < minRad;
 		}
 
+		/// <summary>Returns whether or not a line passes through a box centered at (0,0)</summary>
+		/// <param name="extents">Box extents/"radius" per axis</param>
+		/// <param name="pt">A point in the line</param>
+		/// <param name="dir">The direction of the line</param>
+		public static bool LineRectOverlap( Vector2 extents, Vector2 pt, Vector2 dir ) {
+			Vector2 corner = new Vector2( extents.x, extents.y * -Sign( dir.x * dir.y ) );
+			return SignAsInt( Determinant( dir, corner - pt ) ) != SignAsInt( Determinant( dir, -corner - pt ) );
+		}
 		/// <summary>Returns whether or not two discs overlap. Unlike circles, discs overlap even if one is smaller and is completely inside the other</summary>
 		/// <param name="aPos">The position of the first disc</param>
 		/// <param name="aRadius">The radius of the first disc</param>

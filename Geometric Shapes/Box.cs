@@ -325,4 +325,16 @@ namespace Freya {
 	}
 
 	#endregion
+
+	#region Intersection Tests (2D only, for now)
+
+	public partial struct Box2D {
+		/// <summary>Returns whether or not an infinite line intersects this box</summary>
+		/// <param name="line">The line to see if it intersects</param>
+		public bool Intersects( Line2D line ) => IntersectionTest.LineRectOverlap( extents, line.origin - center, line.dir );
+
+	}
+
+	#endregion
+
 }
