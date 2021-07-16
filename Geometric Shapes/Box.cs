@@ -107,6 +107,42 @@ namespace Freya {
 	}
 
 	#endregion
+
+	#region Vertices
+
+	public partial struct Box2D {
+		/// <summary>Returns a vertex of this box by index</summary>
+		/// <param name="index">The index of the vertex to retrieve</param>
+		public Vector2 GetVertex( int index ) {
+			switch( index ) {
+				case 0:  return new Vector2( center.x - extents.x, center.y - extents.y );
+				case 1:  return new Vector2( center.x - extents.x, center.y + extents.y );
+				case 2:  return new Vector2( center.x + extents.x, center.y - extents.y );
+				case 3:  return new Vector2( center.x + extents.x, center.y + extents.y );
+				default: throw new ArgumentOutOfRangeException( nameof(index), $"Invalid index: {index}. Valid vertex indices range from 0 to {VERTEX_COUNT - 1}" );
+			}
+		}
+	}
+
+	public partial struct Box3D {
+		/// <inheritdoc cref="Box2D.GetVertex"/>
+		public Vector2 GetVertex( int index ) {
+			switch( index ) {
+				case 0:  return new Vector3( center.x - extents.x, center.y - extents.y, center.z - extents.z );
+				case 1:  return new Vector3( center.x - extents.x, center.y - extents.y, center.z + extents.z );
+				case 2:  return new Vector3( center.x - extents.x, center.y + extents.y, center.z - extents.z );
+				case 3:  return new Vector3( center.x - extents.x, center.y + extents.y, center.z + extents.z );
+				case 4:  return new Vector3( center.x + extents.x, center.y - extents.y, center.z - extents.z );
+				case 5:  return new Vector3( center.x + extents.x, center.y - extents.y, center.z + extents.z );
+				case 6:  return new Vector3( center.x + extents.x, center.y + extents.y, center.z - extents.z );
+				case 7:  return new Vector3( center.x + extents.x, center.y + extents.y, center.z + extents.z );
+				default: throw new ArgumentOutOfRangeException( nameof(index), $"Invalid index: {index}. Valid vertex indices range from 0 to {VERTEX_COUNT - 1}" );
+			}
+		}
+	}
+
+	#endregion
+
 	#region Volume
 
 	public partial struct Box2D {
