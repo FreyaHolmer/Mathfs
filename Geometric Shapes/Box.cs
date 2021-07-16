@@ -178,4 +178,56 @@ namespace Freya {
 	}
 
 	#endregion
+
+	#region Contains
+
+	public partial struct Box2D {
+		/// <summary>Returns whether or not a point is inside this box</summary>
+		/// <param name="point">The point to test if it's inside</param>
+		[MethodImpl( INLINE )] public bool Contains( Vector2 point ) => Abs( point.x ) - extents.x <= 0 && Abs( point.y ) - extents.y <= 0;
+	}
+
+	public partial struct Box3D {
+		/// <inheritdoc cref="Box2D.Contains"/>
+		[MethodImpl( INLINE )] public bool Contains( Vector3 point ) => Abs( point.x ) - extents.x <= 0 && Abs( point.y ) - extents.y <= 0 && Abs( point.z ) - extents.z <= 0;
+	}
+
+	#endregion
+
+	#region Encapsulate
+
+	public partial struct Box2D {
+		/// <summary>Extends the boundary of this box to encapsulate a point</summary>
+		/// <param name="point">The point to encapsulate</param>
+		public void Encapsulate( Vector2 point ) {
+			float minX = Min( center.x - extents.x, point.x );
+			float minY = Min( center.y - extents.y, point.y );
+			float maxX = Max( center.x + extents.x, point.x );
+			float maxY = Max( center.y + extents.y, point.y );
+			center.x = ( maxX + minX ) / 2;
+			center.y = ( maxY + minY ) / 2;
+			extents.x = ( maxX - minX ) / 2;
+			extents.y = ( maxY - minY ) / 2;
+		}
+	}
+
+	public partial struct Box3D {
+		/// <inheritdoc cref="Box2D.Encapsulate"/>
+		public void Encapsulate( Vector3 point ) {
+			float minX = Min( center.x - extents.x, point.x );
+			float minY = Min( center.y - extents.y, point.y );
+			float minZ = Min( center.z - extents.z, point.z );
+			float maxX = Max( center.x + extents.x, point.x );
+			float maxY = Max( center.y + extents.y, point.y );
+			float maxZ = Max( center.z + extents.z, point.z );
+			center.x = ( maxX + minX ) / 2;
+			center.y = ( maxY + minY ) / 2;
+			center.z = ( maxZ + minZ ) / 2;
+			extents.x = ( maxX - minX ) / 2;
+			extents.y = ( maxY - minY ) / 2;
+			extents.z = ( maxZ - minZ ) / 2;
+		}
+	}
+
+	#endregion
 }
