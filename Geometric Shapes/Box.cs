@@ -230,4 +230,99 @@ namespace Freya {
 	}
 
 	#endregion
+
+	#region Closest Corner
+
+	public partial struct Box2D {
+		/// <summary>Returns the corner of this box closest to the given point</summary>
+		/// <param name="point">The point to get the closest corner to</param>
+		public Vector2 ClosestCorner( Vector2 point ) =>
+			new Vector2(
+				center.x + Sign( point.x - center.x ) * extents.x,
+				center.y + Sign( point.y - center.y ) * extents.y
+			);
+	}
+
+	public partial struct Box3D {
+		/// <inheritdoc cref="Box2D.ClosestCorner"/>
+		public Vector3 ClosestCorner( Vector3 point ) =>
+			new Vector3(
+				center.x + Sign( point.x - center.x ) * extents.x,
+				center.y + Sign( point.y - center.y ) * extents.y,
+				center.z + Sign( point.z - center.z ) * extents.z
+			);
+	}
+
+	#endregion
+
+	#region Closest point inside
+
+	public partial struct Box2D {
+		/// <summary>Returns the point inside the box, closest to another point.
+		/// Points already inside will return the same location</summary>
+		/// <param name="point">The point to get the closest point to</param>
+		[MethodImpl( INLINE )] public Vector2 ClosestPointInside( Vector2 point ) =>
+			new Vector2(
+				point.x.Clamp( center.x - extents.x, center.x + extents.x ),
+				point.y.Clamp( center.y - extents.y, center.y + extents.y )
+			);
+	}
+
+	public partial struct Box3D {
+		/// <inheritdoc cref="Box2D.ClosestPointInside"/>
+		[MethodImpl( INLINE )] public Vector3 ClosestPointInside( Vector3 point ) =>
+			new Vector3(
+				point.x.Clamp( center.x - extents.x, center.x + extents.x ),
+				point.y.Clamp( center.y - extents.y, center.y + extents.y ),
+				point.z.Clamp( center.z - extents.z, center.z + extents.z )
+			);
+	}
+
+	#endregion
+
+	#region Closest point on bounds
+
+	public partial struct Box2D {
+		/// <summary>Projects a point onto the boundary of this box. Points inside will be pushed out to the boundary</summary>
+		/// <param name="point">The point to project onto the box boundary</param>
+		[MethodImpl( INLINE )] public Vector2 ClosestPointOnBoundary( Vector2 point ) {
+			float px = point.x - center.x;
+			float py = point.y - center.y;
+			float ax = Abs( px );
+			float ay = Abs( py );
+			float dx = ax - extents.x;
+			float dy = ay - extents.y;
+			bool caseX = dy <= dx;
+			bool caseY = caseX == false;
+			return new Vector2(
+				center.x + Sign( px ) * ( caseX ? extents.x : ax.AtMost( extents.x ) ),
+				center.y + Sign( py ) * ( caseY ? extents.y : ay.AtMost( extents.y ) )
+			);
+		}
+	}
+
+	public partial struct Box3D {
+		/// <inheritdoc cref="Box2D.ClosestPointOnBoundary"/>
+		[MethodImpl( INLINE )] public Vector3 ClosestPointOnBoundary( Vector3 point ) {
+			float px = point.x - center.x;
+			float py = point.y - center.y;
+			float pz = point.z - center.z;
+			float ax = Abs( px );
+			float ay = Abs( py );
+			float az = Abs( pz );
+			float dx = ax - extents.x;
+			float dy = ay - extents.y;
+			float dz = az - extents.z;
+			bool caseX = dz <= dx && dy <= dx;
+			bool caseY = caseX == false && dx <= dy && dz <= dy;
+			bool caseZ = caseX == false && caseY == false;
+			return new Vector3(
+				center.x + Sign( px ) * ( caseX ? extents.x : ax.AtMost( extents.x ) ),
+				center.y + Sign( py ) * ( caseY ? extents.y : ay.AtMost( extents.y ) ),
+				center.z + Sign( pz ) * ( caseZ ? extents.z : az.AtMost( extents.z ) )
+			);
+		}
+	}
+
+	#endregion
 }
