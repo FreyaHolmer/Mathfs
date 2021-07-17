@@ -55,6 +55,8 @@ namespace Freya {
 		[MethodImpl( INLINE )] public static float Distance<T>( this T linear, Vector2 point ) where T : ILinear2D {
 			return Vector2.Distance( point, linear.ProjectPoint( point ) );
 		}
+		
+		#region Intersection Tests
 
 		/// <summary>Returns whether or not this intersects another linear object (Ray2D, Line2D or LineSegment2D)</summary>
 		/// <param name="linear">The linear object to test intersection with (Ray2D, Line2D or LineSegment2D)</param>
@@ -65,17 +67,30 @@ namespace Freya {
 		/// <param name="linear">The linear object to test intersection with (Ray2D, Line2D or LineSegment2D)</param>
 		/// <param name="circle">The circle to test intersection against</param>
 		[MethodImpl( INLINE )] public static bool Intersects<T>( this T linear, Circle2D circle ) where T : ILinear2D => IntersectionTest.LinearCircleIntersects( linear, circle );
+		
+		#endregion
 
+		#region Intersection Points
+		
 		/// <summary>Returns whether or not this line intersects another linear object (Ray2D, Line2D or LineSegment2D), and returns the point (if any)</summary>
 		/// <param name="linear">The linear object to test intersection with (Ray2D, Line2D or LineSegment2D)</param>
 		/// <param name="other">The other linear object to test intersection against (Ray2D, Line2D or LineSegment2D)</param>
 		/// <param name="intersectionPoint">The point at which they intersect</param>
 		[MethodImpl( INLINE )] public static bool Intersect<T, U>( this T linear, U other, out Vector2 intersectionPoint ) where T : ILinear2D where U : ILinear2D => IntersectionTest.LinearIntersectionPoint( linear, other, out intersectionPoint );
 
-		/// <summary>Returns the intersections this ray has with a circle (if any)</summary>
+		/// <summary>Returns the intersections this line has with a circle (if any)</summary>
 		/// <param name="linear">The linear object to test intersection with (Ray2D, Line2D or LineSegment2D)</param>
 		/// <param name="circle">The circle to test intersection against</param>
 		[MethodImpl( INLINE )] public static ResultsMax2<Vector2> Intersect<T>( this T linear, Circle2D circle ) where T : ILinear2D => IntersectionTest.LinearCircleIntersectionPoints( linear, circle );
+		
+		/// <summary>Returns the intersections this line has with a box (if any)</summary>
+		/// <param name="linear">The linear object to test intersection with (Ray2D, Line2D or LineSegment2D)</param>
+		/// <param name="box">The box to test intersection against</param>
+		[MethodImpl( INLINE )] public static ResultsMax2<Vector2> Intersect<T>( this T linear, Box2D box ) where T : ILinear2D =>  IntersectionTest.LinearCircleIntersectionPoints( linear, circle );
+
+		#endregion
+
+		
 
 	}
 

@@ -333,6 +333,9 @@ namespace Freya {
 		/// <param name="line">The line to see if it intersects</param>
 		public bool Intersects( Line2D line ) => IntersectionTest.LineRectOverlap( extents, line.origin - center, line.dir );
 
+		/// <summary>Returns the intersection points of this rectangle and a line</summary>
+		/// <param name="line">The line to get intersection points of</param>
+		public ResultsMax2<Vector2> Intersect( Line2D line ) => IntersectionTest.LinearRectPoints( center, extents, line.origin, line.dir );
 	}
 
 	#endregion

@@ -111,6 +111,80 @@ namespace Freya {
 			Vector2 corner = new Vector2( extents.x, extents.y * -Sign( dir.x * dir.y ) );
 			return SignAsInt( Determinant( dir, corner - pt ) ) != SignAsInt( Determinant( dir, -corner - pt ) );
 		}
+
+		/// <summary>Returns the intersection points of a line passing through a box</summary>
+		/// <param name="center">Center of the box</param>
+		/// <param name="extents">Box extents/"radius" per axis</param>
+		/// <param name="pt">A point in the line</param>
+		/// <param name="dir">The direction of the line</param>
+		public static ResultsMax2<Vector2> LinearRectPoints( Vector2 center, Vector2 extents, Vector2 pt, Vector2 dir ) {
+			const float FLAT_THRESH = 0.000001f;
+
+			// place the line relative to the box
+			pt.x -= center.x;
+			pt.y -= center.y;
+
+			// Vertical line
+			if( dir.x.Abs() < FLAT_THRESH ) {
+				if( pt.x.Abs() <= extents.x ) // inside - two intersections
+					return new ResultsMax2<Vector2>(
+						new Vector2( center.x + pt.x, center.y - extents.y ),
+						new Vector2( center.x + pt.x, center.y + extents.y ) );
+				return default; // outside the box
+			}
+
+			// Horizontal line
+			if( dir.y.Abs() < FLAT_THRESH ) {
+				if( pt.y.Abs() <= extents.y ) // inside - two intersections
+					return new ResultsMax2<Vector2>(
+						new Vector2( center.x - extents.x, center.y + pt.y ),
+						new Vector2( center.x + extents.x, center.y + pt.y ) );
+				return default; // outside the box
+			}
+
+
+			// slope intercept form y = ax+b
+			float a = dir.y / dir.x;
+			float b = pt.y - pt.x * a;
+
+			// y coords on vertical lines
+			float xpy = a * extents.x + b; // x = extents.x
+			float xny = -a * extents.x + b; // x = -extents.x
+			// x coords on horizontal lines
+			float ypx = ( extents.y - b ) / a; // y = extents.y
+			float ynx = ( -extents.y - b ) / a; // y = -extents.y
+
+			// validity checks
+			bool xp = Abs( xpy ) <= extents.y;
+			bool xn = Abs( xny ) <= extents.y;
+			bool yp = Abs( ypx ) <= extents.x;
+			bool yn = Abs( ynx ) <= extents.x;
+
+			if( ( xp || xn || yp || yn ) == false )
+				return default; // no intersections
+
+			float ax, ay, bx, by;
+			if( a > 0 ) { // positive slope means we group results in (x,y) and (-x,-y)
+				ax = xp ? extents.x : ypx;
+				ay = xp ? xpy : extents.y;
+				bx = xn ? -extents.x : ynx;
+				by = xn ? xny : -extents.y;
+			} else { // negative slope means we group results in (x,-y) and (-x,y)
+				ax = xp ? extents.x : ynx;
+				ay = xp ? xpy : -extents.y;
+				bx = xn ? -extents.x : ypx;
+				by = xn ? xny : extents.y;
+			}
+
+			// if the points are very close, this means we hit a corner and we should return only one point
+			if( Abs( ax - bx ) + Abs( ay - by ) < 0.000001f )
+				return new ResultsMax2<Vector2>( new Vector2( center.x + ax, center.y + ay ) );
+
+			// else, two points
+			return new ResultsMax2<Vector2>(
+				new Vector2( center.x + ax, center.y + ay ),
+				new Vector2( center.x + bx, center.y + by ) );
+		}
 		/// <summary>Returns whether or not two discs overlap. Unlike circles, discs overlap even if one is smaller and is completely inside the other</summary>
 		/// <param name="aPos">The position of the first disc</param>
 		/// <param name="aRadius">The radius of the first disc</param>
