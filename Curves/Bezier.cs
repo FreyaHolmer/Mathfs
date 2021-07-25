@@ -119,6 +119,48 @@ namespace Freya {
 
 	}
 
+	#region Object Comparison
+
+	public partial struct BezierCubic2D {
+
+		public static bool operator ==( BezierCubic2D a, BezierCubic2D b ) => a.p0 == b.p0 && a.p1 == b.p1 && a.p2 == b.p2 && a.p3 == b.p3;
+		public static bool operator !=( BezierCubic2D a, BezierCubic2D b ) => !( a == b );
+		public bool Equals( BezierCubic2D other ) => p0.Equals( other.p0 ) && p1.Equals( other.p1 ) && p2.Equals( other.p2 ) && p3.Equals( other.p3 );
+		public override bool Equals( object obj ) => obj is BezierCubic2D other && Equals( other );
+
+		public override int GetHashCode() {
+			unchecked {
+				int hashCode = p0.GetHashCode();
+				hashCode = ( hashCode * 397 ) ^ p1.GetHashCode();
+				hashCode = ( hashCode * 397 ) ^ p2.GetHashCode();
+				hashCode = ( hashCode * 397 ) ^ p3.GetHashCode();
+				return hashCode;
+			}
+		}
+
+
+	}
+
+	public partial struct BezierCubic3D {
+
+		public static bool operator ==( BezierCubic3D a, BezierCubic3D b ) => a.p0 == b.p0 && a.p1 == b.p1 && a.p2 == b.p2 && a.p3 == b.p3;
+		public static bool operator !=( BezierCubic3D a, BezierCubic3D b ) => !( a == b );
+		public bool Equals( BezierCubic3D other ) => p0.Equals( other.p0 ) && p1.Equals( other.p1 ) && p2.Equals( other.p2 ) && p3.Equals( other.p3 );
+		public override bool Equals( object obj ) => obj is BezierCubic3D other && Equals( other );
+
+		public override int GetHashCode() {
+			unchecked {
+				int hashCode = p0.GetHashCode();
+				hashCode = ( hashCode * 397 ) ^ p1.GetHashCode();
+				hashCode = ( hashCode * 397 ) ^ p2.GetHashCode();
+				hashCode = ( hashCode * 397 ) ^ p3.GetHashCode();
+				return hashCode;
+			}
+		}
+	}
+
+	#endregion
+
 	// Base properties - Points, Derivatives & Tangents
 
 	#region Point
