@@ -1433,7 +1433,7 @@ namespace Freya {
 			ResultsMax2<float> t = GetLocalExtrema( axis );
 			ResultsMax2<float> pts = default;
 			for( int i = 0; i < t.count; i++ )
-				pts.Add( GetPointComponent( axis, t[i] ) );
+				pts = pts.Add( GetPointComponent( axis, t[i] ) );
 			return pts;
 		}
 	}
@@ -1468,7 +1468,7 @@ namespace Freya {
 			ResultsMax2<float> t = GetLocalExtrema( axis );
 			ResultsMax2<float> pts = default;
 			for( int i = 0; i < t.count; i++ )
-				pts.Add( GetPointComponent( axis, t[i] ) );
+				pts = pts.Add( GetPointComponent( axis, t[i] ) );
 			return pts;
 		}
 	}
