@@ -170,6 +170,9 @@ namespace Freya {
 		/// <summary>Squares the value. Equivalent to <c>v*v</c></summary>
 		[MethodImpl( INLINE )] public static float Square( this float v ) => v * v;
 
+		/// <summary>Cubes the value. Equivalent to <c>v*v*v</c></summary>
+		[MethodImpl( INLINE )] public static float Cube( this float v ) => v * v * v;
+
 		/// <summary>Squares the value. Equivalent to <c>v*v</c></summary>
 		[MethodImpl( INLINE )] public static int Square( this int v ) => v * v;
 
