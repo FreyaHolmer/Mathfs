@@ -788,7 +788,7 @@ namespace Freya {
 				prev = p;
 			}
 
-			return totalDist / accuracy;
+			return totalDist;
 		}
 	}
 
@@ -811,7 +811,7 @@ namespace Freya {
 				prev = p;
 			}
 
-			return totalDist / accuracy;
+			return totalDist;
 		}
 	}
 
