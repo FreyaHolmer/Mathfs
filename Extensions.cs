@@ -445,7 +445,10 @@ namespace Freya {
 		#region Value & Vector interpolation
 
 		/// <inheritdoc cref="Mathfs.Remap(float,float,float,float,float)"/>
-		[MethodImpl( INLINE )] public static float Remap( this float v, float iMin, float iMax, float oMin, float oMax ) => Mathfs.Remap( iMin, iMax, oMin, oMax, v );
+		[MethodImpl( INLINE )] public static float Remap( this float value, float iMin, float iMax, float oMin, float oMax ) => Mathfs.Remap( iMin, iMax, oMin, oMax, value );
+		
+		/// <inheritdoc cref="Mathfs.Remap(float,float,float,float,int)"/>
+		[MethodImpl( INLINE )] public static float Remap( this int value, float iMin, float iMax, float oMin, float oMax ) => Mathfs.Lerp( oMin, oMax, Mathfs.InverseLerp( iMin, iMax, value ) );
 
 		/// <inheritdoc cref="Mathfs.Remap(Vector2,Vector2,Vector2,Vector2,Vector2)"/>
 		[MethodImpl( INLINE )] public static Vector2 Remap( this Vector2 v, Vector2 iMin, Vector2 iMax, Vector2 oMin, Vector2 oMax ) => Mathfs.Remap( iMin, iMax, oMin, oMax, v );

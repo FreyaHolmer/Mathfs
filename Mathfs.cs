@@ -605,6 +605,9 @@ namespace Freya {
 		/// <param name="value">The value to remap</param>
 		[MethodImpl( INLINE )] public static float Remap( float iMin, float iMax, float oMin, float oMax, float value ) => Lerp( oMin, oMax, InverseLerp( iMin, iMax, value ) );
 
+		/// <inheritdoc cref="Mathfs.Remap(float,float,float,float,float)"/>
+		[MethodImpl( INLINE )] public static float Remap( float iMin, float iMax, float oMin, float oMax, int value ) => Lerp( oMin, oMax, InverseLerp( iMin, iMax, value ) );
+
 		/// <summary>Remaps values from the input range [iMin to iMax] into the output range [oMin to oMax] on a per-component basis.
 		/// Equivalent to Lerp(oMin,oMax,InverseLerp(iMin,iMax,value))</summary>
 		/// <param name="iMin">The start values of the input ranges</param>
