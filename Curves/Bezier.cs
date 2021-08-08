@@ -694,7 +694,7 @@ namespace Freya {
 	public partial struct BezierCubic2D {
 		/// <summary>Splits this curve at the given t-value, into two curves of the exact same shape</summary>
 		/// <param name="t">The t-value along the curve to sample</param>
-		public (BezierCubic2D, BezierCubic2D) Split( float t ) {
+		public (BezierCubic2D pre, BezierCubic2D post) Split( float t ) {
 			Vector2 a = Vector2.Lerp( p0, p1, t );
 			Vector2 b = Vector2.Lerp( p1, p2, t );
 			Vector2 c = Vector2.Lerp( p2, p3, t );
@@ -707,7 +707,7 @@ namespace Freya {
 
 	public partial struct BezierCubic3D {
 		/// <inheritdoc cref="BezierCubic2D.Split(float)"/>
-		public (BezierCubic3D, BezierCubic3D) Split( float t ) {
+		public (BezierCubic3D pre, BezierCubic3D post) Split( float t ) {
 			Vector3 a = Vector3.Lerp( p0, p1, t );
 			Vector3 b = Vector3.Lerp( p1, p2, t );
 			Vector3 c = Vector3.Lerp( p2, p3, t );
