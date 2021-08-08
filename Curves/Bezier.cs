@@ -119,7 +119,7 @@ namespace Freya {
 
 	}
 
-	#region Object Comparison
+	#region Object Comparison & ToString
 
 	public partial struct BezierCubic2D {
 
@@ -138,6 +138,7 @@ namespace Freya {
 			}
 		}
 
+		public override string ToString() => $"{p0}, {p1}, {p2}, {p3}";
 
 	}
 
@@ -156,6 +157,29 @@ namespace Freya {
 				hashCode = ( hashCode * 397 ) ^ p3.GetHashCode();
 				return hashCode;
 			}
+		}
+
+		public override string ToString() => $"{p0}, {p1}, {p2}, {p3}";
+
+	}
+
+	#endregion
+
+	#region Type Casting
+
+	public partial struct BezierCubic2D {
+		/// <summary>Returns this bezier curve in 3D, where z = 0</summary>
+		/// <param name="bezierCubic2D">The 2D curve to cast</param>
+		public static explicit operator BezierCubic3D( BezierCubic2D bezierCubic2D ) {
+			return new BezierCubic3D( bezierCubic2D.p0, bezierCubic2D.p1, bezierCubic2D.p2, bezierCubic2D.p3 );
+		}
+	}
+
+	public partial struct BezierCubic3D {
+		/// <summary>Returns this bezier curve flattened to the Z plane, effectively setting z to 0</summary>
+		/// <param name="bezierCubic3D">The 3D curve to cast and flatten on the Z plane</param>
+		public static explicit operator BezierCubic2D( BezierCubic3D bezierCubic3D ) {
+			return new BezierCubic2D( bezierCubic3D.p0, bezierCubic3D.p1, bezierCubic3D.p2, bezierCubic3D.p3 );
 		}
 	}
 
