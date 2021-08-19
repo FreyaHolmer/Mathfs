@@ -418,8 +418,8 @@ namespace Freya {
 		/// <summary>Returns the third derivative at the given t-value on the curve. Loosely analogous to "jerk" (rate of change of acceleration) of the point along the curve</summary>
 		public Vector2 GetThirdDerivative() =>
 			new Vector2(
-				-6 * p0.x + 18 * p1.x - 18 * p2.x + 6 * p3.x,
-				-6 * p0.y + 18 * p1.y - 18 * p2.y + 6 * p3.y
+				6 * ( 3 * ( p1.x - p2.x ) + p3.x - p0.x ),
+				6 * ( 3 * ( p1.y - p2.y ) + p3.y - p0.y )
 			);
 	}
 
@@ -427,9 +427,9 @@ namespace Freya {
 		/// <summary>Returns the third derivative at the given t-value on the curve. Loosely analogous to "jerk" (rate of change of acceleration) of the point along the curve</summary>
 		public Vector3 GetThirdDerivative() =>
 			new Vector3(
-				-6 * p0.x + 18 * p1.x - 18 * p2.x + 6 * p3.x,
-				-6 * p0.y + 18 * p1.y - 18 * p2.y + 6 * p3.y,
-				-6 * p0.z + 18 * p1.z - 18 * p2.z + 6 * p3.z
+				6 * ( 3 * ( p1.x - p2.x ) + p3.x - p0.x ),
+				6 * ( 3 * ( p1.y - p2.y ) + p3.y - p0.y ),
+				6 * ( 3 * ( p1.z - p2.z ) + p3.z - p0.z )
 			);
 	}
 
