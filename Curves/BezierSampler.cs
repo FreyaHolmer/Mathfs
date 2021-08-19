@@ -86,19 +86,24 @@ namespace Freya {
 		/// <summary>Converts a distance value to a t-value. Useful to sample a bezier curve by distance</summary>
 		/// <param name="distance">The distance along the bezier curve at which you'd like to get the t-value for</param>
 		public float DistanceToT( float distance ) {
+			// check if the value is within the length of the curve
 			if( distance.Between( 0, CurveLength ) ) {
+				// find which two distance values our input distance lies between
 				for( int i = 0; i < resolution - 1; i++ ) {
 					float distPrev = cumulativeDistances[i];
 					float distNext = cumulativeDistances[i + 1];
-					if( distance.Within( distPrev, distNext ) ) {
+					if( distance.Within( distPrev, distNext ) ) { // check if our input distance lies between the two distances
+						// get t-values at the samples
 						float tPrev = i / ( resolution - 1f );
 						float tNext = ( i + 1 ) / ( resolution - 1f );
-						return Mathfs.Remap( distPrev, distNext, tPrev, tNext, distance );
+						// remap the distance range to the t-value range
+						return distance.Remap( distPrev, distNext, tPrev, tNext );
 					}
 				}
 			}
 
-			return Mathfs.InverseLerp( 0, CurveLength, distance ); // extrapolate	
+			// distance is outside the length of the curve - extrapolate values outside
+			return distance / CurveLength;
 		}
 
 
