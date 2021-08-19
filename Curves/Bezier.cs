@@ -416,8 +416,7 @@ namespace Freya {
 
 	public partial struct BezierCubic2D {
 		/// <summary>Returns the third derivative at the given t-value on the curve. Loosely analogous to "jerk" (rate of change of acceleration) of the point along the curve</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		public Vector2 GetThirdDerivative( float t ) =>
+		public Vector2 GetThirdDerivative() =>
 			new Vector2(
 				-6 * p0.x + 18 * p1.x - 18 * p2.x + 6 * p3.x,
 				-6 * p0.y + 18 * p1.y - 18 * p2.y + 6 * p3.y
@@ -426,8 +425,7 @@ namespace Freya {
 
 	public partial struct BezierCubic3D {
 		/// <summary>Returns the third derivative at the given t-value on the curve. Loosely analogous to "jerk" (rate of change of acceleration) of the point along the curve</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		public Vector3 GetThirdDerivative( float t ) =>
+		public Vector3 GetThirdDerivative() =>
 			new Vector3(
 				-6 * p0.x + 18 * p1.x - 18 * p2.x + 6 * p3.x,
 				-6 * p0.y + 18 * p1.y - 18 * p2.y + 6 * p3.y,
@@ -1333,7 +1331,7 @@ namespace Freya {
 					6 * ( ax - 2 * bx + cx ),
 					6 * ( ay - 2 * by + cy )
 				),
-				GetThirdDerivative( t )
+				GetThirdDerivative()
 			);
 		}
 	}
@@ -1368,7 +1366,7 @@ namespace Freya {
 					6 * ( ay - 2 * by + cy ),
 					6 * ( az - 2 * bz + cz )
 				),
-				GetThirdDerivative( t )
+				GetThirdDerivative()
 			);
 		}
 	}
