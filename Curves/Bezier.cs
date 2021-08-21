@@ -709,7 +709,7 @@ namespace Freya {
 
 	#endregion
 
-	// Whole-curve properties
+	// Whole-curve properties & functions
 
 	#region Splitting
 
@@ -717,12 +717,23 @@ namespace Freya {
 		/// <summary>Splits this curve at the given t-value, into two curves of the exact same shape</summary>
 		/// <param name="t">The t-value along the curve to sample</param>
 		public (BezierCubic2D pre, BezierCubic2D post) Split( float t ) {
-			Vector2 a = Vector2.Lerp( p0, p1, t );
-			Vector2 b = Vector2.Lerp( p1, p2, t );
-			Vector2 c = Vector2.Lerp( p2, p3, t );
-			Vector2 d = Vector2.Lerp( a, b, t );
-			Vector2 e = Vector2.Lerp( b, c, t );
-			Vector2 p = Vector2.Lerp( d, e, t );
+			Vector2 a = new Vector2(
+				p0.x + ( p1.x - p0.x ) * t,
+				p0.y + ( p1.y - p0.y ) * t );
+			float bx = p1.x + ( p2.x - p1.x ) * t;
+			float by = p1.y + ( p2.y - p1.y ) * t;
+			Vector2 c = new Vector2(
+				p2.x + ( p3.x - p2.x ) * t,
+				p2.y + ( p3.y - p2.y ) * t );
+			Vector2 d = new Vector2(
+				a.x + ( bx - a.x ) * t,
+				a.y + ( by - a.y ) * t );
+			Vector2 e = new Vector2(
+				bx + ( c.x - bx ) * t,
+				by + ( c.y - by ) * t );
+			Vector2 p = new Vector2(
+				d.x + ( e.x - d.x ) * t,
+				d.y + ( e.y - d.y ) * t );
 			return ( new BezierCubic2D( p0, a, d, p ), new BezierCubic2D( p, e, c, p3 ) );
 		}
 	}
@@ -730,12 +741,29 @@ namespace Freya {
 	public partial struct BezierCubic3D {
 		/// <inheritdoc cref="BezierCubic2D.Split(float)"/>
 		public (BezierCubic3D pre, BezierCubic3D post) Split( float t ) {
-			Vector3 a = Vector3.Lerp( p0, p1, t );
-			Vector3 b = Vector3.Lerp( p1, p2, t );
-			Vector3 c = Vector3.Lerp( p2, p3, t );
-			Vector3 d = Vector3.Lerp( a, b, t );
-			Vector3 e = Vector3.Lerp( b, c, t );
-			Vector3 p = Vector3.Lerp( d, e, t );
+			Vector3 a = new Vector3(
+				p0.x + ( p1.x - p0.x ) * t,
+				p0.y + ( p1.y - p0.y ) * t,
+				p0.z + ( p1.z - p0.z ) * t );
+			float bx = p1.x + ( p2.x - p1.x ) * t;
+			float by = p1.y + ( p2.y - p1.y ) * t;
+			float bz = p1.z + ( p2.z - p1.z ) * t;
+			Vector3 c = new Vector3(
+				p2.x + ( p3.x - p2.x ) * t,
+				p2.y + ( p3.y - p2.y ) * t,
+				p2.z + ( p3.z - p2.z ) * t );
+			Vector3 d = new Vector3(
+				a.x + ( bx - a.x ) * t,
+				a.y + ( by - a.y ) * t,
+				a.z + ( bz - a.z ) * t );
+			Vector3 e = new Vector3(
+				bx + ( c.x - bx ) * t,
+				by + ( c.y - by ) * t,
+				bz + ( c.z - bz ) * t );
+			Vector3 p = new Vector3(
+				d.x + ( e.x - d.x ) * t,
+				d.y + ( e.y - d.y ) * t,
+				d.z + ( e.z - d.z ) * t );
 			return ( new BezierCubic3D( p0, a, d, p ), new BezierCubic3D( p, e, c, p3 ) );
 		}
 	}
