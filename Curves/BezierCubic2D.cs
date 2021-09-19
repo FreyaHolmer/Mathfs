@@ -2,6 +2,7 @@
 // a lot of stuff here made possible by this excellent writeup on bezier curves: https://pomax.github.io/bezierinfo/
 
 using System;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using static Freya.Mathfs;
 
@@ -14,49 +15,124 @@ namespace Freya {
 	/// <summary>A 2D cubic bezier curve, with 4 control points</summary>
 	[Serializable] public struct BezierCubic2D {
 
+		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
+
+		[SerializeField] Vector2 p0, p1, p2, p3; // the points of the curve
+
 		/// <summary>The starting point of the curve</summary>
-		public Vector2 p0;
+		public Vector2 P0 {
+			[MethodImpl( INLINE )] get => p0;
+			[MethodImpl( INLINE )] set => _ = ( p0 = value, validCoefficients = false );
+		}
 
 		/// <summary>The second control point of the curve, sometimes called the start tangent point</summary>
-		public Vector2 p1;
+		public Vector2 P1 {
+			[MethodImpl( INLINE )] get => p1;
+			[MethodImpl( INLINE )] set => _ = ( p1 = value, validCoefficients = false );
+		}
 
 		/// <summary>The third control point of the curve, sometimes called the end tangent point</summary>
-		public Vector2 p2;
+		public Vector2 P2 {
+			[MethodImpl( INLINE )] get => p2;
+			[MethodImpl( INLINE )] set => _ = ( p2 = value, validCoefficients = false );
+		}
 
 		/// <summary>The end point of the curve</summary>
-		public Vector2 p3;
+		public Vector2 P3 {
+			[MethodImpl( INLINE )] get => p3;
+			[MethodImpl( INLINE )] set => _ = ( p3 = value, validCoefficients = false );
+		}
+
+		#region Coefficients
+
+		[NonSerialized] bool validCoefficients; // inverted isDirty flag (can't default to true in structs)
+		[NonSerialized] Vector2 c3, c2, c1; // cached coefficients for fast evaluation. c0 = p0
+
+		// Coefficient Calculation
+		[MethodImpl( INLINE )] void ReadyCoefficients() {
+			if( validCoefficients )
+				return; // no need to update
+			validCoefficients = true;
+			c3.x = 3 * ( p1.x - p2.x ) + ( p3.x - p0.x );
+			c2.x = 3 * ( p0.x - p1.x + p2.x - p1.x );
+			c1.x = 3 * ( p1.x - p0.x );
+			c3.y = 3 * ( p1.y - p2.y ) + ( p3.y - p0.y );
+			c2.y = 3 * ( p0.y - p1.y + p2.y - p1.y );
+			c1.y = 3 * ( p1.y - p0.y );
+		}
+
+		/// <summary>The constant coefficient when evaluating this curve in the form C3*t³ + C2*t² + C1*t + C0</summary>
+		public Vector2 C0 {
+			[MethodImpl( INLINE )] get => p0;
+		}
+
+		/// <summary>The linear coefficient when evaluating this curve in the form C3*t³ + C2*t² + C1*t + C0</summary>
+		public Vector2 C1 {
+			[MethodImpl( INLINE )] get {
+				ReadyCoefficients();
+				return c1;
+			}
+		}
+
+		/// <summary>The quadratic coefficient when evaluating this curve in the form C3*t³ + C2*t² + C1*t + C0</summary>
+		public Vector2 C2 {
+			[MethodImpl( INLINE )] get {
+				ReadyCoefficients();
+				return c2;
+			}
+		}
+
+		/// <summary>The cubic coefficient when evaluating this curve in the form C3*t³ + C2*t² + C1*t + C0</summary>
+		public Vector2 C3 {
+			[MethodImpl( INLINE )] get {
+				ReadyCoefficients();
+				return c3;
+			}
+		}
+
+		/// <summary>The polynomial coefficients in the form c3*t³ + c2*t² + c1*t + c0</summary>
+		[MethodImpl( INLINE )] public (Vector2 c3, Vector2 c2, Vector2 c1, Vector2 c0) GetCoefficients() {
+			ReadyCoefficients();
+			return ( c3, c2, c1, p0 );
+		}
+
+		#endregion
 
 		/// <summary>Creates a cubic bezier curve, from 4 control points</summary>
 		/// <param name="p0">The starting point of the curve</param>
 		/// <param name="p1">The second control point of the curve, sometimes called the start tangent point</param>
 		/// <param name="p2">The third control point of the curve, sometimes called the end tangent point</param>
 		/// <param name="p3">The end point of the curve</param>
-		public BezierCubic2D( Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3 ) => ( this.p0, this.p1, this.p2, this.p3 ) = ( p0, p1, p2, p3 );
+		public BezierCubic2D( Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3 ) {
+			( this.p0, this.p1, this.p2, this.p3 ) = ( p0, p1, p2, p3 );
+			validCoefficients = false;
+			c3 = c2 = c1 = default;
+		}
 
 		/// <summary>Returns a control point position by index. Valid indices: 0, 1, 2 or 3</summary>
 		public Vector2 this[ int i ] {
 			get {
 				switch( i ) {
-					case 0:  return p0;
-					case 1:  return p1;
-					case 2:  return p2;
-					case 3:  return p3;
+					case 0:  return P0;
+					case 1:  return P1;
+					case 2:  return P2;
+					case 3:  return P3;
 					default: throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" );
 				}
 			}
 			set {
 				switch( i ) {
 					case 0:
-						p0 = value;
+						P0 = value;
 						break;
 					case 1:
-						p1 = value;
+						P1 = value;
 						break;
 					case 2:
-						p2 = value;
+						P2 = value;
 						break;
 					case 3:
-						p3 = value;
+						P3 = value;
 						break;
 					default: throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" );
 				}
@@ -67,22 +143,22 @@ namespace Freya {
 
 		#region Object Comparison & ToString
 
-		public static bool operator ==( BezierCubic2D a, BezierCubic2D b ) => a.p0 == b.p0 && a.p1 == b.p1 && a.p2 == b.p2 && a.p3 == b.p3;
+		public static bool operator ==( BezierCubic2D a, BezierCubic2D b ) => a.P0 == b.P0 && a.P1 == b.P1 && a.P2 == b.P2 && a.P3 == b.P3;
 		public static bool operator !=( BezierCubic2D a, BezierCubic2D b ) => !( a == b );
-		public bool Equals( BezierCubic2D other ) => p0.Equals( other.p0 ) && p1.Equals( other.p1 ) && p2.Equals( other.p2 ) && p3.Equals( other.p3 );
+		public bool Equals( BezierCubic2D other ) => P0.Equals( other.P0 ) && P1.Equals( other.P1 ) && P2.Equals( other.P2 ) && P3.Equals( other.P3 );
 		public override bool Equals( object obj ) => obj is BezierCubic2D other && Equals( other );
 
 		public override int GetHashCode() {
 			unchecked {
-				int hashCode = p0.GetHashCode();
-				hashCode = ( hashCode * 397 ) ^ p1.GetHashCode();
-				hashCode = ( hashCode * 397 ) ^ p2.GetHashCode();
-				hashCode = ( hashCode * 397 ) ^ p3.GetHashCode();
+				int hashCode = P0.GetHashCode();
+				hashCode = ( hashCode * 397 ) ^ P1.GetHashCode();
+				hashCode = ( hashCode * 397 ) ^ P2.GetHashCode();
+				hashCode = ( hashCode * 397 ) ^ P3.GetHashCode();
 				return hashCode;
 			}
 		}
 
-		public override string ToString() => $"{p0}, {p1}, {p2}, {p3}";
+		public override string ToString() => $"{P0}, {P1}, {P2}, {P3}";
 
 		#endregion
 
@@ -91,32 +167,43 @@ namespace Freya {
 		/// <summary>Returns this bezier curve in 3D, where z = 0</summary>
 		/// <param name="bezierCubic2D">The 2D curve to cast</param>
 		public static explicit operator BezierCubic3D( BezierCubic2D bezierCubic2D ) {
-			return new BezierCubic3D( bezierCubic2D.p0, bezierCubic2D.p1, bezierCubic2D.p2, bezierCubic2D.p3 );
+			return new BezierCubic3D( bezierCubic2D.P0, bezierCubic2D.P1, bezierCubic2D.P2, bezierCubic2D.P3 );
 		}
 
 		#endregion
 
 		// Base properties - Points, Derivatives & Tangents
 
-		#region Point
+		#region Points & Derivatives
 
 		/// <summary>Returns the point at the given t-value on the curve</summary>
 		/// <param name="t">The t-value along the curve to sample</param>
-		public Vector2 GetPoint( float t ) {
-			float ax = p0.x + ( p1.x - p0.x ) * t; // a = lerp( p0, p1, t );
-			float ay = p0.y + ( p1.y - p0.y ) * t;
-			float bx = p1.x + ( p2.x - p1.x ) * t; // b = lerp( p1, p2, t );
-			float by = p1.y + ( p2.y - p1.y ) * t;
-			float cx = p2.x + ( p3.x - p2.x ) * t; // c = lerp( p2, p3, t );
-			float cy = p2.y + ( p3.y - p2.y ) * t;
-			float dx = ax + ( bx - ax ) * t; // d = lerp( a, b, t );
-			float dy = ay + ( by - ay ) * t;
-			float ex = bx + ( cx - bx ) * t; // e = lerp( b, c, t );
-			float ey = by + ( cy - by ) * t;
-			return new Vector2( // ret lerp( d, e, t );
-				dx + ( ex - dx ) * t,
-				dy + ( ey - dy ) * t
-			);
+		[MethodImpl( INLINE )] public Vector2 GetPoint( float t ) {
+			ReadyCoefficients();
+			float t2 = t * t;
+			float t3 = t2 * t;
+			return new Vector2( t3 * c3.x + t2 * c2.x + t * c1.x + p0.x, t3 * c3.y + t2 * c2.y + t * c1.y + p0.y );
+		}
+
+		/// <summary>Returns the derivative at the given t-value on the curve. Loosely analogous to "velocity" of the point along the curve</summary>
+		/// <param name="t">The t-value along the curve to sample</param>
+		[MethodImpl( INLINE )] public Vector2 GetDerivative( float t ) {
+			ReadyCoefficients();
+			float t2 = t * t;
+			return new Vector2( 3 * t2 * c3.x + 2 * t * c2.x + c1.x, 3 * t2 * c3.y + 2 * t * c2.y + c1.y );
+		}
+
+		/// <summary>Returns the second derivative at the given t-value on the curve. Loosely analogous to "acceleration" of the point along the curve</summary>
+		/// <param name="t">The t-value along the curve to sample</param>
+		[MethodImpl( INLINE )] public Vector2 GetSecondDerivative( float t ) {
+			ReadyCoefficients();
+			return new Vector2( 6 * t * c3.x + 2 * c2.x, 6 * t * c3.y + 2 * c2.y );
+		}
+
+		/// <summary>Returns the third derivative at the given t-value on the curve. Loosely analogous to "jerk" (rate of change of acceleration) of the point along the curve</summary>
+		[MethodImpl( INLINE )] public Vector2 GetThirdDerivative() {
+			ReadyCoefficients();
+			return new Vector2( 6 * c3.x, 6 * c3.y );
 		}
 
 		#endregion
@@ -125,24 +212,20 @@ namespace Freya {
 
 		/// <summary>Returns the X coordinate at the given t-value on the curve</summary>
 		/// <param name="t">The t-value along the curve to sample</param>
-		public float GetPointX( float t ) {
-			float a = p0.x + ( p1.x - p0.x ) * t; // a = lerp( p0, p1, t );
-			float b = p1.x + ( p2.x - p1.x ) * t; // b = lerp( p1, p2, t );
-			float c = p2.x + ( p3.x - p2.x ) * t; // c = lerp( p2, p3, t );
-			float d = a + ( b - a ) * t; // d = lerp( a, b, t );
-			float e = b + ( c - b ) * t; // e = lerp( b, c, t );
-			return d + ( e - d ) * t; // ret lerp( d, e, t );
+		[MethodImpl( INLINE )] public float GetPointX( float t ) {
+			ReadyCoefficients();
+			float t2 = t * t;
+			float t3 = t2 * t;
+			return t3 * c3.x + t2 * c2.x + t * c1.x + p0.x;
 		}
 
 		/// <summary>Returns the Y coordinate at the given t-value on the curve</summary>
 		/// <param name="t">The t-value along the curve to sample</param>
-		public float GetPointY( float t ) {
-			float a = p0.y + ( p1.y - p0.y ) * t; // a = lerp( p0, p1, t );
-			float b = p1.y + ( p2.y - p1.y ) * t; // b = lerp( p1, p2, t );
-			float c = p2.y + ( p3.y - p2.y ) * t; // c = lerp( p2, p3, t );
-			float d = a + ( b - a ) * t; // d = lerp( a, b, t );
-			float e = b + ( c - b ) * t; // e = lerp( b, c, t );
-			return d + ( e - d ) * t; // ret lerp( d, e, t );
+		[MethodImpl( INLINE )] public float GetPointY( float t ) {
+			ReadyCoefficients();
+			float t2 = t * t;
+			float t3 = t2 * t;
+			return t3 * c3.y + t2 * c2.y + t * c1.y + p0.y;
 		}
 
 		/// <summary>Returns a component of the coordinate at the given t-value on the curve</summary>
@@ -155,48 +238,6 @@ namespace Freya {
 				default: throw new ArgumentOutOfRangeException( nameof(component), "component has to be either 0 or 1" );
 			}
 		}
-
-		#endregion
-
-		#region Derivatives
-
-		/// <summary>Returns the derivative at the given t-value on the curve. Loosely analogous to "velocity" of the point along the curve</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		public Vector2 GetDerivative( float t ) {
-			float ax = p0.x + ( p1.x - p0.x ) * t; // a = lerp( p0, p1, t );
-			float ay = p0.y + ( p1.y - p0.y ) * t;
-			float bx = p1.x + ( p2.x - p1.x ) * t; // b = lerp( p1, p2, t );
-			float by = p1.y + ( p2.y - p1.y ) * t;
-			float cx = p2.x + ( p3.x - p2.x ) * t; // c = lerp( p2, p3, t );
-			float cy = p2.y + ( p3.y - p2.y ) * t;
-			float dx = ax + ( bx - ax ) * t; // d = lerp( a, b, t );
-			float dy = ay + ( by - ay ) * t;
-			float ex = bx + ( cx - bx ) * t; // e = lerp( b, c, t );
-			float ey = by + ( cy - by ) * t;
-			return new Vector2( 3 * ( ex - dx ), 3 * ( ey - dy ) ); // 3*(e - d)
-		}
-
-		/// <summary>Returns the second derivative at the given t-value on the curve. Loosely analogous to "acceleration" of the point along the curve</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		public Vector2 GetSecondDerivative( float t ) { // unrolled code for performance reasons
-			float ax = p0.x + ( p1.x - p0.x ) * t; // a = lerp( p0, p1, t );
-			float ay = p0.y + ( p1.y - p0.y ) * t;
-			float bx = p1.x + ( p2.x - p1.x ) * t; // b = lerp( p1, p2, t );
-			float by = p1.y + ( p2.y - p1.y ) * t;
-			float cx = p2.x + ( p3.x - p2.x ) * t; // c = lerp( p2, p3, t );
-			float cy = p2.y + ( p3.y - p2.y ) * t;
-			return new Vector2(
-				6 * ( ax - 2 * bx + cx ),
-				6 * ( ay - 2 * by + cy )
-			);
-		}
-
-		/// <summary>Returns the third derivative at the given t-value on the curve. Loosely analogous to "jerk" (rate of change of acceleration) of the point along the curve</summary>
-		public Vector2 GetThirdDerivative() =>
-			new Vector2(
-				6 * ( 3 * ( p1.x - p2.x ) + p3.x - p0.x ),
-				6 * ( 3 * ( p1.y - p2.y ) + p3.y - p0.y )
-			);
 
 		#endregion
 
@@ -309,13 +350,13 @@ namespace Freya {
 		/// <param name="t">The t-value along the curve to sample</param>
 		public (BezierCubic2D pre, BezierCubic2D post) Split( float t ) {
 			Vector2 a = new Vector2(
-				p0.x + ( p1.x - p0.x ) * t,
-				p0.y + ( p1.y - p0.y ) * t );
-			float bx = p1.x + ( p2.x - p1.x ) * t;
-			float by = p1.y + ( p2.y - p1.y ) * t;
+				P0.x + ( P1.x - P0.x ) * t,
+				P0.y + ( P1.y - P0.y ) * t );
+			float bx = P1.x + ( P2.x - P1.x ) * t;
+			float by = P1.y + ( P2.y - P1.y ) * t;
 			Vector2 c = new Vector2(
-				p2.x + ( p3.x - p2.x ) * t,
-				p2.y + ( p3.y - p2.y ) * t );
+				P2.x + ( P3.x - P2.x ) * t,
+				P2.y + ( P3.y - P2.y ) * t );
 			Vector2 d = new Vector2(
 				a.x + ( bx - a.x ) * t,
 				a.y + ( by - a.y ) * t );
@@ -325,7 +366,7 @@ namespace Freya {
 			Vector2 p = new Vector2(
 				d.x + ( e.x - d.x ) * t,
 				d.y + ( e.y - d.y ) * t );
-			return ( new BezierCubic2D( p0, a, d, p ), new BezierCubic2D( p, e, c, p3 ) );
+			return ( new BezierCubic2D( P0, a, d, p ), new BezierCubic2D( p, e, c, P3 ) );
 		}
 
 		#endregion
@@ -335,8 +376,8 @@ namespace Freya {
 		/// <summary>Returns the tight axis-aligned bounds of the curve</summary>
 		public Rect GetBounds() {
 			// first and last points are always included
-			Vector2 min = Vector2.Min( p0, p3 );
-			Vector2 max = Vector2.Max( p0, p3 );
+			Vector2 min = Vector2.Min( P0, P3 );
+			Vector2 max = Vector2.Max( P0, P3 );
 
 			void Encapsulate( int axis, float value ) {
 				min[axis] = Min( min[axis], value );
@@ -360,10 +401,10 @@ namespace Freya {
 		/// <param name="accuracy">The number of subdivisions to approximate the length with. Higher values are more accurate, but more expensive to calculate</param>
 		public float GetLength( int accuracy = 8 ) {
 			if( accuracy <= 2 )
-				return ( p0 - p3 ).magnitude;
+				return ( P0 - P3 ).magnitude;
 
 			float totalDist = 0;
-			Vector2 prev = p0;
+			Vector2 prev = P0;
 			for( int i = 1; i < accuracy; i++ ) {
 				float t = i / ( accuracy - 1f );
 				Vector2 p = GetPoint( t );
@@ -410,7 +451,7 @@ namespace Freya {
 		/// This is how many times to refine the initial guesses, using Newton's method. This converges rapidly, so high numbers are generally not necessary</param>
 		public Vector2 ProjectPoint( Vector2 point, out float t, int initialSubdivisions = 16, int refinementIterations = 4 ) {
 			// define a bezier relative to the test point
-			BezierCubic2D bez = new BezierCubic2D( p0 - point, p1 - point, p2 - point, p3 - point );
+			BezierCubic2D bez = new BezierCubic2D( P0 - point, P1 - point, P2 - point, P3 - point );
 
 			PointProjectSample SampleDistSqDelta( float tSmp ) {
 				PointProjectSample s = new PointProjectSample { t = tSmp };
@@ -446,11 +487,11 @@ namespace Freya {
 					Refine( ref pointProjectGuesses[p] );
 
 			// Now find closest. First include the endpoints
-			float sqDist0 = bez.p0.sqrMagnitude; // include endpoints
-			float sqDist1 = bez.p3.sqrMagnitude;
+			float sqDist0 = bez.P0.sqrMagnitude; // include endpoints
+			float sqDist1 = bez.P3.sqrMagnitude;
 			bool firstClosest = sqDist0 < sqDist1;
 			float tClosest = firstClosest ? 0 : 1;
-			Vector2 ptClosest = firstClosest ? p0 : p3;
+			Vector2 ptClosest = firstClosest ? P0 : P3;
 			float distSqClosest = firstClosest ? sqDist0 : sqDist1;
 
 			// then check internal roots
@@ -469,16 +510,14 @@ namespace Freya {
 
 		#endregion
 
-		// Multi-eval fast paths
-
 		#region Intersection Tests
 
 		// Internal - used by all other intersections
 		private ResultsMax3<float> Intersect( Vector2 origin, Vector2 direction, bool rangeLimited = false, float minRayT = float.NaN, float maxRayT = float.NaN ) {
-			Vector2 p0rel = this.p0 - origin;
-			Vector2 p1rel = this.p1 - origin;
-			Vector2 p2rel = this.p2 - origin;
-			Vector2 p3rel = this.p3 - origin;
+			Vector2 p0rel = this.P0 - origin;
+			Vector2 p1rel = this.P1 - origin;
+			Vector2 p2rel = this.P2 - origin;
+			Vector2 p3rel = this.P3 - origin;
 			float y0 = Determinant( p0rel, direction ); // transform bezier point components into the line space y components
 			float y1 = Determinant( p1rel, direction );
 			float y2 = Determinant( p2rel, direction );
@@ -578,139 +617,71 @@ namespace Freya {
 
 		#endregion
 
-		#region Point & Tangent combo
+		// Multi-eval fast paths
 
-		/// <summary>Returns the point and the tangent direction at the given t-value on the curve. This is more performant than calling GetPoint and GetTangent separately</summary>
+		#region Point & Derivative combos
+
+		/// <summary>Returns the point and the normalized tangent direction at the given t-value on the curve. This is more performant than calling GetPoint and GetTangent separately</summary>
 		/// <param name="t">The t-value along the curve to sample</param>
-		public (Vector2, Vector2) GetPointAndTangent( float t ) { // GetPoint(t) and GetTangent(t) unrolled shared code
-			float ax = p0.x + ( p1.x - p0.x ) * t; // a = lerp( p0, p1, t );
-			float ay = p0.y + ( p1.y - p0.y ) * t;
-			float bx = p1.x + ( p2.x - p1.x ) * t; // b = lerp( p1, p2, t );
-			float by = p1.y + ( p2.y - p1.y ) * t;
-			float cx = p2.x + ( p3.x - p2.x ) * t; // c = lerp( p2, p3, t );
-			float cy = p2.y + ( p3.y - p2.y ) * t;
-			float dx = ax + ( bx - ax ) * t; // d = lerp( a, b, t );
-			float dy = ay + ( by - ay ) * t;
-			float ex = bx + ( cx - bx ) * t; // e = lerp( b, c, t );
-			float ey = by + ( cy - by ) * t;
-			return (
-				new Vector2( dx + ( ex - dx ) * t, dy + ( ey - dy ) * t ), // point
-				new Vector2( ex - dx, ey - dy ).normalized // tangent. factor of 3 not needed
-			);
+		public (Vector2, Vector2) GetPointAndTangent( float t ) {
+			( Vector2 p, Vector2 d ) = GetPointAndDerivative( t );
+			return ( p, d.normalized );
 		}
-
-		#endregion
-
-		#region Point & Derivative combo
 
 		/// <summary>Returns the point and the derivative at the given t-value on the curve. This is more performant than calling GetPoint and GetDerivative separately</summary>
 		/// <param name="t">The t-value along the curve to sample</param>
-		public (Vector2, Vector2) GetPointAndDerivative( float t ) { // GetPoint(t) and GetTangent(t) unrolled shared code
-			float ax = p0.x + ( p1.x - p0.x ) * t; // a = lerp( p0, p1, t );
-			float ay = p0.y + ( p1.y - p0.y ) * t;
-			float bx = p1.x + ( p2.x - p1.x ) * t; // b = lerp( p1, p2, t );
-			float by = p1.y + ( p2.y - p1.y ) * t;
-			float cx = p2.x + ( p3.x - p2.x ) * t; // c = lerp( p2, p3, t );
-			float cy = p2.y + ( p3.y - p2.y ) * t;
-			float dx = ax + ( bx - ax ) * t; // d = lerp( a, b, t );
-			float dy = ay + ( by - ay ) * t;
-			float ex = bx + ( cx - bx ) * t; // e = lerp( b, c, t );
-			float ey = by + ( cy - by ) * t;
+		public (Vector2, Vector2) GetPointAndDerivative( float t ) {
+			ReadyCoefficients();
+			float t2 = t * t;
+			float tx2 = t * 2;
+			float t2x3 = t2 * 3;
+			float t3 = t2 * t;
 			return (
-				new Vector2( dx + ( ex - dx ) * t, dy + ( ey - dy ) * t ), // point
-				new Vector2( 3 * ( ex - dx ), 3 * ( ey - dy ) ) // derivative
+				new Vector2( t3 * c3.x + t2 * c2.x + t * c1.x + p0.x, t3 * c3.y + t2 * c2.y + t * c1.y + p0.y ),
+				new Vector2( t2x3 * c3.x + tx2 * c2.x + c1.x, t2x3 * c3.y + tx2 * c2.y + c1.y )
 			);
 		}
-
-		#endregion
-
-		#region Derivative & Second Derivative combo
 
 		/// <summary>Returns the first two derivatives at the given t-value on the curve</summary>
 		/// <param name="t">The t-value along the curve to sample</param>
-		public (Vector2, Vector2) GetFirstTwoDerivatives( float t ) { // GetDerivative(t) and GetSecondDerivative(t) unrolled shared code
-			float ax = p0.x + ( p1.x - p0.x ) * t; // a = lerp( p0, p1, t );
-			float ay = p0.y + ( p1.y - p0.y ) * t;
-			float bx = p1.x + ( p2.x - p1.x ) * t; // b = lerp( p1, p2, t );
-			float by = p1.y + ( p2.y - p1.y ) * t;
-			float cx = p2.x + ( p3.x - p2.x ) * t; // c = lerp( p2, p3, t );
-			float cy = p2.y + ( p3.y - p2.y ) * t;
-			float dx = ax + ( bx - ax ) * t; // d = lerp( a, b, t );
-			float dy = ay + ( by - ay ) * t;
-			float ex = bx + ( cx - bx ) * t; // e = lerp( b, c, t );
-			float ey = by + ( cy - by ) * t;
+		public (Vector2, Vector2) GetFirstTwoDerivatives( float t ) {
+			ReadyCoefficients();
+			float t2x3 = 3 * t * t;
+			float tx2 = 2 * t;
+			float tx6 = 6 * t;
 			return (
-				new Vector2( // first derivative
-					3 * ( ex - dx ),
-					3 * ( ey - dy )
-				),
-				new Vector2( // second derivative
-					6 * ( ax - 2 * bx + cx ),
-					6 * ( ay - 2 * by + cy )
-				)
+				new Vector2( t2x3 * c3.x + tx2 * c2.x + c1.x, t2x3 * c3.y + tx2 * c2.y + c1.y ),
+				new Vector2( tx6 * c3.x + 2 * c2.x, tx6 * c3.y + 2 * c2.y )
 			);
 		}
-
-		#endregion
-
-		#region Derivative, Second Derivative & Third derivative combo
 
 		/// <summary>Returns all three derivatives at the given t-value on the curve</summary>
 		/// <param name="t">The t-value along the curve to sample</param>
-		public (Vector2, Vector2, Vector2) GetAllThreeDerivatives( float t ) { // GetDerivative(t), GetSecondDerivative(t) and GetThirdDerivative(t) unrolled shared code
-			float ax = p0.x + ( p1.x - p0.x ) * t; // a = lerp( p0, p1, t );
-			float ay = p0.y + ( p1.y - p0.y ) * t;
-			float bx = p1.x + ( p2.x - p1.x ) * t; // b = lerp( p1, p2, t );
-			float by = p1.y + ( p2.y - p1.y ) * t;
-			float cx = p2.x + ( p3.x - p2.x ) * t; // c = lerp( p2, p3, t );
-			float cy = p2.y + ( p3.y - p2.y ) * t;
-			float dx = ax + ( bx - ax ) * t; // d = lerp( a, b, t );
-			float dy = ay + ( by - ay ) * t;
-			float ex = bx + ( cx - bx ) * t; // e = lerp( b, c, t );
-			float ey = by + ( cy - by ) * t;
+		public (Vector2, Vector2, Vector2) GetAllThreeDerivatives( float t ) {
+			ReadyCoefficients();
+			float t2x3 = 3 * t * t;
+			float tx2 = 2 * t;
+			float tx6 = 6 * t;
 			return (
-				new Vector2( // first derivative
-					3 * ( ex - dx ),
-					3 * ( ey - dy )
-				),
-				new Vector2( // second derivative
-					6 * ( ax - 2 * bx + cx ),
-					6 * ( ay - 2 * by + cy )
-				),
-				GetThirdDerivative()
+				new Vector2( t2x3 * c3.x + tx2 * c2.x + c1.x, t2x3 * c3.y + tx2 * c2.y + c1.y ),
+				new Vector2( tx6 * c3.x + 2 * c2.x, tx6 * c3.y + 2 * c2.y ),
+				new Vector2( 6 * c3.x, 6 * c3.y )
 			);
 		}
 
-		#endregion
-
-		#region Point, Derivative & Second Derivative combo
-
 		/// <summary>Returns the point and the first two derivatives at the given t-value on the curve. This is faster than calling them separately</summary>
 		/// <param name="t">The t-value along the curve to sample</param>
-		public (Vector2, Vector2, Vector2) GetPointAndFirstTwoDerivatives( float t ) { // GetPoint(t), GetDerivative(t) and GetSecondDerivative(t) unrolled shared code
-			float ax = p0.x + ( p1.x - p0.x ) * t; // a = lerp( p0, p1, t );
-			float ay = p0.y + ( p1.y - p0.y ) * t;
-			float bx = p1.x + ( p2.x - p1.x ) * t; // b = lerp( p1, p2, t );
-			float by = p1.y + ( p2.y - p1.y ) * t;
-			float cx = p2.x + ( p3.x - p2.x ) * t; // c = lerp( p2, p3, t );
-			float cy = p2.y + ( p3.y - p2.y ) * t;
-			float dx = ax + ( bx - ax ) * t; // d = lerp( a, b, t );
-			float dy = ay + ( by - ay ) * t;
-			float ex = bx + ( cx - bx ) * t; // e = lerp( b, c, t );
-			float ey = by + ( cy - by ) * t;
+		public (Vector2, Vector2, Vector2) GetPointAndFirstTwoDerivatives( float t ) {
+			ReadyCoefficients();
+			float t2 = t * t;
+			float tx2 = t * 2;
+			float tx6 = t * 6;
+			float t2x3 = t2 * 3;
+			float t3 = t2 * t;
 			return (
-				new Vector2( // point
-					dx + ( ex - dx ) * t,
-					dy + ( ey - dy ) * t
-				),
-				new Vector2( // first derivative
-					3 * ( ex - dx ),
-					3 * ( ey - dy )
-				),
-				new Vector2( // second derivative
-					6 * ( ax - 2 * bx + cx ),
-					6 * ( ay - 2 * by + cy )
-				)
+				new Vector2( t3 * c3.x + t2 * c2.x + t * c1.x + p0.x, t3 * c3.y + t2 * c2.y + t * c1.y + p0.y ),
+				new Vector2( t2x3 * c3.x + tx2 * c2.x + c1.x, t2x3 * c3.y + tx2 * c2.y + c1.y ),
+				new Vector2( tx6 * c3.x + 2 * c2.x, tx6 * c3.y + 2 * c2.y )
 			);
 		}
 
@@ -722,8 +693,8 @@ namespace Freya {
 
 		/// <summary>Returns the factors of the derivative polynomials, per-component, in the form at²+bt+c</summary>
 		public (Vector2 a, Vector2 b, Vector2 c) GetDerivativeFactors() {
-			Polynomial X = SplineUtils.GetCubicPolynomialDerivative( p0.x, p1.x, p2.x, p3.x );
-			Polynomial Y = SplineUtils.GetCubicPolynomialDerivative( p0.y, p1.y, p2.y, p3.y );
+			Polynomial X = SplineUtils.GetCubicPolynomialDerivative( P0.x, P1.x, P2.x, P3.x );
+			Polynomial Y = SplineUtils.GetCubicPolynomialDerivative( P0.y, P1.y, P2.y, P3.y );
 			return (
 				new Vector2( X.fQuadratic, Y.fQuadratic ),
 				new Vector2( X.fLinear, Y.fLinear ),
@@ -732,8 +703,8 @@ namespace Freya {
 
 		/// <summary>Returns the factors of the second derivative polynomials, per-component, in the form at+b</summary>
 		public (Vector2 a, Vector2 b) GetSecondDerivativeFactors() {
-			Polynomial X = SplineUtils.GetCubicPolynomialSecondDerivative( p0.x, p1.x, p2.x, p3.x );
-			Polynomial Y = SplineUtils.GetCubicPolynomialSecondDerivative( p0.y, p1.y, p2.y, p3.y );
+			Polynomial X = SplineUtils.GetCubicPolynomialSecondDerivative( P0.x, P1.x, P2.x, P3.x );
+			Polynomial Y = SplineUtils.GetCubicPolynomialSecondDerivative( P0.y, P1.y, P2.y, P3.y );
 			return (
 				new Vector2( X.fLinear, Y.fLinear ),
 				new Vector2( X.fConstant, Y.fConstant ) );
@@ -750,9 +721,9 @@ namespace Freya {
 				throw new ArgumentOutOfRangeException( nameof(axis), "axis has to be either 0 or 1" );
 			Polynomial polynom;
 			if( axis == 0 ) // a little silly but the vec[] indexers are kinda expensive
-				polynom = SplineUtils.GetCubicPolynomialDerivative( p0.x, p1.x, p2.x, p3.x );
+				polynom = SplineUtils.GetCubicPolynomialDerivative( P0.x, P1.x, P2.x, P3.x );
 			else
-				polynom = SplineUtils.GetCubicPolynomialDerivative( p0.y, p1.y, p2.y, p3.y );
+				polynom = SplineUtils.GetCubicPolynomialDerivative( P0.y, P1.y, P2.y, P3.y );
 			ResultsMax3<float> roots = polynom.Roots;
 			ResultsMax2<float> outPts = default;
 			for( int i = 0; i < roots.count; i++ ) {

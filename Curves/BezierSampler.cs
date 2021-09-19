@@ -52,7 +52,7 @@ namespace Freya {
 		/// <param name="bezier">The curve to use when sampling</param>
 		public void Recalculate( BezierCubic2D bezier ) {
 			float cumulativeLength = 0;
-			Vector2 prevPt = bezier.p0;
+			Vector2 prevPt = bezier.P0;
 			cumulativeDistances[0] = 0;
 			for( int i = 1; i < resolution; i++ ) { // todo: could optimize by moving all points so that p0 = (0,0)
 				Vector2 pt = bezier.GetPoint( i / ( resolution - 1f ) );
@@ -67,7 +67,7 @@ namespace Freya {
 		/// <param name="bezier">The curve to use when sampling</param>
 		public void Recalculate( BezierCubic3D bezier ) {
 			float cumulativeLength = 0;
-			Vector3 prevPt = bezier.p0;
+			Vector3 prevPt = bezier.P0;
 			cumulativeDistances[0] = 0;
 			for( int i = 1; i < resolution; i++ ) { // todo: could optimize by moving all points so that p0 = (0,0)
 				Vector3 pt = bezier.GetPoint( i / ( resolution - 1f ) );
