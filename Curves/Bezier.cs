@@ -1068,7 +1068,7 @@ namespace Freya {
 			float y1 = Determinant( p1rel, direction );
 			float y2 = Determinant( p2rel, direction );
 			float y3 = Determinant( p3rel, direction );
-			Polynomial polynomY = BezierUtils.GetCubicPolynomial( y0, y1, y2, y3 );
+			Polynomial polynomY = SplineUtils.GetCubicPolynomial( y0, y1, y2, y3 );
 			ResultsMax3<float> roots = polynomY.Roots; // t values of the function
 
 
@@ -1080,7 +1080,7 @@ namespace Freya {
 				float x1 = Vector2.Dot( p1rel, direction );
 				float x2 = Vector2.Dot( p2rel, direction );
 				float x3 = Vector2.Dot( p3rel, direction );
-				polynomX = BezierUtils.GetCubicPolynomial( x0, x1, x2, x3 );
+				polynomX = SplineUtils.GetCubicPolynomial( x0, x1, x2, x3 );
 			}
 
 			float CurveTtoRayT( float t ) => polynomX.Sample( t );
@@ -1482,8 +1482,8 @@ namespace Freya {
 	public partial struct BezierCubic2D {
 		/// <summary>Returns the factors of the derivative polynomials, per-component, in the form at²+bt+c</summary>
 		public (Vector2 a, Vector2 b, Vector2 c) GetDerivativeFactors() {
-			Polynomial X = BezierUtils.GetCubicPolynomialDerivative( p0.x, p1.x, p2.x, p3.x );
-			Polynomial Y = BezierUtils.GetCubicPolynomialDerivative( p0.y, p1.y, p2.y, p3.y );
+			Polynomial X = SplineUtils.GetCubicPolynomialDerivative( p0.x, p1.x, p2.x, p3.x );
+			Polynomial Y = SplineUtils.GetCubicPolynomialDerivative( p0.y, p1.y, p2.y, p3.y );
 			return (
 				new Vector2( X.fQuadratic, Y.fQuadratic ),
 				new Vector2( X.fLinear, Y.fLinear ),
@@ -1492,8 +1492,8 @@ namespace Freya {
 
 		/// <summary>Returns the factors of the second derivative polynomials, per-component, in the form at+b</summary>
 		public (Vector2 a, Vector2 b) GetSecondDerivativeFactors() {
-			Polynomial X = BezierUtils.GetCubicPolynomialSecondDerivative( p0.x, p1.x, p2.x, p3.x );
-			Polynomial Y = BezierUtils.GetCubicPolynomialSecondDerivative( p0.y, p1.y, p2.y, p3.y );
+			Polynomial X = SplineUtils.GetCubicPolynomialSecondDerivative( p0.x, p1.x, p2.x, p3.x );
+			Polynomial Y = SplineUtils.GetCubicPolynomialSecondDerivative( p0.y, p1.y, p2.y, p3.y );
 			return (
 				new Vector2( X.fLinear, Y.fLinear ),
 				new Vector2( X.fConstant, Y.fConstant ) );
@@ -1503,9 +1503,9 @@ namespace Freya {
 	public partial struct BezierCubic3D {
 		/// <summary>Returns the factors of the derivative polynomials, per-component, in the form at²+bt+c</summary>
 		public (Vector3 a, Vector3 b, Vector3 c) GetDerivativeFactors() {
-			Polynomial X = BezierUtils.GetCubicPolynomialDerivative( p0.x, p1.x, p2.x, p3.x );
-			Polynomial Y = BezierUtils.GetCubicPolynomialDerivative( p0.y, p1.y, p2.y, p3.y );
-			Polynomial Z = BezierUtils.GetCubicPolynomialDerivative( p0.z, p1.z, p2.z, p3.z );
+			Polynomial X = SplineUtils.GetCubicPolynomialDerivative( p0.x, p1.x, p2.x, p3.x );
+			Polynomial Y = SplineUtils.GetCubicPolynomialDerivative( p0.y, p1.y, p2.y, p3.y );
+			Polynomial Z = SplineUtils.GetCubicPolynomialDerivative( p0.z, p1.z, p2.z, p3.z );
 			return (
 				new Vector3( X.fQuadratic, Y.fQuadratic, Z.fQuadratic ),
 				new Vector3( X.fLinear, Y.fLinear, Z.fLinear ),
@@ -1514,9 +1514,9 @@ namespace Freya {
 
 		/// <summary>Returns the factors of the second derivative polynomials, per-component, in the form at+b</summary>
 		public (Vector3 a, Vector3 b) GetSecondDerivativeFactors() {
-			Polynomial X = BezierUtils.GetCubicPolynomialSecondDerivative( p0.x, p1.x, p2.x, p3.x );
-			Polynomial Y = BezierUtils.GetCubicPolynomialSecondDerivative( p0.y, p1.y, p2.y, p3.y );
-			Polynomial Z = BezierUtils.GetCubicPolynomialSecondDerivative( p0.z, p1.z, p2.z, p3.z );
+			Polynomial X = SplineUtils.GetCubicPolynomialSecondDerivative( p0.x, p1.x, p2.x, p3.x );
+			Polynomial Y = SplineUtils.GetCubicPolynomialSecondDerivative( p0.y, p1.y, p2.y, p3.y );
+			Polynomial Z = SplineUtils.GetCubicPolynomialSecondDerivative( p0.z, p1.z, p2.z, p3.z );
 			return (
 				new Vector3( X.fLinear, Y.fLinear, Z.fLinear ),
 				new Vector3( X.fConstant, Y.fConstant, Z.fConstant ) );
@@ -1536,9 +1536,9 @@ namespace Freya {
 				throw new ArgumentOutOfRangeException( nameof(axis), "axis has to be either 0 or 1" );
 			Polynomial polynom;
 			if( axis == 0 ) // a little silly but the vec[] indexers are kinda expensive
-				polynom = BezierUtils.GetCubicPolynomialDerivative( p0.x, p1.x, p2.x, p3.x );
+				polynom = SplineUtils.GetCubicPolynomialDerivative( p0.x, p1.x, p2.x, p3.x );
 			else
-				polynom = BezierUtils.GetCubicPolynomialDerivative( p0.y, p1.y, p2.y, p3.y );
+				polynom = SplineUtils.GetCubicPolynomialDerivative( p0.y, p1.y, p2.y, p3.y );
 			ResultsMax3<float> roots = polynom.Roots;
 			ResultsMax2<float> outPts = default;
 			for( int i = 0; i < roots.count; i++ ) {
@@ -1569,11 +1569,11 @@ namespace Freya {
 				throw new ArgumentOutOfRangeException( nameof(axis), "axis has to be either 0, 1 or 2" );
 			Polynomial polynom;
 			if( axis == 0 ) // a little silly but the vec[] indexers are kinda expensive
-				polynom = BezierUtils.GetCubicPolynomialDerivative( p0.x, p1.x, p2.x, p3.x );
+				polynom = SplineUtils.GetCubicPolynomialDerivative( p0.x, p1.x, p2.x, p3.x );
 			else if( axis == 1 )
-				polynom = BezierUtils.GetCubicPolynomialDerivative( p0.y, p1.y, p2.y, p3.y );
+				polynom = SplineUtils.GetCubicPolynomialDerivative( p0.y, p1.y, p2.y, p3.y );
 			else
-				polynom = BezierUtils.GetCubicPolynomialDerivative( p0.z, p1.z, p2.z, p3.z );
+				polynom = SplineUtils.GetCubicPolynomialDerivative( p0.z, p1.z, p2.z, p3.z );
 			ResultsMax3<float> roots = polynom.Roots;
 			ResultsMax2<float> outPts = default;
 			for( int i = 0; i < roots.count; i++ ) {

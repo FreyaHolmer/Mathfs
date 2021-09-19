@@ -2,8 +2,8 @@
 
 namespace Freya {
 
-	/// <summary>Various utility functions for bezier curves</summary>
-	public static class BezierUtils {
+	/// <summary>Various utility functions for splines</summary>
+	public static class SplineUtils {
 
 		/// <summary>Returns the cubic factors of the polynomials, of a single component, in the form at³+bt²+ct+d</summary>
 		/// <param name="p0">The starting point of the curve</param>
@@ -72,6 +72,7 @@ namespace Freya {
 		public static Vector4 GetBernsteinPolynomialWeightsSecondDerivative( float t ) {
 			return new Vector4( 6 - 6 * t, 18 * t - 12, 6 - 18 * t, 6 * t );
 		}
+
 	}
 
 }
