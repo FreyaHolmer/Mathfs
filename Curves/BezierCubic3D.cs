@@ -12,10 +12,19 @@ namespace Freya {
 	// A lot of the following code is unrolled into floats and components for performance reasons.
 	// It's much faster than keeping the more readable function calls and vector types unfortunately
 
-	/// <summary>A 3D cubic bezier curve, with 4 control points</summary>
+	/// <summary>An optimized 3D cubic bezier curve, with 4 control points</summary>
 	[Serializable] public struct BezierCubic3D {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
+		
+		/// <inheritdoc cref="BezierCubic2D(Vector2,Vector2,Vector2,Vector2)"/>
+		public BezierCubic3D( Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3 ) {
+			( this.p0, this.p1, this.p2, this.p3 ) = ( p0, p1, p2, p3 );
+			validCoefficients = false;
+			c3 = c2 = c1 = default;
+		}
+
+		#region Control Points
 
 		[SerializeField] Vector3 p0, p1, p2, p3; // the points of the curve
 
@@ -42,12 +51,44 @@ namespace Freya {
 			[MethodImpl( INLINE )] get => p3;
 			[MethodImpl( INLINE )] set => _ = ( p3 = value, validCoefficients = false );
 		}
-		
+
+		/// <inheritdoc cref="BezierCubic2D.this"/> 
+		public Vector3 this[ int i ] {
+			get {
+				switch( i ) {
+					case 0:  return P0;
+					case 1:  return P1;
+					case 2:  return P2;
+					case 3:  return P3;
+					default: throw new IndexOutOfRangeException();
+				}
+			}
+			set {
+				switch( i ) {
+					case 0:
+						P0 = value;
+						break;
+					case 1:
+						P1 = value;
+						break;
+					case 2:
+						P2 = value;
+						break;
+					case 3:
+						P3 = value;
+						break;
+					default: throw new IndexOutOfRangeException();
+				}
+			}
+		}
+
+		#endregion
+
 		#region Coefficients
-		
+
 		[NonSerialized] bool validCoefficients; // inverted isDirty flag (can't default to true in structs)
 		[NonSerialized] Vector3 c3, c2, c1; // cached coefficients for fast evaluation. c0 = p0
-		
+
 		// Coefficient Calculation
 		[MethodImpl( INLINE )] void ReadyCoefficients() {
 			if( validCoefficients )
@@ -63,7 +104,7 @@ namespace Freya {
 			c2.z = 3 * ( p0.z - p1.z + p2.z - p1.z );
 			c1.z = 3 * ( p1.z - p0.z );
 		}
-		
+
 		/// <inheritdoc cref="BezierCubic2D.C0"/>
 		public Vector3 C0 {
 			[MethodImpl( INLINE )] get => p0;
@@ -98,45 +139,8 @@ namespace Freya {
 			ReadyCoefficients();
 			return ( c3, c2, c1, p0 );
 		}
-		
+
 		#endregion
-
-		/// <inheritdoc cref="BezierCubic2D(Vector2,Vector2,Vector2,Vector2)"/>
-		public BezierCubic3D( Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3 ) {
-			( this.p0, this.p1, this.p2, this.p3 ) = ( p0, p1, p2, p3 );
-			validCoefficients = false;
-			c3 = c2 = c1 = default;
-		}
-
-		/// <inheritdoc cref="BezierCubic2D.this"/> 
-		public Vector3 this[ int i ] {
-			get {
-				switch( i ) {
-					case 0:  return P0;
-					case 1:  return P1;
-					case 2:  return P2;
-					case 3:  return P3;
-					default: throw new IndexOutOfRangeException();
-				}
-			}
-			set {
-				switch( i ) {
-					case 0:
-						P0 = value;
-						break;
-					case 1:
-						P1 = value;
-						break;
-					case 2:
-						P2 = value;
-						break;
-					case 3:
-						P3 = value;
-						break;
-					default: throw new IndexOutOfRangeException();
-				}
-			}
-		}
 
 		// Object comparison stuff
 
@@ -454,7 +458,7 @@ namespace Freya {
 
 		#region Bounds
 
-		/// <summary>Returns the tight axis-aligned bounds of the curve</summary>
+		/// <inheritdoc cref="BezierCubic2D.GetBounds()"/>
 		public Bounds GetBounds() {
 			// first and last points are always included
 			Vector3 min = Vector3.Min( P0, P3 );
@@ -478,8 +482,7 @@ namespace Freya {
 
 		#region Length
 
-		/// <summary>Returns the approximate length of the curve</summary>
-		/// <param name="accuracy">The number of subdivisions to approximate the length with. Higher values are more accurate, but more expensive to calculate</param>
+		/// <inheritdoc cref="BezierCubic2D.GetLength(int)"/>
 		public float GetLength( int accuracy = 8 ) {
 			if( accuracy <= 2 )
 				return ( P0 - P3 ).magnitude;
@@ -503,14 +506,7 @@ namespace Freya {
 
 		#region Project Point
 
-		/// <summary>Returns the (approximate) point on the curve closest to the input point</summary>
-		/// <param name="point">The point to project against the curve</param>
-		/// <param name="initialSubdivisions">Recommended range: [8-32]. More subdivisions will be more accurate, but more expensive.
-		/// This is how many subdivisions to split the curve into, to find candidates for the closest point.
-		/// If your curves are complex, you might need to use around 16 subdivisions.
-		/// If they are usually very simple, then around 8 subdivisions is likely fine</param>
-		/// <param name="refinementIterations">Recommended range: [3-6]. More iterations will be more accurate, but more expensive.
-		/// This is how many times to refine the initial guesses, using Newton's method. This converges rapidly, so high numbers are generally not necessary</param>
+		/// <inheritdoc cref="BezierCubic2D.ProjectPoint(Vector2,int,int)"/>
 		public Vector3 ProjectPoint( Vector3 point, int initialSubdivisions = 16, int refinementIterations = 4 ) => ProjectPoint( point, out _, initialSubdivisions, refinementIterations );
 
 		struct PointProjectSample {
@@ -522,15 +518,7 @@ namespace Freya {
 
 		static PointProjectSample[] pointProjectGuesses = { default, default, default };
 
-		/// <summary>Returns the (approximate) point on the curve closest to the input point</summary>
-		/// <param name="point">The point to project against the curve</param>
-		/// <param name="t">The t-value at the projected point on the curve</param>
-		/// <param name="initialSubdivisions">Recommended range: [8-32]. More subdivisions will be more accurate, but more expensive.
-		/// This is how many subdivisions to split the curve into, to find candidates for the closest point.
-		/// If your curves are complex, you might need to use around 16 subdivisions.
-		/// If they are usually very simple, then around 8 subdivisions is likely fine</param>
-		/// <param name="refinementIterations">Recommended range: [3-6]. More iterations will be more accurate, but more expensive.
-		/// This is how many times to refine the initial guesses, using Newton's method. This converges rapidly, so high numbers are generally not necessary</param>
+		/// <inheritdoc cref="BezierCubic2D.ProjectPoint(Vector2,out float,int,int)"/>
 		public Vector3 ProjectPoint( Vector3 point, out float t, int initialSubdivisions = 16, int refinementIterations = 4 ) {
 			// define a bezier relative to the test point
 			BezierCubic3D bez = new BezierCubic3D( P0 - point, P1 - point, P2 - point, P3 - point );

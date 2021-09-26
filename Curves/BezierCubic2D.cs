@@ -12,10 +12,23 @@ namespace Freya {
 	// A lot of the following code is unrolled into floats and components for performance reasons.
 	// It's much faster than keeping the more readable function calls and vector types unfortunately
 
-	/// <summary>A 2D cubic bezier curve, with 4 control points</summary>
+	/// <summary>An optimized 2D cubic bezier curve, with 4 control points</summary>
 	[Serializable] public struct BezierCubic2D {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
+		
+		/// <summary>Creates a cubic bezier curve, from 4 control points</summary>
+		/// <param name="p0">The starting point of the curve</param>
+		/// <param name="p1">The second control point of the curve, sometimes called the start tangent point</param>
+		/// <param name="p2">The third control point of the curve, sometimes called the end tangent point</param>
+		/// <param name="p3">The end point of the curve</param>
+		public BezierCubic2D( Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3 ) {
+			( this.p0, this.p1, this.p2, this.p3 ) = ( p0, p1, p2, p3 );
+			validCoefficients = false;
+			c3 = c2 = c1 = default;
+		}
+		
+		#region Control Points
 
 		[SerializeField] Vector2 p0, p1, p2, p3; // the points of the curve
 
@@ -42,6 +55,38 @@ namespace Freya {
 			[MethodImpl( INLINE )] get => p3;
 			[MethodImpl( INLINE )] set => _ = ( p3 = value, validCoefficients = false );
 		}
+
+		/// <summary>Get or set a control point position by index. Valid indices: 0, 1, 2 or 3</summary>
+		public Vector2 this[ int i ] {
+			get {
+				switch( i ) {
+					case 0:  return P0;
+					case 1:  return P1;
+					case 2:  return P2;
+					case 3:  return P3;
+					default: throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" );
+				}
+			}
+			set {
+				switch( i ) {
+					case 0:
+						P0 = value;
+						break;
+					case 1:
+						P1 = value;
+						break;
+					case 2:
+						P2 = value;
+						break;
+					case 3:
+						P3 = value;
+						break;
+					default: throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" );
+				}
+			}
+		}
+
+		#endregion
 
 		#region Coefficients
 
@@ -97,48 +142,7 @@ namespace Freya {
 		}
 
 		#endregion
-
-		/// <summary>Creates a cubic bezier curve, from 4 control points</summary>
-		/// <param name="p0">The starting point of the curve</param>
-		/// <param name="p1">The second control point of the curve, sometimes called the start tangent point</param>
-		/// <param name="p2">The third control point of the curve, sometimes called the end tangent point</param>
-		/// <param name="p3">The end point of the curve</param>
-		public BezierCubic2D( Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3 ) {
-			( this.p0, this.p1, this.p2, this.p3 ) = ( p0, p1, p2, p3 );
-			validCoefficients = false;
-			c3 = c2 = c1 = default;
-		}
-
-		/// <summary>Returns a control point position by index. Valid indices: 0, 1, 2 or 3</summary>
-		public Vector2 this[ int i ] {
-			get {
-				switch( i ) {
-					case 0:  return P0;
-					case 1:  return P1;
-					case 2:  return P2;
-					case 3:  return P3;
-					default: throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" );
-				}
-			}
-			set {
-				switch( i ) {
-					case 0:
-						P0 = value;
-						break;
-					case 1:
-						P1 = value;
-						break;
-					case 2:
-						P2 = value;
-						break;
-					case 3:
-						P3 = value;
-						break;
-					default: throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" );
-				}
-			}
-		}
-
+		
 		// Object comparison stuff
 
 		#region Object Comparison & ToString
