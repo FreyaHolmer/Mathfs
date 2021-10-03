@@ -296,6 +296,31 @@ namespace Freya {
 		/// <param name="c">The circumference</param>
 		[MethodImpl( INLINE )] public static float CircumferenceToRadius( float c ) => c / TAU;
 
+		/// <summary>Returns the osculating circle of a point in a curve. Osculating circles are defined everywhere except on inflection points, where curvature is 0</summary>
+		/// <param name="point">The point of the curve</param>
+		/// <param name="velocity">The first derivative of the point in the curve</param>
+		/// <param name="acceleration">The second derivative of the point in the curve</param>
+		[MethodImpl( INLINE )] public static Circle2D GetOsculatingCircle( Vector2 point, Vector2 velocity, Vector2 acceleration ) {
+			float curvature = GetCurvature( velocity, acceleration );
+			Vector2 tangent = velocity.normalized;
+			Vector2 normal = tangent.Rotate90CCW();
+			float signedRadius = 1f / curvature;
+			return new Circle2D( point + normal * signedRadius, Abs( signedRadius ) );
+		}
+
+	}
+
+	public partial struct Circle3D {
+
+		/// <inheritdoc cref="Circle2D.GetOsculatingCircle(Vector2,Vector2,Vector2)"/>
+		public static Circle3D GetOsculatingCircle( Vector3 point, Vector3 velocity, Vector3 acceleration ) {
+			Vector3 curvatureVector = GetCurvature( velocity, acceleration );
+			( Vector3 axis, float curvature ) = curvatureVector.GetDirAndMagnitude();
+			Vector3 normal = Vector3.Cross( velocity, Vector3.Cross( acceleration, velocity ) ).normalized;
+			float signedRadius = 1f / curvature;
+			return new Circle3D( point + normal * signedRadius, axis, Abs( signedRadius ) );
+		}
+
 	}
 
 	#endregion

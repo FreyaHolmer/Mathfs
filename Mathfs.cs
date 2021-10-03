@@ -882,6 +882,92 @@ namespace Freya {
 		/// <seealso cref="MathfsExtensions.Angle"/>
 		[MethodImpl( INLINE )] public static float DirToAng( Vector2 vec ) => Mathf.Atan2( vec.y, vec.x );
 
+		/// <summary>Returns a 2D orientation from a vector, representing the X axis</summary>
+		/// <param name="v">The direction to create a 2D orientation from (does not have to be normalized)</param>
+		[MethodImpl( INLINE )] public static Quaternion DirToOrientation( Vector2 v ) {
+			v.Normalize();
+			v.x += 1;
+			v.Normalize();
+			return new Quaternion( 0, 0, v.y, v.x );
+		}
+
+		/// <summary>Returns a 2D Pose from a point and a vector, representing the X axis</summary>
+		/// <param name="pt">The location of the pose</param>
+		/// <param name="v">The direction to create a 2D orientation from (does not have to be normalized)</param>
+		[MethodImpl( INLINE )] public static Pose PointDirToPose( Vector2 pt, Vector2 v ) => new Pose( pt, DirToOrientation( v ) );
+
+		/// <summary>Returns a matrix representing a 2D position and rotation</summary>
+		/// <param name="point">The location of the matrix</param>
+		/// <param name="tangent">The direction of the X axis (has to be normalized)</param>
+		[MethodImpl( INLINE )] public static Matrix4x4 GetMatrixFrom2DPointDir( Vector2 point, Vector2 tangent ) {
+			Vector2 N = tangent.Rotate90CCW();
+			return new Matrix4x4(
+				new Vector4( tangent.x, tangent.y, 0, 0 ),
+				new Vector4( N.x, N.y, 0, 0 ),
+				new Vector4( 0, 0, 1, 0 ),
+				new Vector4( point.x, point.y, 0, 1 )
+			);
+		}
+
+		/// <summary>Returns the signed curvature at a point in a curve, in radians per distance unit (equivalent to the reciprocal radius of the osculating circle)</summary>
+		/// <param name="velocity">The first derivative of the point in the curve</param>
+		/// <param name="acceleration">The second derivative of the point in the curve</param>
+		[MethodImpl( INLINE )] public static float GetCurvature( Vector2 velocity, Vector2 acceleration ) {
+			float dMag = velocity.magnitude;
+			return Determinant( velocity, acceleration ) / ( dMag * dMag * dMag );
+		}
+
+		/// <summary>Returns a pseudovector of a point in a curve, where the magnitude is the curvature in radians per distance unit, and the direction is the axis of curvature</summary>
+		/// <param name="velocity">The first derivative of the point in the curve</param>
+		/// <param name="acceleration">The second derivative of the point in the curve</param>
+		[MethodImpl( INLINE )] public static Vector3 GetCurvature( Vector3 velocity, Vector3 acceleration ) {
+			float dMag = velocity.magnitude;
+			return Vector3.Cross( velocity, acceleration ) / ( dMag * dMag * dMag );
+		}
+
+		/// <summary>Returns the torsion of a given point in a curve, in radians per distance unit</summary>
+		/// <param name="velocity">The first derivative of the point in the curve</param>
+		/// <param name="acceleration">The second derivative of the point in the curve</param>
+		/// <param name="jerk">The third derivative of the point in the curve</param>
+		[MethodImpl( INLINE )] public static float GetTorsion( Vector3 velocity, Vector3 acceleration, Vector3 jerk ) {
+			Vector3 cVector = Vector3.Cross( velocity, acceleration );
+			return Vector3.Dot( cVector, jerk ) / cVector.sqrMagnitude;
+		}
+
+		/// <summary>Returns the frenet-serret (curvature-based) normal direction at a given point in a curve</summary>
+		/// <param name="velocity">The first derivative of the point in the curve</param>
+		/// <param name="acceleration">The second derivative of the point in the curve</param>
+		[MethodImpl( INLINE )] public static Vector3 GetArcNormal( Vector3 velocity, Vector3 acceleration ) => Vector3.Cross( velocity, Vector3.Cross( acceleration, velocity ) ).normalized;
+
+		/// <summary>Returns the frenet-serret (curvature-based) binormal direction at a given point in a curve</summary>
+		/// <param name="velocity">The first derivative of the point in the curve</param>
+		/// <param name="acceleration">The second derivative of the point in the curve</param>
+		[MethodImpl( INLINE )] public static Vector3 GetArcBinormal( Vector3 velocity, Vector3 acceleration ) => Vector3.Cross( velocity, acceleration ).normalized;
+
+		/// <summary>Returns a normal direction given a reference up vector and a tangent direction</summary>
+		/// <param name="tangent">The tangent direction (does not have to be normalized)</param>
+		/// <param name="up">The reference up vector. The normal will be perpendicular to both the supplied up vector and the curve</param>
+		[MethodImpl( INLINE )] public static Vector3 GetNormalFromLookTangent( Vector3 tangent, Vector3 up ) => Vector3.Cross( up, tangent ).normalized;
+
+		/// <summary>Returns the binormal from a vector, given a reference up vector.
+		/// The binormal will attempt to be as aligned with the reference vector as possible,
+		/// while still being perpendicular to the tangent</summary>
+		/// <param name="tangent">The tangent direction (does not have to be normalized)</param>
+		/// <param name="up">The reference up vector. The normal will be perpendicular to both the supplied up vector and the tangent</param>
+		[MethodImpl( INLINE )] public static Vector3 GetBinormalFromLookTangent( Vector3 tangent, Vector3 up ) {
+			Vector3 normal = Vector3.Cross( up, tangent ).normalized;
+			return Vector3.Cross( tangent.normalized, normal );
+		}
+
+		/// <summary>Returns the frenet-serret (curvature-based) orientation of a point in a curve with the given velocity and acceleration values, where the Z direction is tangent to the curve.
+		/// The X axis will point to the inner arc of the current curvature</summary>
+		/// <param name="velocity">The first derivative of the point in the curve</param>
+		/// <param name="acceleration">The second derivative of the point in the curve</param>
+		[MethodImpl( INLINE )] public static Quaternion GetArcOrientation( Vector3 velocity, Vector3 acceleration ) {
+			Vector3 binormal = Vector3.Cross( velocity, acceleration );
+			return Quaternion.LookRotation( velocity, binormal );
+		}
+
 		/// <summary>Returns the signed angle between <c>a</c> and <c>b</c>, in the range -tau/2 to tau/2 (-pi to pi)</summary>
 		[MethodImpl( INLINE )] public static float SignedAngle( Vector2 a, Vector2 b ) => AngleBetween( a, b ) * Mathf.Sign( Determinant( a, b ) ); // -tau/2 to tau/2
 

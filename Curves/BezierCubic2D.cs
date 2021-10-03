@@ -13,10 +13,10 @@ namespace Freya {
 	// It's much faster than keeping the more readable function calls and vector types unfortunately
 
 	/// <summary>An optimized 2D cubic bezier curve, with 4 control points</summary>
-	[Serializable] public struct BezierCubic2D {
+	[Serializable] public struct BezierCubic2D : IParamCurve3Diff<Vector2> {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
-		
+
 		/// <summary>Creates a cubic bezier curve, from 4 control points</summary>
 		/// <param name="p0">The starting point of the curve</param>
 		/// <param name="p1">The second control point of the curve, sometimes called the start tangent point</param>
@@ -27,7 +27,7 @@ namespace Freya {
 			validCoefficients = false;
 			c3 = c2 = c1 = default;
 		}
-		
+
 		#region Control Points
 
 		[SerializeField] Vector2 p0, p1, p2, p3; // the points of the curve
@@ -142,7 +142,7 @@ namespace Freya {
 		}
 
 		#endregion
-		
+
 		// Object comparison stuff
 
 		#region Object Comparison & ToString
@@ -178,10 +178,18 @@ namespace Freya {
 
 		// Base properties - Points, Derivatives & Tangents
 
-		#region Points & Derivatives
+		#region Core IParamCurve Implementations
 
-		/// <summary>Returns the point at the given t-value on the curve</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
+		public int Degree {
+			[MethodImpl( INLINE )] get => 3;
+		}
+		public int Count {
+			[MethodImpl( INLINE )] get => 4;
+		}
+
+		[MethodImpl( INLINE )] public Vector2 GetStartPoint() => p0;
+		[MethodImpl( INLINE )] public Vector2 GetEndPoint() => p3;
+
 		[MethodImpl( INLINE )] public Vector2 GetPoint( float t ) {
 			ReadyCoefficients();
 			float t2 = t * t;
@@ -189,23 +197,19 @@ namespace Freya {
 			return new Vector2( t3 * c3.x + t2 * c2.x + t * c1.x + p0.x, t3 * c3.y + t2 * c2.y + t * c1.y + p0.y );
 		}
 
-		/// <summary>Returns the derivative at the given t-value on the curve. Loosely analogous to "velocity" of the point along the curve</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
 		[MethodImpl( INLINE )] public Vector2 GetDerivative( float t ) {
 			ReadyCoefficients();
 			float t2 = t * t;
 			return new Vector2( 3 * t2 * c3.x + 2 * t * c2.x + c1.x, 3 * t2 * c3.y + 2 * t * c2.y + c1.y );
 		}
 
-		/// <summary>Returns the second derivative at the given t-value on the curve. Loosely analogous to "acceleration" of the point along the curve</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
 		[MethodImpl( INLINE )] public Vector2 GetSecondDerivative( float t ) {
 			ReadyCoefficients();
+			BezierQuad2D b;
 			return new Vector2( 6 * t * c3.x + 2 * c2.x, 6 * t * c3.y + 2 * c2.y );
 		}
 
-		/// <summary>Returns the third derivative at the given t-value on the curve. Loosely analogous to "jerk" (rate of change of acceleration) of the point along the curve</summary>
-		[MethodImpl( INLINE )] public Vector2 GetThirdDerivative() {
+		[MethodImpl( INLINE )] public Vector2 GetThirdDerivative( float t = 0 ) {
 			ReadyCoefficients();
 			return new Vector2( 6 * c3.x, 6 * c3.y );
 		}
@@ -241,107 +245,6 @@ namespace Freya {
 				case 1:  return GetPointY( t );
 				default: throw new ArgumentOutOfRangeException( nameof(component), "component has to be either 0 or 1" );
 			}
-		}
-
-		#endregion
-
-		#region Tangent
-
-		/// <summary>Returns the normalized tangent direction at the given t-value on the curve</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		public Vector2 GetTangent( float t ) => GetDerivative( t ).normalized;
-
-		#endregion
-
-		// Curvature
-
-		#region Curvature
-
-		/// <summary>Returns the signed curvature at the given t-value on the curve, in radians per distance unit (equivalent to the reciprocal radius of the osculating circle)</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		public float GetCurvature( float t ) {
-			( Vector2 vel, Vector2 acc ) = GetFirstTwoDerivatives( t );
-			float dMag = vel.magnitude;
-			return Determinant( vel, acc ) / ( dMag * dMag * dMag );
-		}
-
-		#endregion
-
-		#region Osculating Circle
-
-		/// <summary>Returns the osculating circle at the given t-value in the curve, if possible. Osculating circles are defined everywhere except on inflection points, where curvature is 0</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		public Circle2D GetOsculatingCircle( float t ) {
-			( Vector2 point, Vector2 delta, Vector2 deltaDelta ) = GetPointAndFirstTwoDerivatives( t );
-			float dMag = delta.magnitude;
-			float curvature = Determinant( delta, deltaDelta ) / ( dMag * dMag * dMag );
-			Vector2 tangent = delta.normalized;
-			Vector2 normal = tangent.Rotate90CCW();
-			float signedRadius = 1f / curvature;
-			return new Circle2D( point + normal * signedRadius, Abs( signedRadius ) );
-		}
-
-		#endregion
-
-		// Normals, Orientation & Angles
-
-		#region Normal
-
-		/// <summary>Returns the normal direction at the given t-value on the curve.
-		/// This normal will point to the inner arc of the current curvature</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		public Vector2 GetNormal( float t ) => GetTangent( t ).Rotate90CCW();
-
-		#endregion
-
-		#region Angle (2D only)
-
-		/// <summary>Returns the 2D angle of the direction of the curve at the given point, in radians</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		public float GetAngle( float t ) => DirToAng( GetDerivative( t ) );
-
-		#endregion
-
-		#region Orientation
-
-		/// <summary>Returns the orientation at the given point t, where the X axis is tangent to the curve</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		public Quaternion GetOrientation( float t ) {
-			Vector2 v = GetTangent( t );
-			v.x += 1;
-			v.Normalize();
-			return new Quaternion( 0, 0, v.y, v.x );
-		}
-
-		#endregion
-
-		#region Pose
-
-		/// <summary>Returns the position and orientation at the given t-value on the curve</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		public Pose GetPose( float t ) {
-			( Vector2 p, Vector2 v ) = GetPointAndTangent( t );
-			v.x += 1;
-			v.Normalize();
-			Quaternion rot = new Quaternion( 0, 0, v.y, v.x );
-			return new Pose( p, rot );
-		}
-
-		#endregion
-
-		#region Matrix
-
-		/// <summary>Returns the position and orientation at the given t-value on the curve, expressed as a matrix</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		public Matrix4x4 GetMatrix( float t ) {
-			( Vector2 P, Vector2 T ) = GetPointAndTangent( t );
-			Vector2 N = T.Rotate90CCW();
-			return new Matrix4x4(
-				new Vector4( T.x, T.y, 0, 0 ),
-				new Vector4( N.x, N.y, 0, 0 ),
-				new Vector4( 0, 0, 1, 0 ),
-				new Vector4( P.x, P.y, 0, 1 )
-			);
 		}
 
 		#endregion
@@ -399,30 +302,6 @@ namespace Freya {
 
 		#endregion
 
-		#region Length
-
-		/// <summary>Returns the approximate length of the curve</summary>
-		/// <param name="accuracy">The number of subdivisions to approximate the length with. Higher values are more accurate, but more expensive to calculate</param>
-		public float GetLength( int accuracy = 8 ) {
-			if( accuracy <= 2 )
-				return ( P0 - P3 ).magnitude;
-
-			float totalDist = 0;
-			Vector2 prev = P0;
-			for( int i = 1; i < accuracy; i++ ) {
-				float t = i / ( accuracy - 1f );
-				Vector2 p = GetPoint( t );
-				float dx = p.x - prev.x;
-				float dy = p.y - prev.y;
-				totalDist += Mathf.Sqrt( dx * dx + dy * dy );
-				prev = p;
-			}
-
-			return totalDist;
-		}
-
-		#endregion
-
 		#region Project Point
 
 		/// <summary>Returns the (approximate) point on the curve closest to the input point</summary>
@@ -459,7 +338,8 @@ namespace Freya {
 
 			PointProjectSample SampleDistSqDelta( float tSmp ) {
 				PointProjectSample s = new PointProjectSample { t = tSmp };
-				( s.f, s.fp ) = bez.GetPointAndDerivative( tSmp );
+				s.f = bez.GetPoint( tSmp );
+				s.fp = bez.GetDerivative( tSmp );
 				s.distDeltaSq = Vector2.Dot( s.f, s.fp );
 				return s;
 			}
@@ -621,97 +501,20 @@ namespace Freya {
 
 		#endregion
 
-		// Multi-eval fast paths
-
-		#region Point & Derivative combos
-
-		/// <summary>Returns the point and the normalized tangent direction at the given t-value on the curve. This is more performant than calling GetPoint and GetTangent separately</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		public (Vector2, Vector2) GetPointAndTangent( float t ) {
-			( Vector2 p, Vector2 d ) = GetPointAndDerivative( t );
-			return ( p, d.normalized );
-		}
-
-		/// <summary>Returns the point and the derivative at the given t-value on the curve. This is more performant than calling GetPoint and GetDerivative separately</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		public (Vector2, Vector2) GetPointAndDerivative( float t ) {
-			ReadyCoefficients();
-			float t2 = t * t;
-			float tx2 = t * 2;
-			float t2x3 = t2 * 3;
-			float t3 = t2 * t;
-			return (
-				new Vector2( t3 * c3.x + t2 * c2.x + t * c1.x + p0.x, t3 * c3.y + t2 * c2.y + t * c1.y + p0.y ),
-				new Vector2( t2x3 * c3.x + tx2 * c2.x + c1.x, t2x3 * c3.y + tx2 * c2.y + c1.y )
-			);
-		}
-
-		/// <summary>Returns the first two derivatives at the given t-value on the curve</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		public (Vector2, Vector2) GetFirstTwoDerivatives( float t ) {
-			ReadyCoefficients();
-			float t2x3 = 3 * t * t;
-			float tx2 = 2 * t;
-			float tx6 = 6 * t;
-			return (
-				new Vector2( t2x3 * c3.x + tx2 * c2.x + c1.x, t2x3 * c3.y + tx2 * c2.y + c1.y ),
-				new Vector2( tx6 * c3.x + 2 * c2.x, tx6 * c3.y + 2 * c2.y )
-			);
-		}
-
-		/// <summary>Returns all three derivatives at the given t-value on the curve</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		public (Vector2, Vector2, Vector2) GetAllThreeDerivatives( float t ) {
-			ReadyCoefficients();
-			float t2x3 = 3 * t * t;
-			float tx2 = 2 * t;
-			float tx6 = 6 * t;
-			return (
-				new Vector2( t2x3 * c3.x + tx2 * c2.x + c1.x, t2x3 * c3.y + tx2 * c2.y + c1.y ),
-				new Vector2( tx6 * c3.x + 2 * c2.x, tx6 * c3.y + 2 * c2.y ),
-				new Vector2( 6 * c3.x, 6 * c3.y )
-			);
-		}
-
-		/// <summary>Returns the point and the first two derivatives at the given t-value on the curve. This is faster than calling them separately</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		public (Vector2, Vector2, Vector2) GetPointAndFirstTwoDerivatives( float t ) {
-			ReadyCoefficients();
-			float t2 = t * t;
-			float tx2 = t * 2;
-			float tx6 = t * 6;
-			float t2x3 = t2 * 3;
-			float t3 = t2 * t;
-			return (
-				new Vector2( t3 * c3.x + t2 * c2.x + t * c1.x + p0.x, t3 * c3.y + t2 * c2.y + t * c1.y + p0.y ),
-				new Vector2( t2x3 * c3.x + tx2 * c2.x + c1.x, t2x3 * c3.y + tx2 * c2.y + c1.y ),
-				new Vector2( tx6 * c3.x + 2 * c2.x, tx6 * c3.y + 2 * c2.y )
-			);
-		}
-
-		#endregion
-
 		// Esoteric math stuff
 
 		#region Polynomial Factors
 
 		/// <summary>Returns the factors of the derivative polynomials, per-component, in the form at²+bt+c</summary>
 		public (Vector2 a, Vector2 b, Vector2 c) GetDerivativeFactors() {
-			Polynomial X = SplineUtils.GetCubicPolynomialDerivative( P0.x, P1.x, P2.x, P3.x );
-			Polynomial Y = SplineUtils.GetCubicPolynomialDerivative( P0.y, P1.y, P2.y, P3.y );
-			return (
-				new Vector2( X.fQuadratic, Y.fQuadratic ),
-				new Vector2( X.fLinear, Y.fLinear ),
-				new Vector2( X.fConstant, Y.fConstant ) );
+			ReadyCoefficients();
+			return ( new Vector2( 3 * c3.x, 3 * c3.y ), new Vector2( 2 * c2.x, 2 * c2.y ), c1 );
 		}
 
 		/// <summary>Returns the factors of the second derivative polynomials, per-component, in the form at+b</summary>
 		public (Vector2 a, Vector2 b) GetSecondDerivativeFactors() {
-			Polynomial X = SplineUtils.GetCubicPolynomialSecondDerivative( P0.x, P1.x, P2.x, P3.x );
-			Polynomial Y = SplineUtils.GetCubicPolynomialSecondDerivative( P0.y, P1.y, P2.y, P3.y );
-			return (
-				new Vector2( X.fLinear, Y.fLinear ),
-				new Vector2( X.fConstant, Y.fConstant ) );
+			ReadyCoefficients();
+			return ( new Vector2( 6 * c3.x, 6 * c3.y ), new Vector2( 2 * c2.x, 2 * c2.y ) );
 		}
 
 		#endregion
@@ -754,3 +557,59 @@ namespace Freya {
 	}
 
 }
+
+// code graveyard - kept just in case I want to bring any of it back:
+/*
+/// <summary>Returns the point and the derivative at the given t-value on the curve. This is more performant than calling GetPoint and GetDerivative separately</summary>
+/// <param name="t">The t-value along the curve to sample</param>
+public (Vector2, Vector2) GetPointAndDerivative( float t ) {
+	ReadyCoefficients();
+	float t2 = t * t;
+	float tx2 = t * 2;
+	float t2x3 = t2 * 3;
+	float t3 = t2 * t;
+	return (
+		new Vector2( t3 * c3.x + t2 * c2.x + t * c1.x + p0.x, t3 * c3.y + t2 * c2.y + t * c1.y + p0.y ),
+		new Vector2( t2x3 * c3.x + tx2 * c2.x + c1.x, t2x3 * c3.y + tx2 * c2.y + c1.y )
+	);
+}
+
+/// <summary>Returns all three derivatives at the given t-value on the curve</summary>
+/// <param name="t">The t-value along the curve to sample</param>
+public (Vector2, Vector2, Vector2) GetAllThreeDerivatives( float t ) {
+	ReadyCoefficients();
+	float t2x3 = 3 * t * t;
+	float tx2 = 2 * t;
+	float tx6 = 6 * t;
+	return (
+		new Vector2( t2x3 * c3.x + tx2 * c2.x + c1.x, t2x3 * c3.y + tx2 * c2.y + c1.y ),
+		new Vector2( tx6 * c3.x + 2 * c2.x, tx6 * c3.y + 2 * c2.y ),
+		new Vector2( 6 * c3.x, 6 * c3.y )
+	);
+}
+
+[MethodImpl( INLINE )] public (Vector2, Vector2) GetFirstTwoDerivatives( float t ) {
+	ReadyCoefficients();
+	float t2x3 = 3 * t * t;
+	float tx2 = 2 * t;
+	float tx6 = 6 * t;
+	return (
+		new Vector2( t2x3 * c3.x + tx2 * c2.x + c1.x, t2x3 * c3.y + tx2 * c2.y + c1.y ),
+		new Vector2( tx6 * c3.x + 2 * c2.x, tx6 * c3.y + 2 * c2.y )
+	);
+}
+
+public (Vector2, Vector2, Vector2) GetPointAndFirstTwoDerivatives( float t ) {
+	ReadyCoefficients();
+	float t2 = t * t;
+	float tx2 = t * 2;
+	float tx6 = t * 6;
+	float t2x3 = t2 * 3;
+	float t3 = t2 * t;
+	return (
+		new Vector2( t3 * c3.x + t2 * c2.x + t * c1.x + p0.x, t3 * c3.y + t2 * c2.y + t * c1.y + p0.y ),
+		new Vector2( t2x3 * c3.x + tx2 * c2.x + c1.x, t2x3 * c3.y + tx2 * c2.y + c1.y ),
+		new Vector2( tx6 * c3.x + 2 * c2.x, tx6 * c3.y + 2 * c2.y )
+	);
+}
+*/

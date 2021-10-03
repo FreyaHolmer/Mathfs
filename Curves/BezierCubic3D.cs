@@ -13,10 +13,10 @@ namespace Freya {
 	// It's much faster than keeping the more readable function calls and vector types unfortunately
 
 	/// <summary>An optimized 3D cubic bezier curve, with 4 control points</summary>
-	[Serializable] public struct BezierCubic3D {
+	[Serializable] public struct BezierCubic3D : IParamCurve3Diff<Vector3> {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
-		
+
 		/// <inheritdoc cref="BezierCubic2D(Vector2,Vector2,Vector2,Vector2)"/>
 		public BezierCubic3D( Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3 ) {
 			( this.p0, this.p1, this.p2, this.p3 ) = ( p0, p1, p2, p3 );
@@ -177,9 +177,18 @@ namespace Freya {
 
 		// Base properties - Points, Derivatives & Tangents
 
-		#region Points & Derivatives
+		#region Core IParamCurve Implementations
 
-		/// <inheritdoc cref="BezierCubic2D.GetPoint(float)"/>
+		public int Degree {
+			[MethodImpl( INLINE )] get => 3;
+		}
+		public int Count {
+			[MethodImpl( INLINE )] get => 4;
+		}
+
+		[MethodImpl( INLINE )] public Vector3 GetStartPoint() => p0;
+		[MethodImpl( INLINE )] public Vector3 GetEndPoint() => p3;
+
 		[MethodImpl( INLINE )] public Vector3 GetPoint( float t ) {
 			ReadyCoefficients();
 			float t2 = t * t;
@@ -187,21 +196,18 @@ namespace Freya {
 			return new Vector3( t3 * c3.x + t2 * c2.x + t * c1.x + p0.x, t3 * c3.y + t2 * c2.y + t * c1.y + p0.y, t3 * c3.z + t2 * c2.z + t * c1.z + p0.z );
 		}
 
-		/// <inheritdoc cref="BezierCubic2D.GetDerivative(float)"/>
 		[MethodImpl( INLINE )] public Vector3 GetDerivative( float t ) {
 			ReadyCoefficients();
 			float t2 = t * t;
 			return new Vector3( 3 * t2 * c3.x + 2 * t * c2.x + c1.x, 3 * t2 * c3.y + 2 * t * c2.y + c1.y, 3 * t2 * c3.z + 2 * t * c2.z + c1.z );
 		}
 
-		/// <inheritdoc cref="BezierCubic2D.GetSecondDerivative(float)"/>
 		[MethodImpl( INLINE )] public Vector3 GetSecondDerivative( float t ) {
 			ReadyCoefficients();
 			return new Vector3( 6 * t * c3.x + 2 * c2.x, 6 * t * c3.y + 2 * c2.y, 6 * t * c3.z + 2 * c2.z );
 		}
 
-		/// <inheritdoc cref="BezierCubic2D.GetThirdDerivative()"/>
-		[MethodImpl( INLINE )] public Vector3 GetThirdDerivative() {
+		[MethodImpl( INLINE )] public Vector3 GetThirdDerivative( float t = 0 ) {
 			ReadyCoefficients();
 			return new Vector3( 6 * c3.x, 6 * c3.y, 6 * c3.z );
 		}
@@ -210,8 +216,7 @@ namespace Freya {
 
 		#region Point Components
 
-		/// <summary>Returns the X coordinate at the given t-value on the curve</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
+		/// <inheritdoc cref="BezierCubic2D.GetPointX"/>
 		[MethodImpl( INLINE )] public float GetPointX( float t ) {
 			ReadyCoefficients();
 			float t2 = t * t;
@@ -219,8 +224,7 @@ namespace Freya {
 			return t3 * c3.x + t2 * c2.x + t * c1.x + p0.x;
 		}
 
-		/// <summary>Returns the Y coordinate at the given t-value on the curve</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
+		/// <inheritdoc cref="BezierCubic2D.GetPointY"/>
 		[MethodImpl( INLINE )] public float GetPointY( float t ) {
 			ReadyCoefficients();
 			float t2 = t * t;
@@ -247,177 +251,6 @@ namespace Freya {
 				case 2:  return GetPointZ( t );
 				default: throw new ArgumentOutOfRangeException( nameof(component), "component has to be either 0, 1 or 2" );
 			}
-		}
-
-		#endregion
-
-		#region Tangent
-
-		/// <summary>Returns the normalized tangent direction at the given t-value on the curve</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		public Vector3 GetTangent( float t ) => GetDerivative( t ).normalized;
-
-		#endregion
-
-		// Curvature & Torsion
-
-		#region Curvature
-
-		/// <summary>Returns a pseudovector at the given t-value on the curve, where the magnitude is the curvature in radians per distance unit, and the direction is the axis of curvature</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		public Vector3 GetCurvature( float t ) {
-			( Vector3 vel, Vector3 acc ) = GetFirstTwoDerivatives( t );
-			float dMag = vel.magnitude;
-			return Vector3.Cross( vel, acc ) / ( dMag * dMag * dMag );
-		}
-
-		#endregion
-
-		#region Torsion
-
-		/// <summary>Returns the torsion at the given t-value on the curve, in radians per distance unit</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		public float GetTorsion( float t ) {
-			( Vector3 vel, Vector3 acc, Vector3 jerk ) = GetAllThreeDerivatives( t );
-			Vector3 cVector = Vector3.Cross( vel, acc );
-			return Vector3.Dot( cVector, jerk ) / cVector.sqrMagnitude;
-		}
-
-		#endregion
-
-		#region Osculating Circle
-
-		/// <summary>Returns the osculating circle at the given t-value in the curve, if possible. Osculating circles are defined everywhere except on inflection points, where curvature is 0</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		public Circle3D GetOsculatingCircle( float t ) {
-			( Vector3 point, Vector3 vel, Vector3 acc ) = GetPointAndFirstTwoDerivatives( t );
-			float dMag = vel.magnitude;
-			Vector3 curvatureVector = Vector3.Cross( vel, acc ) / ( dMag * dMag * dMag );
-			( Vector3 axis, float curvature ) = curvatureVector.GetDirAndMagnitude();
-			Vector3 normal = Vector3.Cross( vel, Vector3.Cross( acc, vel ) ).normalized;
-			float signedRadius = 1f / curvature;
-			return new Circle3D( point + normal * signedRadius, axis, Abs( signedRadius ) );
-		}
-
-		#endregion
-
-		// Normals, Orientation & Angles
-
-		#region Normal
-
-		/// <summary>Returns the frenet-serret (curvature-based) normal direction at the given t-value on the curve</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		public Vector3 GetArcNormal( float t ) {
-			( Vector3 vel, Vector3 acc ) = GetFirstTwoDerivatives( t );
-			return Vector3.Cross( vel, Vector3.Cross( acc, vel ) ).normalized;
-		}
-
-		/// <summary>Returns a normal of the curve given a reference up vector and t-value on the curve.
-		/// The normal will be perpendicular to both the supplied up vector and the curve</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		/// <param name="up">The reference up vector. The normal will be perpendicular to both the supplied up vector and the curve</param>
-		public Vector3 GetNormal( float t, Vector3 up ) {
-			Vector3 vel = GetDerivative( t );
-			return Vector3.Cross( up, vel ).normalized;
-		}
-
-		#endregion
-
-		#region Binormal
-
-		/// <summary>Returns the frenet-serret (curvature-based) binormal direction at the given t-value on the curve</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		public Vector3 GetArcBinormal( float t ) {
-			( Vector3 vel, Vector3 acc ) = GetFirstTwoDerivatives( t );
-			return Vector3.Cross( vel, acc ).normalized;
-		}
-
-		/// <summary>Returns the binormal of the curve given a reference up vector and t-value on the curve.
-		/// The binormal will attempt to be as aligned with the reference vector as possible,
-		/// while still being perpendicular to the curve</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		/// <param name="up">The reference up vector. The binormal will attempt to be as aligned with the reference vector as possible, while still being perpendicular to the curve</param>
-		public Vector3 GetBinormal( float t, Vector3 up ) {
-			Vector3 vel = GetDerivative( t );
-			Vector3 normal = Vector3.Cross( up, vel ).normalized;
-			return Vector3.Cross( vel.normalized, normal );
-		}
-
-		#endregion
-
-		#region Orientation
-
-		/// <summary>Returns the orientation at the given point t, where the Z direction is tangent to the curve.
-		/// The Y axis will attempt to align with the supplied up vector</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		/// <param name="up">The reference up vector. The Y axis will attempt to be as aligned with this vector as much as possible</param>
-		public Quaternion GetOrientation( float t, Vector3 up ) => Quaternion.LookRotation( GetDerivative( t ), up );
-
-		/// <summary>Returns the frenet-serret (curvature-based) orientation of curve at the given point t, where the Z direction is tangent to the curve.
-		/// The X axis will point to the inner arc of the current curvature</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		public Quaternion GetArcOrientation( float t ) {
-			( Vector3 vel, Vector3 acc ) = GetFirstTwoDerivatives( t );
-			Vector3 binormal = Vector3.Cross( vel, acc );
-			return Quaternion.LookRotation( vel, binormal );
-		}
-
-		#endregion
-
-		#region Pose
-
-		/// <summary>Returns the position and orientation of curve at the given point t, where the Z direction is tangent to the curve.
-		/// The Y axis will attempt to align with the supplied up vector</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		/// <param name="up">The reference up vector. The Y axis will attempt to be as aligned with this vector as much as possible</param>
-		public Pose GetPose( float t, Vector3 up ) {
-			( Vector2 p, Vector2 v ) = GetPointAndTangent( t );
-			return new Pose( p, Quaternion.LookRotation( v, up ) );
-		}
-
-		/// <summary>Returns the position and the frenet-serret (curvature-based) orientation of curve at the given point t, where the Z direction is tangent to the curve.
-		/// The X axis will point to the inner arc of the current curvature</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		public Pose GetArcPose( float t ) {
-			( Vector3 pt, Vector3 vel, Vector3 acc ) = GetPointAndFirstTwoDerivatives( t );
-			Vector3 binormal = Vector3.Cross( vel, acc );
-			return new Pose( pt, Quaternion.LookRotation( vel, binormal ) );
-		}
-
-		#endregion
-
-		#region Matrix
-
-		/// <summary>Returns the position and orientation of curve at the given point t, expressed as a matrix, where the Z direction is tangent to the curve.
-		/// The Y axis will attempt to align with the supplied up vector</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		/// <param name="up">The reference up vector. The Y axis will attempt to be as aligned with this vector as much as possible</param>
-		public Matrix4x4 GetMatrix( float t, Vector3 up ) {
-			( Vector3 P, Vector3 T ) = GetPointAndTangent( t );
-			Vector3 N = Vector3.Cross( up, T ).normalized; // X axis
-			Vector3 B = Vector3.Cross( T, N ); // Y axis
-			return new Matrix4x4(
-				new Vector4( N.x, N.y, N.z, 0 ),
-				new Vector4( B.x, B.y, B.z, 0 ),
-				new Vector4( T.x, T.y, T.z, 0 ),
-				new Vector4( P.x, P.y, P.z, 1 )
-			);
-		}
-
-		/// <summary>Returns the position and the frenet-serret (curvature-based) orientation of curve at the given point t, expressed as a matrix, where the Z direction is tangent to the curve.
-		/// The X axis will point to the inner arc of the current curvature</summary>
-		/// <param name="t">The t-value along the curve to sample</param>
-		public Matrix4x4 GetArcMatrix( float t ) {
-			( Vector3 P, Vector3 vel, Vector3 acc ) = GetPointAndFirstTwoDerivatives( t );
-			Vector3 T = vel.normalized;
-			Vector3 B = Vector3.Cross( vel, acc ).normalized;
-			Vector3 N = Vector3.Cross( B, T );
-			return new Matrix4x4(
-				new Vector4( N.x, N.y, N.z, 0 ),
-				new Vector4( B.x, B.y, B.z, 0 ),
-				new Vector4( T.x, T.y, T.z, 0 ),
-				new Vector4( P.x, P.y, P.z, 1 )
-			);
 		}
 
 		#endregion
@@ -480,30 +313,6 @@ namespace Freya {
 
 		#endregion
 
-		#region Length
-
-		/// <inheritdoc cref="BezierCubic2D.GetLength(int)"/>
-		public float GetLength( int accuracy = 8 ) {
-			if( accuracy <= 2 )
-				return ( P0 - P3 ).magnitude;
-
-			float totalDist = 0;
-			Vector3 prev = P0;
-			for( int i = 1; i < accuracy; i++ ) {
-				float t = i / ( accuracy - 1f );
-				Vector3 p = GetPoint( t );
-				float dx = p.x - prev.x;
-				float dy = p.y - prev.y;
-				float dz = p.z - prev.z;
-				totalDist += Mathf.Sqrt( dx * dx + dy * dy + dz * dz );
-				prev = p;
-			}
-
-			return totalDist;
-		}
-
-		#endregion
-
 		#region Project Point
 
 		/// <inheritdoc cref="BezierCubic2D.ProjectPoint(Vector2,int,int)"/>
@@ -525,7 +334,7 @@ namespace Freya {
 
 			PointProjectSample SampleDistSqDelta( float tSmp ) {
 				PointProjectSample s = new PointProjectSample { t = tSmp };
-				( s.f, s.fp ) = bez.GetPointAndDerivative( tSmp );
+				( s.f, s.fp ) = ( bez.GetPoint( tSmp ), bez.GetDerivative( tSmp ) );
 				s.distDeltaSq = Vector3.Dot( s.f, s.fp );
 				return s;
 			}
@@ -580,114 +389,20 @@ namespace Freya {
 
 		#endregion
 
-		// Multi-eval fast paths
-
-		#region Point & Derivative combos
-
-		/// <inheritdoc cref="BezierCubic2D.GetPointAndTangent(float)"/> 
-		public (Vector3, Vector3) GetPointAndTangent( float t ) {
-			( Vector3 p, Vector3 d ) = GetPointAndDerivative( t );
-			return ( p, d.normalized );
-		}
-
-		/// <inheritdoc cref="BezierCubic2D.GetPointAndDerivative(float)"/> 
-		public (Vector3, Vector3) GetPointAndDerivative( float t ) {
-			ReadyCoefficients();
-			float t2 = t * t;
-			float tx2 = t * 2;
-			float t2x3 = t2 * 3;
-			float t3 = t2 * t;
-			return (
-				new Vector3(
-					t3 * c3.x + t2 * c2.x + t * c1.x + p0.x,
-					t3 * c3.y + t2 * c2.y + t * c1.y + p0.y,
-					t3 * c3.z + t2 * c2.z + t * c1.z + p0.z
-				),
-				new Vector3(
-					t2x3 * c3.x + tx2 * c2.x + c1.x,
-					t2x3 * c3.y + tx2 * c2.y + c1.y,
-					t2x3 * c3.z + tx2 * c2.z + c1.z
-				)
-			);
-		}
-
-		/// <inheritdoc cref="BezierCubic2D.GetFirstTwoDerivatives(float)"/> 
-		public (Vector3, Vector3) GetFirstTwoDerivatives( float t ) {
-			ReadyCoefficients();
-			float t2x3 = 3 * t * t;
-			float tx2 = 2 * t;
-			float tx6 = 6 * t;
-			return (
-				new Vector3( t2x3 * c3.x + tx2 * c2.x + c1.x, t2x3 * c3.y + tx2 * c2.y + c1.y, t2x3 * c3.z + tx2 * c2.z + c1.z ),
-				new Vector3( tx6 * c3.x + 2 * c2.x, tx6 * c3.y + 2 * c2.y, tx6 * c3.z + 2 * c2.z )
-			);
-		}
-
-		/// <inheritdoc cref="BezierCubic2D.GetAllThreeDerivatives(float)"/>
-		public (Vector3, Vector3, Vector3) GetAllThreeDerivatives( float t ) {
-			ReadyCoefficients();
-			float t2x3 = 3 * t * t;
-			float tx2 = 2 * t;
-			float tx6 = 6 * t;
-			return (
-				new Vector3( t2x3 * c3.x + tx2 * c2.x + c1.x, t2x3 * c3.y + tx2 * c2.y + c1.y, t2x3 * c3.z + tx2 * c2.z + c1.z ),
-				new Vector3( tx6 * c3.x + 2 * c2.x, tx6 * c3.y + 2 * c2.y, tx6 * c3.z + 2 * c2.z ),
-				new Vector3( 6 * c3.x, 6 * c3.y, 6 * c3.z )
-			);
-		}
-
-		/// <inheritdoc cref="BezierCubic2D.GetPointAndFirstTwoDerivatives(float)"/>
-		public (Vector3, Vector3, Vector3) GetPointAndFirstTwoDerivatives( float t ) {
-			ReadyCoefficients();
-			float t2 = t * t;
-			float tx2 = t * 2;
-			float tx6 = t * 6;
-			float t2x3 = t2 * 3;
-			float t3 = t2 * t;
-			return (
-				new Vector3(
-					t3 * c3.x + t2 * c2.x + t * c1.x + p0.x,
-					t3 * c3.y + t2 * c2.y + t * c1.y + p0.y,
-					t3 * c3.z + t2 * c2.z + t * c1.z + p0.z
-				),
-				new Vector3(
-					t2x3 * c3.x + tx2 * c2.x + c1.x,
-					t2x3 * c3.y + tx2 * c2.y + c1.y,
-					t2x3 * c3.z + tx2 * c2.z + c1.z
-				),
-				new Vector3(
-					tx6 * c3.x + 2 * c2.x,
-					tx6 * c3.y + 2 * c2.y,
-					tx6 * c3.z + 2 * c2.z
-				)
-			);
-		}
-
-		#endregion
-
 		// Esoteric math stuff
 
 		#region Polynomial Factors
 
-		/// <summary>Returns the factors of the derivative polynomials, per-component, in the form at²+bt+c</summary>
+		/// <inheritdoc cref="BezierCubic2D.GetDerivativeFactors"/>
 		public (Vector3 a, Vector3 b, Vector3 c) GetDerivativeFactors() {
-			Polynomial X = SplineUtils.GetCubicPolynomialDerivative( P0.x, P1.x, P2.x, P3.x );
-			Polynomial Y = SplineUtils.GetCubicPolynomialDerivative( P0.y, P1.y, P2.y, P3.y );
-			Polynomial Z = SplineUtils.GetCubicPolynomialDerivative( P0.z, P1.z, P2.z, P3.z );
-			return (
-				new Vector3( X.fQuadratic, Y.fQuadratic, Z.fQuadratic ),
-				new Vector3( X.fLinear, Y.fLinear, Z.fLinear ),
-				new Vector3( X.fConstant, Y.fConstant, Z.fConstant ) );
+			ReadyCoefficients();
+			return ( new Vector3( 3 * c3.x, 3 * c3.y, 3 * c3.z ), new Vector3( 2 * c2.x, 2 * c2.y, 2 * c2.z ), c1 );
 		}
 
-		/// <summary>Returns the factors of the second derivative polynomials, per-component, in the form at+b</summary>
+		/// <inheritdoc cref="BezierCubic2D.GetSecondDerivativeFactors"/>
 		public (Vector3 a, Vector3 b) GetSecondDerivativeFactors() {
-			Polynomial X = SplineUtils.GetCubicPolynomialSecondDerivative( P0.x, P1.x, P2.x, P3.x );
-			Polynomial Y = SplineUtils.GetCubicPolynomialSecondDerivative( P0.y, P1.y, P2.y, P3.y );
-			Polynomial Z = SplineUtils.GetCubicPolynomialSecondDerivative( P0.z, P1.z, P2.z, P3.z );
-			return (
-				new Vector3( X.fLinear, Y.fLinear, Z.fLinear ),
-				new Vector3( X.fConstant, Y.fConstant, Z.fConstant ) );
+			ReadyCoefficients();
+			return ( new Vector3( 6 * c3.x, 6 * c3.y, 6 * c3.z ), new Vector3( 2 * c2.x, 2 * c2.y, 2 * c2.z ) );
 		}
 
 		#endregion
@@ -732,3 +447,89 @@ namespace Freya {
 	}
 
 }
+
+// Code graveyard below - saving just in case
+/*
+#region Point & Derivative combos
+
+/// <inheritdoc cref="BezierCubic2D.GetPointAndTangent(float)"/> 
+public (Vector3, Vector3) GetPointAndTangent( float t ) {
+	( Vector3 p, Vector3 d ) = GetPointAndDerivative( t );
+	return ( p, d.normalized );
+}
+
+/// <inheritdoc cref="BezierCubic2D.GetPointAndDerivative(float)"/> 
+public (Vector3, Vector3) GetPointAndDerivative( float t ) {
+	ReadyCoefficients();
+	float t2 = t * t;
+	float tx2 = t * 2;
+	float t2x3 = t2 * 3;
+	float t3 = t2 * t;
+	return (
+		new Vector3(
+			t3 * c3.x + t2 * c2.x + t * c1.x + p0.x,
+			t3 * c3.y + t2 * c2.y + t * c1.y + p0.y,
+			t3 * c3.z + t2 * c2.z + t * c1.z + p0.z
+		),
+		new Vector3(
+			t2x3 * c3.x + tx2 * c2.x + c1.x,
+			t2x3 * c3.y + tx2 * c2.y + c1.y,
+			t2x3 * c3.z + tx2 * c2.z + c1.z
+		)
+	);
+}
+
+/// <inheritdoc cref="BezierCubic2D.GetFirstTwoDerivatives(float)"/> 
+public (Vector3, Vector3) GetFirstTwoDerivatives( float t ) {
+	ReadyCoefficients();
+	float t2x3 = 3 * t * t;
+	float tx2 = 2 * t;
+	float tx6 = 6 * t;
+	return (
+		new Vector3( t2x3 * c3.x + tx2 * c2.x + c1.x, t2x3 * c3.y + tx2 * c2.y + c1.y, t2x3 * c3.z + tx2 * c2.z + c1.z ),
+		new Vector3( tx6 * c3.x + 2 * c2.x, tx6 * c3.y + 2 * c2.y, tx6 * c3.z + 2 * c2.z )
+	);
+}
+
+/// <inheritdoc cref="BezierCubic2D.GetAllThreeDerivatives(float)"/>
+public (Vector3, Vector3, Vector3) GetAllThreeDerivatives( float t ) {
+	ReadyCoefficients();
+	float t2x3 = 3 * t * t;
+	float tx2 = 2 * t;
+	float tx6 = 6 * t;
+	return (
+		new Vector3( t2x3 * c3.x + tx2 * c2.x + c1.x, t2x3 * c3.y + tx2 * c2.y + c1.y, t2x3 * c3.z + tx2 * c2.z + c1.z ),
+		new Vector3( tx6 * c3.x + 2 * c2.x, tx6 * c3.y + 2 * c2.y, tx6 * c3.z + 2 * c2.z ),
+		new Vector3( 6 * c3.x, 6 * c3.y, 6 * c3.z )
+	);
+}
+
+/// <inheritdoc cref="BezierCubic2D.GetPointAndFirstTwoDerivatives(float)"/>
+public (Vector3, Vector3, Vector3) GetPointAndFirstTwoDerivatives( float t ) {
+	ReadyCoefficients();
+	float t2 = t * t;
+	float tx2 = t * 2;
+	float tx6 = t * 6;
+	float t2x3 = t2 * 3;
+	float t3 = t2 * t;
+	return (
+		new Vector3(
+			t3 * c3.x + t2 * c2.x + t * c1.x + p0.x,
+			t3 * c3.y + t2 * c2.y + t * c1.y + p0.y,
+			t3 * c3.z + t2 * c2.z + t * c1.z + p0.z
+		),
+		new Vector3(
+			t2x3 * c3.x + tx2 * c2.x + c1.x,
+			t2x3 * c3.y + tx2 * c2.y + c1.y,
+			t2x3 * c3.z + tx2 * c2.z + c1.z
+		),
+		new Vector3(
+			tx6 * c3.x + 2 * c2.x,
+			tx6 * c3.y + 2 * c2.y,
+			tx6 * c3.z + 2 * c2.z
+		)
+	);
+}
+
+#endregion
+*/
