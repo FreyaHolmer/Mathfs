@@ -638,6 +638,18 @@ namespace Freya {
 		/// <param name="value">A value between a and b. Note: values outside this range are still valid, and will be extrapolated</param>
 		[MethodImpl( INLINE )] public static float InverseLerp( float a, float b, float value ) => ( value - a ) / ( b - a );
 
+		/// <summary>Given a value between a and b, returns its normalized location in that range, as a t-value (interpolant) from 0 to 1.
+		/// This safe version returns 0 if a == b, instead of a division by zero</summary>
+		/// <param name="a">The start of the range, where it would return 0</param>
+		/// <param name="b">The end of the range, where it would return 1</param>
+		/// <param name="value">A value between a and b. Note: values outside this range are still valid, and will be extrapolated</param>
+		[MethodImpl( INLINE )] public static float InverseLerpSafe( float a, float b, float value ) {
+			float den = b - a;
+			if( den == 0 )
+				return 0;
+			return ( value - a ) / den;
+		}
+
 		/// <summary>Given values between a and b in each component, returns their normalized locations in the given ranges, as t-values (interpolants) from 0 to 1</summary>
 		/// <param name="a">The start of the ranges, where it would return 0</param>
 		/// <param name="b">The end of the ranges, where it would return 1</param>
