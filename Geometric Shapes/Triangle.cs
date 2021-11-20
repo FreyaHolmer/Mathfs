@@ -133,6 +133,29 @@ namespace Freya {
 			}
 		}
 
+		/// <summary>The intersection of the perpendicular bisectors of each edge of the triangle</summary>
+		public Vector2 Circumcenter {
+			get {
+				Line2D bsA = LineSegment2D.GetBisector( a, b );
+				Line2D bsB = LineSegment2D.GetBisector( b, c );
+				if( bsA.Intersect( bsB, out Vector2 intPt ) )
+					return intPt;
+				throw new ArithmeticException( "Cannot get the circumcenter of a triangle without area" );
+			}
+		}
+
+		/// <summary>The intersection of the altitudes of the triangle</summary>
+		public Vector2 Orthocenter {
+			get {
+				Line2D bsA = new Line2D( a, ( b - c ).Rotate90CW() );
+				Line2D bsB = new Line2D( b, ( c - a ).Rotate90CW() );
+				if( bsA.Intersect( bsB, out Vector2 intPt ) )
+					return intPt;
+				throw new ArithmeticException( "Cannot get the orthocenter of a triangle without area" );
+			}
+		}
+
+
 	}
 
 	public partial struct Triangle3D {
