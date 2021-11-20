@@ -73,6 +73,18 @@ namespace Freya {
 			return new Vector4( 6 - 6 * t, 18 * t - 12, 6 - 18 * t, 6 * t );
 		}
 
+		public static float[] GenerateUniformKnots( int degree, int pCount, bool open ) {
+			int kCount = degree + pCount + 1;
+			float[] knots = new float[kCount];
+			// open:		0 0[0 1 2 3 4]4 4
+			// closed:	   [0 1 2 3 4 5 6 7 8]
+			for( int i = 0; i < kCount; i++ )
+				knots[i] = open == false ? i : Mathf.Clamp( i - degree, 0, kCount - 2 * degree - 1 );
+			return knots;
+		}
+
+		internal static int BSplineKnotCount( int pointCount, int degree ) => degree + pointCount + 1;
+
 	}
 
 }
