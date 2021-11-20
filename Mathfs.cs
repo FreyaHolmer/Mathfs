@@ -507,6 +507,12 @@ namespace Freya {
 		/// <summary>Repeats a value within a range, going back and forth</summary>
 		[MethodImpl( INLINE )] public static float PingPong( float t, float length ) => length - Abs( Repeat( t, length * 2f ) - length );
 
+		/// <summary>Returns the height of in a triangle wave at time <c>t</c> going from <c>0</c> to <c>1</c> and back to <c>0</c> within the the given <c>period</c></summary>
+		[MethodImpl( INLINE )] public static float TriangleWave( float t, float period = 1f ) {
+			float x = t / period;
+			return 1f - Abs( 2 * ( x - Floor( x ) ) - 1 );
+		}
+
 		#endregion
 
 		#region Smoothing & Easing Curves
