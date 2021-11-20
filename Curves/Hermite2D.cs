@@ -129,7 +129,6 @@ namespace Freya {
 
 		[MethodImpl( INLINE )] public Vector2 GetSecondDerivative( float t ) {
 			ReadyCoefficients();
-			BezierQuad2D b;
 			return new Vector2( 6 * t * c3.x + 2 * c2.x, 6 * t * c3.y + 2 * c2.y );
 		}
 
