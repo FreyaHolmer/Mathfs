@@ -137,6 +137,18 @@ namespace Freya {
 
 		#endregion
 
+		#region Rect
+
+		public static Rect Encapsulate( this Rect r, Vector2 p ) {
+			r.xMax = Mathf.Max( r.xMax, p.x );
+			r.xMin = Mathf.Min( r.xMin, p.x );
+			r.yMax = Mathf.Max( r.yMax, p.y );
+			r.yMin = Mathf.Min( r.yMin, p.y );
+			return r;
+		}
+
+		#endregion
+
 		#region Simple float and int operations
 
 		/// <summary>Returns true if v is between or equal to <c>min</c> &amp; <c>max</c></summary>
@@ -446,7 +458,7 @@ namespace Freya {
 
 		/// <inheritdoc cref="Mathfs.Remap(float,float,float,float,float)"/>
 		[MethodImpl( INLINE )] public static float Remap( this float value, float iMin, float iMax, float oMin, float oMax ) => Mathfs.Remap( iMin, iMax, oMin, oMax, value );
-		
+
 		/// <inheritdoc cref="Mathfs.Remap(float,float,float,float,int)"/>
 		[MethodImpl( INLINE )] public static float Remap( this int value, float iMin, float iMax, float oMin, float oMax ) => Mathfs.Lerp( oMin, oMax, Mathfs.InverseLerp( iMin, iMax, value ) );
 

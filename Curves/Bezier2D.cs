@@ -17,7 +17,11 @@ namespace Freya {
 
 		/// <summary>Creates a general bezier curve, from any number of control points</summary>
 		/// <param name="points">The control points of this curve</param>
-		public Bezier2D( Vector2[] points ) => this.points = points;
+		public Bezier2D( params Vector2[] points ) {
+			this.points = points;
+			if( points == null || points.Length <= 1 )
+				throw new ArgumentException( "Bézier curves require at least two points" );
+		}
 
 		/// <summary>Get or set a control point position by index</summary>
 		public Vector2 this[ int i ] {
