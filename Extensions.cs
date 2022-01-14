@@ -139,6 +139,9 @@ namespace Freya {
 
 		#region Rect
 
+		/// <summary>Expands the rectangle to encapsulate the point <c>p</c></summary>
+		/// <param name="r">The rectangle to expand</param>
+		/// <param name="p">The point to encapsulate</param>
 		public static Rect Encapsulate( this Rect r, Vector2 p ) {
 			r.xMax = Mathf.Max( r.xMax, p.x );
 			r.xMin = Mathf.Min( r.xMin, p.x );

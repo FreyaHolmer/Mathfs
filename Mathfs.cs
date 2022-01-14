@@ -620,6 +620,16 @@ namespace Freya {
 		/// <inheritdoc cref="Mathfs.Lerp(Vector2,Vector2,Vector2)"/>
 		[MethodImpl( INLINE )] public static Vector4 Lerp( Vector4 a, Vector4 b, Vector4 t ) => new Vector4( Lerp( a.x, b.x, t.x ), Lerp( a.y, b.y, t.y ), Lerp( a.z, b.z, t.z ), Lerp( a.w, b.w, t.w ) );
 
+		/// <summary>Linearly blends between two rectangles, moving and resizing from the center. Note: this lerp is unclamped</summary>
+		/// <param name="a">The start value, when t is 0</param>
+		/// <param name="b">The start value, when t is 1</param>
+		/// <param name="t">The t-values from 0 to 1 representing position along the lerp</param>
+		public static Rect Lerp( Rect a, Rect b, float t ) {
+			Vector2 center = Vector2.LerpUnclamped( a.center, b.center, t );
+			Vector2 size = Vector2.LerpUnclamped( a.size, b.size, t );
+			return new Rect( default, size ) { center = center };
+		}
+
 		/// <summary>Blends between a and b, based on the t-value. When t = 0 it returns a, when t = 1 it returns b, and any values between are blended linearly</summary>
 		/// <param name="a">The start value, when t is 0</param>
 		/// <param name="b">The start value, when t is 1</param>
@@ -974,6 +984,16 @@ namespace Freya {
 		/// <param name="pt">The location of the pose</param>
 		/// <param name="v">The direction to create a 2D orientation from (does not have to be normalized)</param>
 		[MethodImpl( INLINE )] public static Pose PointDirToPose( Vector2 pt, Vector2 v ) => new Pose( pt, DirToOrientation( v ) );
+
+		/// <summary>Linearly blends between two poses. The position will lerp, while the rotation will slerp. Note: this lerp is unclamped</summary>
+		/// <param name="a">Pose at t = 0</param>
+		/// <param name="b">Pose at t = 1</param>
+		/// <param name="t">The t-value to blend from a to b, from 0 to 1 (values outside will extrapolate)</param>
+		public static Pose Lerp( Pose a, Pose b, float t ) =>
+			new Pose(
+				Vector3.LerpUnclamped( a.position, b.position, t ),
+				Quaternion.SlerpUnclamped( a.rotation, b.rotation, t )
+			);
 
 		/// <summary>Returns a matrix representing a 2D position and rotation</summary>
 		/// <param name="point">The location of the matrix</param>
