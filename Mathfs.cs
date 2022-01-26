@@ -75,7 +75,19 @@ namespace Freya {
 		[MethodImpl( INLINE )] public static float Log10( float value ) => (float)Math.Log10( value );
 
 		/// <summary>Returns the binomial coefficient n over k</summary>
-		static int BinomialCoef( uint n, uint k ) => Factorial( n ) / ( Factorial( k ) * Factorial( n - k ) );
+		public static ulong BinomialCoef( uint n, uint k ) {
+			// source: https://blog.plover.com/math/choose.html
+			ulong r = 1;
+			if( k > n ) return 0;
+			for( ulong d = 1; d <= k; d++ ) {
+				r *= n--;
+				r /= d;
+			}
+
+			return r;
+			// mathematically clean but extremely prone to overflow
+			//return Factorial( n ) / ( Factorial( k ) * Factorial( n - k ) );
+		}
 
 		/// <summary>Returns the Factorial of a given value from 0 to 12</summary>
 		/// <param name="value">A value between 0 and 12 (integers can't store the factorial of 13 or above)</param>
