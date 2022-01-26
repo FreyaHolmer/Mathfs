@@ -91,14 +91,16 @@ namespace Freya {
 				return; // no need to update
 			validCoefficients = true;
 			const float _6th = 1 / 6f;
-			c3.x = _6th * ( P0.x - 3 * P1.x + 3 * P2.x - P3.x );
-			c2.x = 0.5f * ( P1.x - 2 * P2.x + P3.x );
-			c1.x = 0.5f * ( P1.x - P3.x );
-			c0.x = _6th * ( P1.x + 4 * P2.x + P3.x );
-			c3.y = _6th * ( P0.y - 3 * P1.y + 3 * P2.y - P3.y );
-			c2.y = 0.5f * ( P1.y - 2 * P2.y + P3.y );
-			c1.y = 0.5f * ( P1.y - P3.y );
-			c0.y = _6th * ( P1.y + 4 * P2.y + P3.y );
+			c3.x = _6th * ( -p0.x + 3 * ( p1.x - p2.x ) + p3.x );
+			c2.x = 0.5f * ( p0.x - 2 * p1.x + p2.x );
+			c1.x = 0.5f * ( -p0.x + p2.x );
+			c0.x = _6th * ( p0.x + 4 * p1.x + p2.x );
+			
+			c3.y = _6th * ( -p0.y + 3 * ( p1.y - p2.y ) + p3.y );
+			c2.y = 0.5f * ( p0.y - 2 * p1.y + p2.y );
+			c1.y = 0.5f * ( -p0.y + p2.y );
+			c0.y = _6th * ( p0.y + 4 * p1.y + p2.y );
+
 		}
 
 		/// <summary>The constant coefficient when evaluating this curve in the form C3*t³ + C2*t² + C1*t + C0</summary>
