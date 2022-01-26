@@ -15,12 +15,15 @@ namespace Freya {
 		/// <summary>The control points of the curve</summary>
 		public readonly Vector2[] points;
 
+		readonly Vector2[] ptEvalBuffer;
+
 		/// <summary>Creates a general bezier curve, from any number of control points</summary>
 		/// <param name="points">The control points of this curve</param>
 		public Bezier2D( params Vector2[] points ) {
 			this.points = points;
 			if( points == null || points.Length <= 1 )
 				throw new ArgumentException( "Bézier curves require at least two points" );
+			ptEvalBuffer = new Vector2[points.Length - 1];
 		}
 
 		/// <summary>Get or set a control point position by index</summary>
@@ -44,12 +47,22 @@ namespace Freya {
 		}
 
 		public Vector2 GetPoint( float t ) {
-			return B( Degree, 0 );
+			float n = Count - 1;
+			for( int i = 0; i < n; i++ )
+				ptEvalBuffer[i] = Vector2.LerpUnclamped( points[i], points[i + 1], t );
+			while( n > 1 ) {
+				n--;
+				for( int i = 0; i < n; i++ )
+					ptEvalBuffer[i] = Vector2.LerpUnclamped( ptEvalBuffer[i], ptEvalBuffer[i + 1], t );
+			}
 
+			return ptEvalBuffer[0];
+			/* // pretty but slow recursive implementation:
+			return B( Degree, 0 );
 			Vector2 B( int k, int i ) {
 				if( k == 0 ) return points[i];
-				return Vector2.LerpUnclamped( B( k - 1, i ), B( k - 1, i + 1 ), t ); // todo: optimize
-			}
+				return Vector2.LerpUnclamped( B( k - 1, i ), B( k - 1, i + 1 ), t );
+			}*/
 		}
 
 		#endregion
