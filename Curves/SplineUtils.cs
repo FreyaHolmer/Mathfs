@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Freya {
 
@@ -71,6 +72,16 @@ namespace Freya {
 		/// <param name="t">The t-value along the curve to sample</param>
 		public static Vector4 GetBernsteinPolynomialWeightsSecondDerivative( float t ) {
 			return new Vector4( 6 - 6 * t, 18 * t - 12, 6 - 18 * t, 6 * t );
+		}
+		
+		/// <summary>Samples a bernstein polynomial bézier basis function</summary>
+		/// <param name="degree">The degree of the bézier curve</param>
+		/// <param name="i">The basis function index</param>
+		/// <param name="t">The value to sample at</param>
+		public static float SampleBasisFunction( int degree, int i, float t ) {
+			ulong bc = Mathfs.BinomialCoef( (uint)degree, (uint)i );
+			double scale = Math.Pow( 1f - t, degree - i ) * Math.Pow( t, i );
+			return (float)(bc * scale);
 		}
 
 		public static float[] GenerateUniformKnots( int degree, int pCount, bool open ) {
