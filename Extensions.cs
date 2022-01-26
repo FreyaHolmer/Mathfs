@@ -47,6 +47,10 @@ namespace Freya {
 		/// <param name="angRadians">The angle, in radians, to convert to degrees</param>
 		[MethodImpl( INLINE )] public static float RadToDeg( this float angRadians ) => angRadians * Mathfs.Rad2Deg;
 
+		/// <summary>Extracts the quaternion components into a Vector4</summary>
+		/// <param name="q">The quaternion to get the components of</param>
+		[MethodImpl( INLINE )] public static Vector4 ToVector4( this Quaternion q ) => new Vector4( q.x, q.y, q.z, q.w );
+
 		#endregion
 
 		#region Swizzling
