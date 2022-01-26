@@ -166,6 +166,18 @@ namespace Freya {
 		/// <param name="b">The second value to compare</param>
 		[MethodImpl( INLINE )] public static bool Approximately( float a, float b ) => Abs( b - a ) < Max( 0.000001f * Max( Abs( a ), Abs( b ) ), Epsilon * 8 );
 
+		/// <inheritdoc cref="Approximately(float,float)"/>
+		[MethodImpl( INLINE )] public static bool Approximately( Vector2 a, Vector2 b ) => Approximately( a.x, b.x ) && Approximately( a.y, b.y );
+
+		/// <inheritdoc cref="Approximately(float,float)"/>
+		[MethodImpl( INLINE )] public static bool Approximately( Vector3 a, Vector3 b ) => Approximately( a.x, b.x ) && Approximately( a.y, b.y ) && Approximately( a.z, b.z );
+
+		/// <inheritdoc cref="Approximately(float,float)"/>
+		[MethodImpl( INLINE )] public static bool Approximately( Vector4 a, Vector4 b ) => Approximately( a.x, b.x ) && Approximately( a.y, b.y ) && Approximately( a.z, b.z ) && Approximately( a.w, b.w );
+		
+		/// <inheritdoc cref="Approximately(float,float)"/>
+		[MethodImpl( INLINE )] public static bool Approximately( Color a, Color b ) => Approximately( a.r, b.r ) && Approximately( a.g, b.g ) && Approximately( a.b, b.b ) && Approximately( a.a, b.a );
+
 		#endregion
 
 		#region Trigonometry
