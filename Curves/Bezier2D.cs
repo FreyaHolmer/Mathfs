@@ -67,6 +67,15 @@ namespace Freya {
 
 		#endregion
 
+		/// <summary>Calculates the weight (influence) of a given point at the given t-value</summary>
+		/// <param name="i">The point to get the weight of</param>
+		/// <param name="t">The t-value where you want sample the weight value</param>
+		public float GetPointWeight( int i, float t ) {
+			if(i < 0 || i >= Count)
+				throw new IndexOutOfRangeException($"GetPointWeight index {i} is out of range. Valid range is 0 to {Count-1}");
+			return SplineUtils.SampleBasisFunction( Degree, i, t );
+		}
+
 		/// <summary>Returns the derivative bezier curve if possible, otherwise returns null</summary>
 		public Bezier2D GetDerivative() {
 			int n = Count - 1;
