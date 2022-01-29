@@ -2,17 +2,11 @@
 Expanded Math Functionality for Unity
 
 ## Features
- - Intersection tests 
-   - Ray/Ray
-   - Ray/LineSegment
-   - Ray/Line
-   - Ray/Circle
-   - LineSegment/LineSegment
-   - LineSegment/Line
-   - LineSegment/Circle
-   - Line/Line
-   - Line/Circle
-   - Circle/Circle
+ - 2D Intersection tests between all combinations of:
+   - Ray
+   - LineSegment
+   - Line
+   - Circle
  - Curves & Splines
    - Bézier (Quadratic, Cubic & Generalized)
    - Hermite
