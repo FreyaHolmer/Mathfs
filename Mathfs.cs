@@ -34,6 +34,9 @@ namespace Freya {
 		/// <summary>The square root of two. The length of the vector (1,1)</summary>
 		public const float SQRT2 = 1.41421356237f;
 
+		/// <summary>The reciprocal of the square root of two. The components of the vector (1,1)</summary>
+		public const float RSQRT2 = 1f / SQRT2;
+
 		/// <summary>Multiply an angle in degrees by this, to convert it to radians</summary>
 		public const float Deg2Rad = TAU / 360f;
 
