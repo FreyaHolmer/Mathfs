@@ -760,7 +760,7 @@ namespace Freya {
 		/// <summary>Exponential interpolation, the multiplicative version of lerp, useful for values such as scaling or zooming</summary>
 		/// <param name="a">The start value</param>
 		/// <param name="b">The end value</param>
-		/// <param name="t">The t-value from 0 to 1 representing position along the lerp</param>
+		/// <param name="t">The t-value from 0 to 1 representing position along the eerp</param>
 		[MethodImpl( INLINE )] public static float Eerp( float a, float b, float t ) => Mathf.Pow( a, 1 - t ) * Mathf.Pow( b, t );
 
 		/// <summary>Inverse exponential interpolation, the multiplicative version of InverseLerp, useful for values such as scaling or zooming</summary>
