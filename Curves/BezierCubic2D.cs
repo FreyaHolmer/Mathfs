@@ -250,6 +250,40 @@ namespace Freya {
 
 		// Whole-curve properties & functions
 
+		#region Interpolation
+
+		/// <summary>Returns linear blend between two bézier curves</summary>
+		/// <param name="a">The first curve</param>
+		/// <param name="b">The second curve</param>
+		/// <param name="t">A value from 0 to 1 to blend between <c>a</c> and <c>b</c></param>
+		public static BezierCubic2D Lerp( BezierCubic2D a, BezierCubic2D b, float t ) {
+			return new BezierCubic2D(
+				Vector2.LerpUnclamped( a.p0, b.p0, t ),
+				Vector2.LerpUnclamped( a.p1, b.p1, t ),
+				Vector2.LerpUnclamped( a.p2, b.p2, t ),
+				Vector2.LerpUnclamped( a.p3, b.p3, t )
+			);
+		}
+
+		/// <summary>Returns blend between two bézier curves,
+		/// where the endpoints are linearly interpolated,
+		/// while the tangents are spherically interpolated relative to their corresponding endpoint</summary>
+		/// <param name="a">The first curve</param>
+		/// <param name="b">The second curve</param>
+		/// <param name="t">A value from 0 to 1 to blend between <c>a</c> and <c>b</c></param>
+		public static BezierCubic2D Slerp( BezierCubic2D a, BezierCubic2D b, float t ) {
+			Vector2 p0 = Vector2.LerpUnclamped( a.p0, b.p0, t );
+			Vector2 p3 = Vector2.LerpUnclamped( a.p3, b.p3, t );
+			return new BezierCubic2D(
+				p0,
+				p0 + (Vector2)Vector3.SlerpUnclamped( a.p1 - a.p0, b.p1 - b.p0, t ),
+				p3 + (Vector2)Vector3.SlerpUnclamped( a.p2 - a.p3, b.p2 - b.p3, t ),
+				p3
+			);
+		}
+
+		#endregion
+
 		#region Splitting
 
 		/// <summary>Splits this curve at the given t-value, into two curves of the exact same shape</summary>

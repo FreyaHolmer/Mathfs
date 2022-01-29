@@ -257,6 +257,32 @@ namespace Freya {
 
 		// Whole-curve properties & functions
 
+		#region Interpolation
+
+		/// <inheritdoc cref="BezierCubic2D.Lerp(BezierCubic2D,BezierCubic2D,float)"/>
+		public static BezierCubic3D Lerp( BezierCubic3D a, BezierCubic3D b, float t ) {
+			return new BezierCubic3D(
+				Vector3.LerpUnclamped( a.p0, b.p0, t ),
+				Vector3.LerpUnclamped( a.p1, b.p1, t ),
+				Vector3.LerpUnclamped( a.p2, b.p2, t ),
+				Vector3.LerpUnclamped( a.p3, b.p3, t )
+			);
+		}
+
+		/// <inheritdoc cref="BezierCubic2D.Slerp(BezierCubic2D,BezierCubic2D,float)"/>
+		public static BezierCubic3D Slerp( BezierCubic3D a, BezierCubic3D b, float t ) {
+			Vector3 p0 = Vector3.LerpUnclamped( a.p0, b.p0, t );
+			Vector3 p3 = Vector3.LerpUnclamped( a.p3, b.p3, t );
+			return new BezierCubic3D(
+				p0,
+				p0 + Vector3.SlerpUnclamped( a.p1 - a.p0, b.p1 - b.p0, t ),
+				p3 + Vector3.SlerpUnclamped( a.p2 - a.p3, b.p2 - b.p3, t ),
+				p3
+			);
+		}
+
+		#endregion
+
 		#region Splitting
 
 		/// <inheritdoc cref="BezierCubic2D.Split(float)"/>
