@@ -13,6 +13,13 @@ Expanded Math Functionality for Unity
    - Line/Line
    - Line/Circle
    - Circle/Circle
+ - Curves & Splines
+   - Bézier (Quadratic, Cubic & Generalized)
+   - Hermite
+   - Catmull-Rom
+   - B-Spline (Uniform Cubic & Generalized Non-Uniform)
+   - NURBS (Non-Unifrom Rational B-Spline)
+   - Trajectory (Cubic)
  - Trajectory math
    - GetDisplacement (point in trajectory), given gravity, angle, speed & time
    - GetLaunchSpeed, given gravity, angle & lateral distance
