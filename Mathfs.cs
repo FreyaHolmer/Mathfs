@@ -174,7 +174,7 @@ namespace Freya {
 
 		/// <inheritdoc cref="Approximately(float,float)"/>
 		[MethodImpl( INLINE )] public static bool Approximately( Vector4 a, Vector4 b ) => Approximately( a.x, b.x ) && Approximately( a.y, b.y ) && Approximately( a.z, b.z ) && Approximately( a.w, b.w );
-		
+
 		/// <inheritdoc cref="Approximately(float,float)"/>
 		[MethodImpl( INLINE )] public static bool Approximately( Color a, Color b ) => Approximately( a.r, b.r ) && Approximately( a.g, b.g ) && Approximately( a.b, b.b ) && Approximately( a.a, b.a );
 
