@@ -56,7 +56,7 @@ namespace Freya {
 		#region Swizzling
 
 		/// <summary>Returns X and Y as a Vector2, equivalent to <c>new Vector2(v.x,v.y)</c></summary>
-		[MethodImpl( INLINE )] public static Vector2 XY( this Vector2 v ) => new Vector2( v.y, v.x );
+		[MethodImpl( INLINE )] public static Vector2 XY( this Vector2 v ) => new Vector2( v.x, v.y );
 
 		/// <summary>Returns Y and X as a Vector2, equivalent to <c>new Vector2(v.y,v.x)</c></summary>
 		[MethodImpl( INLINE )] public static Vector2 YX( this Vector2 v ) => new Vector2( v.y, v.x );
