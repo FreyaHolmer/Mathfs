@@ -466,9 +466,14 @@ namespace Freya {
 		/// <inheritdoc cref="Mathfs.Remap(float,float,float,float,float)"/>
 		[MethodImpl( INLINE )] public static float Remap( this float value, float iMin, float iMax, float oMin, float oMax ) => Mathfs.Remap( iMin, iMax, oMin, oMax, value );
 
+		/// <inheritdoc cref="Mathfs.RemapClamped(float,float,float,float,float)"/>
+		[MethodImpl( INLINE )] public static float RemapClamped( this float value, float iMin, float iMax, float oMin, float oMax ) => Mathfs.RemapClamped( iMin, iMax, oMin, oMax, value );
+
 		/// <inheritdoc cref="Mathfs.Remap(float,float,float,float,int)"/>
 		[MethodImpl( INLINE )] public static float Remap( this int value, float iMin, float iMax, float oMin, float oMax ) => Mathfs.Remap( iMin, iMax, oMin, oMax, value );
 
+		/// <inheritdoc cref="Mathfs.RemapClamped(float,float,float,float,float)"/>
+		[MethodImpl( INLINE )] public static float RemapClamped( this int value, float iMin, float iMax, float oMin, float oMax ) => Mathfs.RemapClamped( iMin, iMax, oMin, oMax, value );
 		/// <inheritdoc cref="Mathfs.Remap(Vector2,Vector2,Vector2,Vector2,Vector2)"/>
 		[MethodImpl( INLINE )] public static Vector2 Remap( this Vector2 v, Vector2 iMin, Vector2 iMax, Vector2 oMin, Vector2 oMax ) => Mathfs.Remap( iMin, iMax, oMin, oMax, v );
 
@@ -483,9 +488,6 @@ namespace Freya {
 
 		/// <inheritdoc cref="Mathfs.Remap(Bounds,Bounds,Vector3)"/>
 		[MethodImpl( INLINE )] public static Vector3 Remap( this Vector3 iPos, Bounds iBounds, Bounds oBounds ) => Mathfs.Remap( iBounds.min, iBounds.max, oBounds.min, oBounds.max, iPos );
-
-		/// <inheritdoc cref="Mathfs.Remap(float,float,float,float,float)"/>
-		[MethodImpl( INLINE )] public static float RemapClamped( this float value, float iMin, float iMax, float oMin, float oMax ) => Mathfs.Lerp( oMin, oMax, Mathfs.InverseLerpClamped( iMin, iMax, value ) );
 
 		#endregion
 
