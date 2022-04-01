@@ -1,5 +1,4 @@
 ﻿// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
-// a lot of stuff here made possible by this excellent writeup on bezier curves: https://pomax.github.io/bezierinfo/
 
 namespace Freya {
 

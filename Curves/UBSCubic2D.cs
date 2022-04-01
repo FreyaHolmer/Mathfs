@@ -95,12 +95,11 @@ namespace Freya {
 			c2.x = 0.5f * ( p0.x - 2 * p1.x + p2.x );
 			c1.x = 0.5f * ( -p0.x + p2.x );
 			c0.x = _6th * ( p0.x + 4 * p1.x + p2.x );
-			
+
 			c3.y = _6th * ( -p0.y + 3 * ( p1.y - p2.y ) + p3.y );
 			c2.y = 0.5f * ( p0.y - 2 * p1.y + p2.y );
 			c1.y = 0.5f * ( -p0.y + p2.y );
 			c0.y = _6th * ( p0.y + 4 * p1.y + p2.y );
-
 		}
 
 		/// <summary>The constant coefficient when evaluating this curve in the form C3*t³ + C2*t² + C1*t + C0</summary>
