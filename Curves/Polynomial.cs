@@ -206,6 +206,10 @@ namespace Freya {
 
 		#endregion
 
+		public static Polynomial operator /( Polynomial p, float v ) => new(p.fCubic / v, p.fQuadratic / v, p.fLinear / v, p.fConstant / v);
+		public static Polynomial operator /( float v, Polynomial p ) => new(v / p.fCubic, v / p.fQuadratic, v / p.fLinear, v / p.fConstant);
+		public static Polynomial operator *( Polynomial p, float v ) => new(p.fCubic * v, p.fQuadratic * v, p.fLinear * v, p.fConstant * v);
+		public static Polynomial operator *( float v, Polynomial p ) => p * v;
 
 	}
 
