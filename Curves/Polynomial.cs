@@ -128,6 +128,19 @@ namespace Freya {
 			return -b / a;
 		}
 
+
+		/// <summary>Linearly interpolates between two polynomials</summary>
+		/// <param name="a">The first polynomial to blend from</param>
+		/// <param name="b">The second polynomial to blend to</param>
+		/// <param name="t">The blend value, typically from 0 to 1</param>
+		public static Polynomial Lerp( Polynomial a, Polynomial b, float t ) =>
+			new(
+				t.Lerp( a.fCubic, b.fCubic ),
+				t.Lerp( a.fQuadratic, b.fQuadratic ),
+				t.Lerp( a.fLinear, b.fLinear ),
+				t.Lerp( a.fConstant, b.fConstant )
+			);
+
 		#region Internal root solvers
 
 		// These functions lack safety checks (division by zero etc.) for lower degree equivalency - they presume "a" is always nonzero.
