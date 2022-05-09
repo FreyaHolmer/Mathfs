@@ -203,6 +203,18 @@ namespace Freya {
 			);
 		}
 
+		/// <summary>Get the basis function for the given point, by index</summary>
+		/// <param name="i">The index of the point (0, 1, 2 or 3)</param>
+		public static Polynomial GetBasisFunction( int i ) {
+			return i switch {
+				0 => new Polynomial( -1, 3, -3, 1 ) / 6f,
+				1 => new Polynomial( 3, -6, 0, 4 ) / 6f,
+				2 => new Polynomial( -3, 3, 3, 1 ) / 6f,
+				3 => new Polynomial( 1, 0, 0, 0 ) / 6f,
+				_ => throw new IndexOutOfRangeException( "Cubic B-Spline index needs to be between 0 and 3" )
+			};
+		}
+
 	}
 
 }
