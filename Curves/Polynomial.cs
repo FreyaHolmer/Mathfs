@@ -12,22 +12,44 @@ namespace Freya {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 
-		/// <summary>The cubic factor. <c>[fCubed]x³+bx²+cx+d</c></summary>
+		/// <summary>The cubic coefficient. <c>[fCubic]x³+bx²+cx+d</c></summary>
 		public float fCubic;
 
-		/// <summary>The quadratic factor. <c>[fQuadratic]x²+cx+d</c></summary>
+		/// <summary>The quadratic coefficient. <c>[fQuadratic]x²+cx+d</c></summary>
 		public float fQuadratic;
 
-		/// <summary>The linear factor. <c>[fLinear]x+d</c></summary>
+		/// <summary>The linear coefficient. <c>[fLinear]x+d</c></summary>
 		public float fLinear;
 
-		/// <summary>The constant factor. <c>ax+[fConstant]</c></summary>
+		/// <summary>The constant coefficient. <c>ax+[fConstant]</c></summary>
 		public float fConstant;
 
-		/// <summary>The type of polynomial</summary>
-		public PolynomialType Type => GetPolynomialType( fCubic, fQuadratic, fLinear, fConstant );
+		/// <summary>Get or set the coefficient of the given degree</summary>
+		/// <param name="degree">The degree of the coefficient you want to get/set. For example, 0 will return the constant coefficient, 3 will return the cubic coefficient</param>
+		public float this[ int degree ] {
+			get =>
+				degree switch {
+					0 => fConstant,
+					1 => fLinear,
+					2 => fQuadratic,
+					3 => fCubic,
+					_ => throw new IndexOutOfRangeException( "Polynomial factor degree has to be between 0 and 3" )
+				};
+			set {
+				_ = degree switch {
+					0 => fConstant = value,
+					1 => fLinear = value,
+					2 => fQuadratic = value,
+					3 => fCubic = value,
+					_ => throw new IndexOutOfRangeException( "Polynomial factor degree has to be between 0 and 3" )
+				};
+			}
+		}
 
-		/// <summary>Creates a polynomial of the form <c>ax+b</c></summary>
+		/// <summary>The degree of the polynomial</summary>
+		public PolynomialDegree Degree => GetPolynomialDegree( fCubic, fQuadratic, fLinear, fConstant );
+
+		/// <summary>Creates a linear polynomial of the form <c>ax+b</c></summary>
 		/// <param name="a">The linear factor <c>a</c> in <c>ax+b</c></param>
 		/// <param name="b">The constant factor <c>b</c> in <c>ax+b</c></param>
 		public Polynomial( float a, float b ) {
@@ -36,7 +58,7 @@ namespace Freya {
 			fConstant = b;
 		}
 
-		/// <summary>Creates a polynomial of the form <c>ax²+bx+c</c></summary>
+		/// <summary>Creates a quadratic polynomial of the form <c>ax²+bx+c</c></summary>
 		/// <param name="a">The quadratic factor <c>a</c> in <c>ax²+bx+c</c></param>
 		/// <param name="b">The linear factor <c>b</c> in <c>ax²+bx+c</c></param>
 		/// <param name="c">The constant factor <c>c</c> in <c>ax²+bx+c</c></param>
@@ -47,7 +69,7 @@ namespace Freya {
 			fConstant = c;
 		}
 
-		/// <summary>Creates a polynomial of the form <c>ax³+bx²+cx+d</c></summary>
+		/// <summary>Creates a cubic polynomial of the form <c>ax³+bx²+cx+d</c></summary>
 		/// <param name="a">The cubic factor <c>a</c> in <c>ax³+bx²+cx+d</c></param>
 		/// <param name="b">The quadratic factor <c>b</c> in <c>ax³+bx²+cx+d</c></param>
 		/// <param name="c">The linear factor <c>c</c> in <c>ax³+bx²+cx+d</c></param>
@@ -78,52 +100,50 @@ namespace Freya {
 		/// <param name="b">The quadratic factor <c>b</c> in <c>ax³+bx²+cx+d</c></param>
 		/// <param name="c">The linear factor <c>c</c> in <c>ax³+bx²+cx+d</c></param>
 		/// <param name="d">The constant factor <c>d</c> in <c>ax³+bx²+cx+d</c></param>
-		[MethodImpl( INLINE )] public static PolynomialType GetPolynomialType( float a, float b, float c, float d ) => FactorAlmost0( a ) ? GetPolynomialType( b, c, d ) : PolynomialType.Cubic;
+		[MethodImpl( INLINE )] public static PolynomialDegree GetPolynomialDegree( float a, float b, float c, float d ) => FactorAlmost0( a ) ? GetPolynomialDegree( b, c, d ) : PolynomialDegree.Cubic;
 
-		/// <summary>Given ax²+bx+c, returns the net polynomial type/degree, accounting for values very close to 0</summary>
+		/// <summary>Given ax²+bx+c, returns the net polynomial degree, accounting for values very close to 0</summary>
 		/// <param name="a">The quadratic factor <c>a</c> in <c>ax²+bx+c</c></param>
 		/// <param name="b">The linear factor <c>b</c> in <c>ax²+bx+c</c></param>
 		/// <param name="c">The constant factor <c>c</c> in <c>ax²+bx+c</c></param>
-		[MethodImpl( INLINE )] public static PolynomialType GetPolynomialType( float a, float b, float c ) => FactorAlmost0( a ) ? GetPolynomialType( b, c ) : PolynomialType.Quadratic;
+		[MethodImpl( INLINE )] public static PolynomialDegree GetPolynomialDegree( float a, float b, float c ) => FactorAlmost0( a ) ? GetPolynomialDegree( b, c ) : PolynomialDegree.Quadratic;
 
-		/// <summary>Given ax+b, returns the net polynomial type/degree, accounting for values very close to 0</summary>
+		/// <summary>Given ax+b, returns the net polynomial degree, accounting for values very close to 0</summary>
 		/// <param name="a">The linear factor <c>a</c> in <c>ax+b</c></param>
 		/// <param name="b">The constant factor <c>b</c> in <c>ax+b</c></param>
-		[MethodImpl( INLINE )] public static PolynomialType GetPolynomialType( float a, float b ) => FactorAlmost0( a ) ? PolynomialType.Constant : PolynomialType.Linear;
+		[MethodImpl( INLINE )] public static PolynomialDegree GetPolynomialDegree( float a, float b ) => FactorAlmost0( a ) ? PolynomialDegree.Constant : PolynomialDegree.Linear;
 
 		/// <summary>Returns the roots/solutions of ax³+bx²+cx+d = 0. There's either 0, 1, 2 or 3 roots, filled in left to right among the return values</summary>
 		/// <param name="a">The cubic factor <c>a</c> in <c>ax³+bx²+cx+d</c></param>
 		/// <param name="b">The quadratic factor <c>b</c> in <c>ax³+bx²+cx+d</c></param>
 		/// <param name="c">The linear factor <c>c</c> in <c>ax³+bx²+cx+d</c></param>
 		/// <param name="d">The constant factor <c>d</c> in <c>ax³+bx²+cx+d</c></param>
-		public static ResultsMax3<float> GetCubicRoots( float a, float b, float c, float d ) {
-			switch( GetPolynomialType( a, b, c, d ) ) {
-				case PolynomialType.Constant:  return default; // either no roots or infinite roots if c == 0
-				case PolynomialType.Linear:    return new ResultsMax3<float>( SolveLinearRoot( c, d ) );
-				case PolynomialType.Quadratic: return SolveQuadraticRoots( b, c, d );
-				case PolynomialType.Cubic:     return SolveCubicRoots( a, b, c, d );
-				default:                       throw new InvalidEnumArgumentException();
-			}
-		}
+		public static ResultsMax3<float> GetCubicRoots( float a, float b, float c, float d ) =>
+			GetPolynomialDegree( a, b, c, d ) switch {
+				PolynomialDegree.Constant  => default, // either no roots or infinite roots if c == 0
+				PolynomialDegree.Linear    => new ResultsMax3<float>( SolveLinearRoot( c, d ) ),
+				PolynomialDegree.Quadratic => SolveQuadraticRoots( b, c, d ),
+				PolynomialDegree.Cubic     => SolveCubicRoots( a, b, c, d ),
+				_                          => throw new InvalidEnumArgumentException()
+			};
 
 		/// <summary>Returns the roots/solutions of ax²+bx+c = 0. There's either 0, 1 or 2 roots, filled in left to right among the return values</summary>
 		/// <param name="a">The quadratic factor <c>a</c> in <c>ax²+bx+c</c></param>
 		/// <param name="b">The linear factor <c>b</c> in <c>ax²+bx+c</c></param>
 		/// <param name="c">The constant factor <c>c</c> in <c>ax²+bx+c</c></param>
-		public static ResultsMax2<float> GetQuadraticRoots( float a, float b, float c ) {
-			switch( GetPolynomialType( a, b, c ) ) {
-				case PolynomialType.Constant:  return default; // either no roots or infinite roots if c == 0
-				case PolynomialType.Linear:    return new ResultsMax2<float>( SolveLinearRoot( b, c ) );
-				case PolynomialType.Quadratic: return SolveQuadraticRoots( a, b, c );
-				default:                       throw new InvalidEnumArgumentException();
-			}
-		}
+		public static ResultsMax2<float> GetQuadraticRoots( float a, float b, float c ) =>
+			GetPolynomialDegree( a, b, c ) switch {
+				PolynomialDegree.Constant  => default, // either no roots or infinite roots if c == 0
+				PolynomialDegree.Linear    => new ResultsMax2<float>( SolveLinearRoot( b, c ) ),
+				PolynomialDegree.Quadratic => SolveQuadraticRoots( a, b, c ),
+				_                          => throw new InvalidEnumArgumentException()
+			};
 
 		/// <summary>Returns the root/solution of ax+b = 0. Returns null if there is no root</summary>
 		/// <param name="a">The linear factor <c>a</c> in <c>ax+b</c></param>
 		/// <param name="b">The constant factor <c>b</c> in <c>ax+b</c></param>
 		public static float? GetLinearRoots( float a, float b ) {
-			if( GetPolynomialType( a, b ) == PolynomialType.Constant )
+			if( GetPolynomialDegree( a, b ) == PolynomialDegree.Constant )
 				return null;
 			return -b / a;
 		}
