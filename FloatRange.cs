@@ -1,7 +1,5 @@
 ﻿// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
-using UnityEngine;
-
 namespace Freya {
 
 	/// <summary>A value range between two values a and b</summary>
@@ -22,13 +20,13 @@ namespace Freya {
 		public float Center => ( a + b ) / 2;
 
 		/// <summary>The length/span of this value range</summary>
-		public float Length => Mathf.Abs( b - a );
+		public float Length => Mathfs.Abs( b - a );
 
 		/// <summary>The minimum value of this range</summary>
-		public float Min => Mathf.Min( a, b );
+		public float Min => Mathfs.Min( a, b );
 
 		/// <summary>The maximum value of this range</summary>
-		public float Max => Mathf.Max( a, b );
+		public float Max => Mathfs.Max( a, b );
 
 		/// <summary>The direction of this value range. Returns -1 if <c>b</c> is greater than <c>a</c>, otherwise returns 1</summary>
 		public int Sign => b > a ? 1 : -1;
@@ -63,8 +61,8 @@ namespace Freya {
 		/// <param name="value">The value to include</param>
 		public FloatRange Encapsulate( float value ) =>
 			Sign switch {
-				1 => ( Mathf.Min( a, value ), Mathf.Max( b, value ) ), // forward - a is min, b is max
-				_ => ( Mathf.Min( b, value ), Mathf.Max( a, value ) ) // reversed - b is min, a is max
+				1 => ( Mathfs.Min( a, value ), Mathfs.Max( b, value ) ), // forward - a is min, b is max
+				_ => ( Mathfs.Min( b, value ), Mathfs.Max( a, value ) ) // reversed - b is min, a is max
 			};
 
 		public static implicit operator FloatRange( (float a, float b) tuple ) => new FloatRange( tuple.a, tuple.b );
