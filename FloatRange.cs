@@ -29,7 +29,7 @@ namespace Freya {
 		public float Max => Mathfs.Max( a, b );
 
 		/// <summary>The direction of this value range. Returns -1 if <c>b</c> is greater than <c>a</c>, otherwise returns 1</summary>
-		public int Sign => b > a ? 1 : -1;
+		public int Direction => b > a ? 1 : -1;
 
 		/// <summary>Interpolates a value from <c>a</c> to <c>b</c>, based on a parameter <c>t</c></summary>
 		/// <param name="t">The normalized interpolant from <c>a</c> to <c>b</c>. A value of 0 returns <c>a</c>, a value of 1 returns <c>b</c></param>
@@ -60,7 +60,7 @@ namespace Freya {
 		/// <summary>Expands the minimum or maximum value to contain the given <c>value</c></summary>
 		/// <param name="value">The value to include</param>
 		public FloatRange Encapsulate( float value ) =>
-			Sign switch {
+			Direction switch {
 				1 => ( Mathfs.Min( a, value ), Mathfs.Max( b, value ) ), // forward - a is min, b is max
 				_ => ( Mathfs.Min( b, value ), Mathfs.Max( a, value ) ) // reversed - b is min, a is max
 			};
