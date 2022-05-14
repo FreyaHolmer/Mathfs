@@ -38,7 +38,7 @@ namespace Freya {
 			[MethodImpl( INLINE )] get => points.Length - 1;
 		}
 
-		public Vector3 GetPoint( float t ) {
+		public Vector3 Eval( float t ) {
 			return B( Degree, 0 );
 
 			Vector3 B( int k, int i ) {

@@ -1,5 +1,7 @@
 ﻿// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
+using UnityEngine;
+
 namespace Freya {
 
 	/// <summary>A value range between two values a and b</summary>
@@ -64,6 +66,21 @@ namespace Freya {
 				1 => ( Mathfs.Min( a, value ), Mathfs.Max( b, value ) ), // forward - a is min, b is max
 				_ => ( Mathfs.Min( b, value ), Mathfs.Max( a, value ) ) // reversed - b is min, a is max
 			};
+
+		/// <summary>Returns the rectangle encapsulating the region defined by a range per axis. Note: The direction of each range is ignored</summary>
+		/// <param name="rangeX">The range of the X axis</param>
+		/// <param name="rangeY">The range of the Y axis</param>
+		public static Rect ToRect( FloatRange rangeX, FloatRange rangeY ) => new Rect( rangeX.Min, rangeY.Min, rangeX.Length, rangeY.Length );
+		
+		/// <summary>Returns the bounding box encapsulating the region defined by a range per axis. Note: The direction of each range is ignored</summary>
+		/// <param name="rangeX">The range of the X axis</param>
+		/// <param name="rangeY">The range of the Y axis</param>
+		/// <param name="rangeZ">The range of the Z axis</param>
+		public static Bounds ToBounds( FloatRange rangeX, FloatRange rangeY, FloatRange rangeZ ) {
+			Vector3 center = new ( rangeX.Center, rangeY.Center, rangeZ.Center );
+			Vector3 size = new ( rangeX.Length, rangeY.Length, rangeZ.Length );
+			return new Bounds( center, size );
+		}
 
 		public static implicit operator FloatRange( (float a, float b) tuple ) => new FloatRange( tuple.a, tuple.b );
 

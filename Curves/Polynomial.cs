@@ -4,6 +4,7 @@ using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Freya {
 
@@ -12,86 +13,119 @@ namespace Freya {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 
-		/// <summary>The cubic coefficient. <c>[fCubic]x³+bx²+cx+d</c></summary>
-		public float fCubic;
+		/// <summary>A polynomial with all 0 coefficients. f(x) = 0</summary>
+		public static readonly Polynomial zero = new Polynomial( 0, 0, 0, 0 );
 
-		/// <summary>The quadratic coefficient. <c>[fQuadratic]x²+cx+d</c></summary>
-		public float fQuadratic;
+		/// <summary>The cubic coefficient</summary>
+		[FormerlySerializedAs( "fCubic" )] public float c3;
 
-		/// <summary>The linear coefficient. <c>[fLinear]x+d</c></summary>
-		public float fLinear;
+		/// <summary>The quadratic coefficient</summary>
+		[FormerlySerializedAs( "fQuadratic" )] public float c2;
 
-		/// <summary>The constant coefficient. <c>ax+[fConstant]</c></summary>
-		public float fConstant;
+		/// <summary>The linear coefficient</summary>
+		[FormerlySerializedAs( "fLinear" )] public float c1;
+
+		/// <summary>The constant coefficient</summary>
+		[FormerlySerializedAs( "fConstant" )] public float c0;
 
 		/// <summary>Get or set the coefficient of the given degree</summary>
 		/// <param name="degree">The degree of the coefficient you want to get/set. For example, 0 will return the constant coefficient, 3 will return the cubic coefficient</param>
 		public float this[ int degree ] {
 			get =>
 				degree switch {
-					0 => fConstant,
-					1 => fLinear,
-					2 => fQuadratic,
-					3 => fCubic,
+					0 => c0,
+					1 => c1,
+					2 => c2,
+					3 => c3,
 					_ => throw new IndexOutOfRangeException( "Polynomial factor degree has to be between 0 and 3" )
 				};
 			set {
 				_ = degree switch {
-					0 => fConstant = value,
-					1 => fLinear = value,
-					2 => fQuadratic = value,
-					3 => fCubic = value,
+					0 => c0 = value,
+					1 => c1 = value,
+					2 => c2 = value,
+					3 => c3 = value,
 					_ => throw new IndexOutOfRangeException( "Polynomial factor degree has to be between 0 and 3" )
 				};
 			}
 		}
 
 		/// <summary>The degree of the polynomial</summary>
-		public PolynomialDegree Degree => GetPolynomialDegree( fCubic, fQuadratic, fLinear, fConstant );
+		public PolynomialDegree Degree => GetPolynomialDegree( c3, c2, c1, c0 );
+
+		/// <inheritdoc cref="Polynomial.Cubic"/>
+		public Polynomial( float a, float b, float c, float d ) => ( c3, c2, c1, c0 ) = ( a, b, c, d );
+
+		/// <summary>Evaluates the polynomial at the given value <c>t</c></summary>
+		/// <param name="t">The value to sample at</param>
+		public float Eval( float t ) => c3 * ( t * t * t ) + c2 * ( t * t ) + c1 * t + c0;
+		
+		/// <summary>Differentiates this function, returning the n-th derivative of this polynomial</summary>
+		/// <param name="n">The number of times to differentiate this function. 0 returns the function itself, 1 returns the first derivative</param>
+		public Polynomial Differentiate( int n = 1 ) {
+			return n switch {
+				0 => this,
+				1 => new Polynomial( 0, 3 * c3, 2 * c2, c1 ),
+				2 => new Polynomial( 0, 0, 6 * c3, 2 * c2 ),
+				3 => new Polynomial( 0, 0, 0, 6 * c3 ),
+				_ => n > 3 ? zero : throw new IndexOutOfRangeException( "Cannot differentiate a negative amount of times" )
+			};
+		}
+
+		/// <summary>Calculates the roots (values where this polynomial = 0)</summary>
+		public ResultsMax3<float> Roots => GetCubicRoots( c3, c2, c1, c0 );
+
+		/// <summary>Calculates the local extrema of this polynomial</summary>
+		public ResultsMax2<float> LocalExtrema => (ResultsMax2<float>)Differentiate().Roots;
+
+		/// <summary>Calculates the local extrema of this polynomial in the unit interval</summary>
+		public ResultsMax2<float> LocalExtrema01 {
+			get {
+				ResultsMax2<float> all = LocalExtrema;
+				ResultsMax2<float> valids = new ResultsMax2<float>();
+				for( int i = 0; i < all.count; i++ ) {
+					float t = all[i];
+					if( t.Within( 0, 1 ) )
+						valids = valids.Add( all[i] );
+				}
+
+				return valids;
+			}
+		}
+
+		/// <summary>Returns the output value range within the unit interval</summary>
+		public FloatRange OutputRange01 {
+			get {
+				FloatRange range = ( Eval( 0 ), Eval( 1 ) );
+				foreach( float t in LocalExtrema01 )
+					range = range.Encapsulate( Eval( t ) );
+				return range;
+			}
+		}
+
+		#region Statics
+
+		/// <summary>Creates a constant polynomial</summary>
+		/// <param name="constant">The constant factor</param>
+		public static Polynomial Constant( float constant ) => new Polynomial( 0, 0, 0, constant );
 
 		/// <summary>Creates a linear polynomial of the form <c>ax+b</c></summary>
 		/// <param name="a">The linear factor <c>a</c> in <c>ax+b</c></param>
 		/// <param name="b">The constant factor <c>b</c> in <c>ax+b</c></param>
-		public Polynomial( float a, float b ) {
-			fCubic = fQuadratic = 0;
-			fLinear = a;
-			fConstant = b;
-		}
+		public static Polynomial Linear( float a, float b ) => new Polynomial( 0, 0, a, b );
 
 		/// <summary>Creates a quadratic polynomial of the form <c>ax²+bx+c</c></summary>
 		/// <param name="a">The quadratic factor <c>a</c> in <c>ax²+bx+c</c></param>
 		/// <param name="b">The linear factor <c>b</c> in <c>ax²+bx+c</c></param>
 		/// <param name="c">The constant factor <c>c</c> in <c>ax²+bx+c</c></param>
-		public Polynomial( float a, float b, float c ) {
-			fCubic = 0;
-			fQuadratic = a;
-			fLinear = b;
-			fConstant = c;
-		}
+		public static Polynomial Quadratic( float a, float b, float c ) => new Polynomial( 0, a, b, c );
 
 		/// <summary>Creates a cubic polynomial of the form <c>ax³+bx²+cx+d</c></summary>
 		/// <param name="a">The cubic factor <c>a</c> in <c>ax³+bx²+cx+d</c></param>
 		/// <param name="b">The quadratic factor <c>b</c> in <c>ax³+bx²+cx+d</c></param>
 		/// <param name="c">The linear factor <c>c</c> in <c>ax³+bx²+cx+d</c></param>
 		/// <param name="d">The constant factor <c>d</c> in <c>ax³+bx²+cx+d</c></param>
-		public Polynomial( float a, float b, float c, float d ) {
-			fCubic = a;
-			fQuadratic = b;
-			fLinear = c;
-			fConstant = d;
-		}
-
-		/// <summary>Calculates the derivative (rate of change) of this polynomial</summary>
-		public Polynomial Derivative => new Polynomial( 3 * fCubic, 2 * fQuadratic, fLinear );
-
-		/// <summary>Calculates the roots (values where this polynomial = 0)</summary>
-		public ResultsMax3<float> Roots => GetCubicRoots( fCubic, fQuadratic, fLinear, fConstant );
-
-		/// <summary>Samples the polynomial at a given x value</summary>
-		/// <param name="x">The value to sample at</param>
-		public float Sample( float x ) => fCubic * ( x * x * x ) + fQuadratic * ( x * x ) + fLinear * x + fConstant;
-
-		#region Statics
+		public static Polynomial Cubic( float a, float b, float c, float d ) => new Polynomial( a, b, c, d );
 
 		static bool FactorAlmost0( float v ) => v.Abs() < 0.00001f;
 
@@ -155,10 +189,10 @@ namespace Freya {
 		/// <param name="t">The blend value, typically from 0 to 1</param>
 		public static Polynomial Lerp( Polynomial a, Polynomial b, float t ) =>
 			new(
-				t.Lerp( a.fCubic, b.fCubic ),
-				t.Lerp( a.fQuadratic, b.fQuadratic ),
-				t.Lerp( a.fLinear, b.fLinear ),
-				t.Lerp( a.fConstant, b.fConstant )
+				t.Lerp( a.c3, b.c3 ),
+				t.Lerp( a.c2, b.c2 ),
+				t.Lerp( a.c1, b.c1 ),
+				t.Lerp( a.c0, b.c0 )
 			);
 
 		#region Internal root solvers
@@ -239,9 +273,9 @@ namespace Freya {
 
 		#endregion
 
-		public static Polynomial operator /( Polynomial p, float v ) => new(p.fCubic / v, p.fQuadratic / v, p.fLinear / v, p.fConstant / v);
-		public static Polynomial operator /( float v, Polynomial p ) => new(v / p.fCubic, v / p.fQuadratic, v / p.fLinear, v / p.fConstant);
-		public static Polynomial operator *( Polynomial p, float v ) => new(p.fCubic * v, p.fQuadratic * v, p.fLinear * v, p.fConstant * v);
+		public static Polynomial operator /( Polynomial p, float v ) => new(p.c3 / v, p.c2 / v, p.c1 / v, p.c0 / v);
+		public static Polynomial operator /( float v, Polynomial p ) => new(v / p.c3, v / p.c2, v / p.c1, v / p.c0);
+		public static Polynomial operator *( Polynomial p, float v ) => new(p.c3 * v, p.c2 * v, p.c1 * v, p.c0 * v);
 		public static Polynomial operator *( float v, Polynomial p ) => p * v;
 
 	}

@@ -46,7 +46,7 @@ namespace Freya {
 			[MethodImpl( INLINE )] get => points.Length - 1;
 		}
 
-		public Vector2 GetPoint( float t ) {
+		public Vector2 Eval( float t ) {
 			float n = Count - 1;
 			for( int i = 0; i < n; i++ )
 				ptEvalBuffer[i] = Vector2.LerpUnclamped( points[i], points[i + 1], t );
@@ -73,7 +73,7 @@ namespace Freya {
 		public float GetPointWeight( int i, float t ) {
 			if(i < 0 || i >= Count)
 				throw new IndexOutOfRangeException($"GetPointWeight index {i} is out of range. Valid range is 0 to {Count-1}");
-			return SplineUtils.SampleBasisFunction( Degree, i, t );
+			return SplineUtils.SampleBernsteinBasisFunction( Degree, i, t );
 		}
 
 		/// <summary>Returns the derivative bezier curve if possible, otherwise returns null</summary>

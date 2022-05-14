@@ -135,19 +135,19 @@ namespace Freya {
 		[MethodImpl( INLINE )] public Vector3 GetStartPoint() => p0;
 		[MethodImpl( INLINE )] public Vector3 GetEndPoint() => p2;
 
-		public Vector3 GetPoint( float t ) {
+		public Vector3 Eval( float t ) {
 			ReadyCoefficients();
 			float tt = t * t;
 			return new Vector3( c2.x * tt + c1.x * t + p0.x, c2.y * tt + c1.y * t + p0.y, c2.z * tt + c1.z * t + p0.z );
 		}
 
-		public Vector3 GetDerivative( float t ) {
+		public Vector3 EvalDerivative( float t ) {
 			ReadyCoefficients();
 			float tx2 = 2 * t;
 			return new Vector3( tx2 * c2.x + c1.x, tx2 * c2.y + c1.y, tx2 * c2.z + c1.z );
 		}
 
-		public Vector3 GetSecondDerivative( float t = 0 ) {
+		public Vector3 EvalSecondDerivative( float t = 0 ) {
 			ReadyCoefficients();
 			return new Vector3( 2 * c2.x, 2 * c2.y, 2 * c2.z );
 		}

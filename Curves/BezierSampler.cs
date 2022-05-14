@@ -55,7 +55,7 @@ namespace Freya {
 			Vector2 prevPt = bezier.P0;
 			cumulativeDistances[0] = 0;
 			for( int i = 1; i < resolution; i++ ) { // todo: could optimize by moving all points so that p0 = (0,0)
-				Vector2 pt = bezier.GetPoint( i / ( resolution - 1f ) );
+				Vector2 pt = bezier.Curve.Eval( i / ( resolution - 1f ) );
 				cumulativeLength += Vector2.Distance( prevPt, pt );
 				cumulativeDistances[i] = cumulativeLength;
 				prevPt = pt;
@@ -70,7 +70,7 @@ namespace Freya {
 			Vector3 prevPt = bezier.P0;
 			cumulativeDistances[0] = 0;
 			for( int i = 1; i < resolution; i++ ) { // todo: could optimize by moving all points so that p0 = (0,0)
-				Vector3 pt = bezier.GetPoint( i / ( resolution - 1f ) );
+				Vector3 pt = bezier.Curve.Eval( i / ( resolution - 1f ) );
 				cumulativeLength += Vector3.Distance( prevPt, pt );
 				cumulativeDistances[i] = cumulativeLength;
 				prevPt = pt;

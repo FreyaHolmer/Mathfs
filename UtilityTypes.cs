@@ -109,6 +109,19 @@ namespace Freya {
 
 			throw new InvalidCastException( "Failed to cast ResultsMax2 to ResultsMax3" );
 		}
+		
+		/// <summary>Explicitly casts ResultsMax3 to ResultsMax2</summary>
+		/// <param name="m3">The results to cast</param>
+		public static explicit operator ResultsMax2<T>( ResultsMax3<T> m3 ) {
+			switch( m3.count ) {
+				case 0: return default;
+				case 1: return new ResultsMax2<T>( m3.a );
+				case 2: return new ResultsMax2<T>( m3.a, m3.b );
+				case 3: throw new IndexOutOfRangeException( "Attempt to cast ResultsMax3 to ResultsMax2 when it had 3 results" );
+			}
+
+			throw new InvalidCastException( "Failed to cast ResultsMax2 to ResultsMax3" );
+		}
 
 
 		IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
