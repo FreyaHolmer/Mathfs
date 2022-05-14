@@ -17,6 +17,11 @@ namespace Freya {
 
 		readonly Vector2[] ptEvalBuffer;
 
+		/// <summary>The number of control points in this curve</summary>
+		public int Count {
+			[MethodImpl( INLINE )] get => points.Length;
+		}
+
 		/// <summary>Creates a general bezier curve, from any number of control points</summary>
 		/// <param name="points">The control points of this curve</param>
 		public Bezier2D( params Vector2[] points ) {
@@ -34,13 +39,6 @@ namespace Freya {
 
 		#region Core IParamCurve Implementations
 
-		public Vector2 GetStartPoint() => points[0];
-		public Vector2 GetEndPoint() => points[Count - 1];
-
-		public int Count {
-			[MethodImpl( INLINE )] get => points.Length;
-		}
-
 		/// <summary>The degree of the curve, equal to the number of control points minus 1. 2 points = degree 1 (linear), 3 points = degree 2 (quadratic), 4 points = degree 3 (cubic)</summary>
 		public int Degree {
 			[MethodImpl( INLINE )] get => points.Length - 1;
@@ -57,27 +55,12 @@ namespace Freya {
 			}
 
 			return ptEvalBuffer[0];
-			/* // pretty but slow recursive implementation:
-			return B( Degree, 0 );
-			Vector2 B( int k, int i ) {
-				if( k == 0 ) return points[i];
-				return Vector2.LerpUnclamped( B( k - 1, i ), B( k - 1, i + 1 ), t );
-			}*/
 		}
 
 		#endregion
 
-		/// <summary>Calculates the weight (influence) of a given point at the given t-value</summary>
-		/// <param name="i">The point to get the weight of</param>
-		/// <param name="t">The t-value where you want sample the weight value</param>
-		public float GetPointWeight( int i, float t ) {
-			if(i < 0 || i >= Count)
-				throw new IndexOutOfRangeException($"GetPointWeight index {i} is out of range. Valid range is 0 to {Count-1}");
-			return SplineUtils.SampleBernsteinBasisFunction( Degree, i, t );
-		}
-
 		/// <summary>Returns the derivative bezier curve if possible, otherwise returns null</summary>
-		public Bezier2D GetDerivative() {
+		public Bezier2D Differentiate() {
 			int n = Count - 1;
 			if( n == 0 )
 				return null; // no derivative

@@ -14,9 +14,20 @@ namespace Freya {
 
 		/// <inheritdoc cref="Bezier2D.points"/>
 		public readonly Vector3[] points;
+		readonly Vector3[] ptEvalBuffer;
+		
+		/// <inheritdoc cref="Bezier2D.Count"/>
+		public int Count {
+			[MethodImpl( INLINE )] get => points.Length;
+		}
 
 		/// <inheritdoc cref="Bezier2D(Vector2[])"/>
-		public Bezier3D( Vector3[] points ) => this.points = points;
+		public Bezier3D( Vector3[] points ) {
+			this.points = points;
+			if( points == null || points.Length <= 1 )
+				throw new ArgumentException( "Bézier curves require at least two points" );
+			ptEvalBuffer = new Vector3[points.Length - 1];
+		}
 
 		/// <inheritdoc cref="Bezier2D.this[int]"/>
 		public Vector3 this[ int i ] {
@@ -26,31 +37,28 @@ namespace Freya {
 
 		#region Core IParamCurve Implementations
 
-		public Vector3 GetStartPoint() => points[0];
-		public Vector3 GetEndPoint() => points[Count - 1];
-
-		public int Count {
-			[MethodImpl( INLINE )] get => points.Length;
-		}
-
-		/// <summary>The degree of the curve, equal to the number of control points minus 1. 2 points = degree 1 (linear), 3 points = degree 2 (quadratic), 4 points = degree 3 (cubic)</summary>
+		/// <inheritdoc cref="Bezier2D.Degree"/>
 		public int Degree {
 			[MethodImpl( INLINE )] get => points.Length - 1;
 		}
 
 		public Vector3 Eval( float t ) {
-			return B( Degree, 0 );
-
-			Vector3 B( int k, int i ) {
-				if( k == 0 ) return points[i];
-				return Vector3.LerpUnclamped( B( k - 1, i ), B( k - 1, i + 1 ), t ); // todo: optimize
+			float n = Count - 1;
+			for( int i = 0; i < n; i++ )
+				ptEvalBuffer[i] = Vector3.LerpUnclamped( points[i], points[i + 1], t );
+			while( n > 1 ) {
+				n--;
+				for( int i = 0; i < n; i++ )
+					ptEvalBuffer[i] = Vector3.LerpUnclamped( ptEvalBuffer[i], ptEvalBuffer[i + 1], t );
 			}
+
+			return ptEvalBuffer[0];
 		}
 
 		#endregion
 
-		/// <inheritdoc cref="Bezier2D.GetDerivative()"/>
-		public Bezier3D GetDerivative() {
+		/// <inheritdoc cref="Bezier2D.Differentiate"/>
+		public Bezier3D Differentiate() {
 			int n = Count - 1;
 			if( n == 0 )
 				return null; // no derivative
