@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Freya {
 
 	/// <summary>An optimized 2D uniform B-spline segment</summary>
-	[Serializable] public struct UBSCubic2D : IParamCurve3Diff<Vector2> {
+	[Serializable] public struct UBSCubic2D : IParamCubicSplineSegment2D {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 
@@ -17,7 +17,15 @@ namespace Freya {
 		public UBSCubic2D( Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3 ) {
 			( this.p0, this.p1, this.p2, this.p3 ) = ( p0, p1, p2, p3 );
 			validCoefficients = false;
-			c3 = c2 = c1 = c0 = default;
+			curve = default;
+		}
+		
+		Polynomial2D curve;
+		public Polynomial2D Curve {
+			get {
+				ReadyCoefficients();
+				return curve;
+			}
 		}
 
 		#region Control Points
@@ -83,136 +91,35 @@ namespace Freya {
 		#region Coefficients
 
 		[NonSerialized] bool validCoefficients; // inverted isDirty flag (can't default to true in structs)
-		[NonSerialized] Vector2 c3, c2, c1, c0; // cached coefficients for fast evaluation
 
 		// Coefficient Calculation
 		[MethodImpl( INLINE )] void ReadyCoefficients() {
 			if( validCoefficients )
 				return; // no need to update
 			validCoefficients = true;
-			const float _6th = 1 / 6f;
-			c3.x = _6th * ( -p0.x + 3 * ( p1.x - p2.x ) + p3.x );
-			c2.x = 0.5f * ( p0.x - 2 * p1.x + p2.x );
-			c1.x = 0.5f * ( -p0.x + p2.x );
-			c0.x = _6th * ( p0.x + 4 * p1.x + p2.x );
-
-			c3.y = _6th * ( -p0.y + 3 * ( p1.y - p2.y ) + p3.y );
-			c2.y = 0.5f * ( p0.y - 2 * p1.y + p2.y );
-			c1.y = 0.5f * ( -p0.y + p2.y );
-			c0.y = _6th * ( p0.y + 4 * p1.y + p2.y );
-		}
-
-		/// <summary>The constant coefficient when evaluating this curve in the form C3*t³ + C2*t² + C1*t + C0</summary>
-		public Vector2 C0 {
-			[MethodImpl( INLINE )] get {
-				ReadyCoefficients();
-				return c0;
-			}
-		}
-
-		/// <summary>The linear coefficient when evaluating this curve in the form C3*t³ + C2*t² + C1*t + C0</summary>
-		public Vector2 C1 {
-			[MethodImpl( INLINE )] get {
-				ReadyCoefficients();
-				return c1;
-			}
-		}
-
-		/// <summary>The quadratic coefficient when evaluating this curve in the form C3*t³ + C2*t² + C1*t + C0</summary>
-		public Vector2 C2 {
-			[MethodImpl( INLINE )] get {
-				ReadyCoefficients();
-				return c2;
-			}
-		}
-
-		/// <summary>The cubic coefficient when evaluating this curve in the form C3*t³ + C2*t² + C1*t + C0</summary>
-		public Vector2 C3 {
-			[MethodImpl( INLINE )] get {
-				ReadyCoefficients();
-				return c3;
-			}
-		}
-
-		/// <summary>The polynomial coefficients in the form c3*t³ + c2*t² + c1*t + c0</summary>
-		[MethodImpl( INLINE )] public (Vector2 c3, Vector2 c2, Vector2 c1, Vector2 c0) GetCoefficients() {
-			ReadyCoefficients();
-			return ( c3, c2, c1, c0 );
+			curve = CharMatrix.cubicUniformBspline.GetCurve( p0, p1, p2, p3 );
 		}
 
 		#endregion
-
-		#region Core IParamCurve Implementations
-
-		public int Degree {
-			[MethodImpl( INLINE )] get => 3;
-		}
-		public int Count {
-			[MethodImpl( INLINE )] get => 4;
-		}
-
-		[MethodImpl( INLINE )] public Vector2 GetStartPoint() => C0;
-
-		[MethodImpl( INLINE )] public Vector2 GetEndPoint() {
-			ReadyCoefficients();
-			float x = c0.x + c1.x + c2.x + c3.x;
-			float y = c0.y + c1.y + c2.y + c3.y;
-			return new Vector2( x, y );
-		}
-
-		[MethodImpl( INLINE )] public Vector2 Eval( float t ) {
-			ReadyCoefficients();
-			float t2 = t * t;
-			float t3 = t2 * t;
-			return new Vector2( t3 * c3.x + t2 * c2.x + t * c1.x + c0.x, t3 * c3.y + t2 * c2.y + t * c1.y + c0.y );
-		}
-
-		[MethodImpl( INLINE )] public Vector2 EvalDerivative( float t ) {
-			ReadyCoefficients();
-			float t2 = t * t;
-			return new Vector2( 3 * t2 * c3.x + 2 * t * c2.x + c1.x, 3 * t2 * c3.y + 2 * t * c2.y + c1.y );
-		}
-
-		[MethodImpl( INLINE )] public Vector2 EvalSecondDerivative( float t ) {
-			ReadyCoefficients();
-			return new Vector2( 6 * t * c3.x + 2 * c2.x, 6 * t * c3.y + 2 * c2.y );
-		}
-
-		[MethodImpl( INLINE )] public Vector2 EvalThirdDerivative( float t = 0 ) {
-			ReadyCoefficients();
-			return new Vector2( 6 * c3.x, 6 * c3.y );
-		}
-
-		#endregion
-
+		
 		/// <summary>Returns the exact cubic bézier representation of this segment</summary>
 		public BezierCubic2D ToBezier() {
-			float ax = p0.x + ( 2f / 3f ) * ( p1.x - p0.x );
-			float bx = p1.x + ( 1f / 3f ) * ( p2.x - p1.x );
-			float cx = p1.x + ( 2f / 3f ) * ( p2.x - p1.x );
-			float dx = p2.x + ( 1f / 3f ) * ( p3.x - p2.x );
-			float ay = p0.y + ( 2f / 3f ) * ( p1.y - p0.y );
-			float by = p1.y + ( 1f / 3f ) * ( p2.y - p1.y );
-			float cy = p1.y + ( 2f / 3f ) * ( p2.y - p1.y );
-			float dy = p2.y + ( 1f / 3f ) * ( p3.y - p2.y );
+			const float _13 = 1f / 3f;
+			const float _23 = 2f / 3f;
+			float ax = p0.x + _23 * ( p1.x - p0.x );
+			float bx = p1.x + _13 * ( p2.x - p1.x );
+			float cx = p1.x + _23 * ( p2.x - p1.x );
+			float dx = p2.x + _13 * ( p3.x - p2.x );
+			float ay = p0.y + _23 * ( p1.y - p0.y );
+			float by = p1.y + _13 * ( p2.y - p1.y );
+			float cy = p1.y + _23 * ( p2.y - p1.y );
+			float dy = p2.y + _13 * ( p3.y - p2.y );
 			return new BezierCubic2D(
 				new Vector2( 0.5f * ( ax + bx ), 0.5f * ( ay + by ) ),
 				new Vector2( bx, by ),
 				new Vector2( cx, cy ),
 				new Vector2( 0.5f * ( cx + dx ), 0.5f * ( cy + dy ) )
 			);
-		}
-
-		/// <summary>Get the basis function for the given point, by index</summary>
-		/// <param name="i">The index of the point (0, 1, 2 or 3)</param>
-		public static Polynomial GetBasisFunction( int i ) {
-			return i switch {
-				0 => new Polynomial( -1, 3, -3, 1 ) / 6f,
-				1 => new Polynomial( 3, -6, 0, 4 ) / 6f,
-				2 => new Polynomial( -3, 3, 3, 1 ) / 6f,
-				3 => new Polynomial( 1, 0, 0, 0 ) / 6f,
-				_ => throw new IndexOutOfRangeException( "Cubic B-Spline index needs to be between 0 and 3" )
-			};
 		}
 
 	}
