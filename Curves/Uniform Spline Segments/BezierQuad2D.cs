@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Freya {
 
 	/// <summary>An optimized 2D quadratic bezier curve, with 3 control points</summary>
-	[Serializable] public struct BezierQuad2D : IParamCurve2Diff<Vector2> {
+	[Serializable] public struct BezierQuad2D : IParamCubicSplineSegment2D {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 
@@ -19,7 +19,15 @@ namespace Freya {
 		public BezierQuad2D( Vector2 p0, Vector2 p1, Vector2 p2 ) {
 			( this.p0, this.p1, this.p2 ) = ( p0, p1, p2 );
 			validCoefficients = false;
-			c2 = c1 = default;
+			curve = default;
+		}
+
+		Polynomial2D curve;
+		public Polynomial2D Curve {
+			get {
+				ReadyCoefficients();
+				return curve;
+			}
 		}
 
 		#region Control Points
@@ -75,84 +83,16 @@ namespace Freya {
 		#region Coefficients
 
 		[NonSerialized] bool validCoefficients; // inverted isDirty flag (can't default to true in structs)
-		[NonSerialized] Vector2 c2, c1; // cached coefficients for fast evaluation. c0 = p0
 
 		// Coefficient Calculation
 		[MethodImpl( INLINE )] void ReadyCoefficients() {
 			if( validCoefficients )
 				return; // no need to update
 			validCoefficients = true;
-			c2.x = p0.x - 2 * p1.x + p2.x;
-			c1.x = 2 * ( p1.x - p0.x );
-			c2.y = p0.y - 2 * p1.y + p2.y;
-			c1.y = 2 * ( p1.y - p0.y );
-		}
-
-		/// <summary>The constant coefficient when evaluating this curve in the form C2*t² + C1*t + C0</summary>
-		public Vector2 C0 {
-			[MethodImpl( INLINE )] get => p0;
-		}
-
-		/// <summary>The linear coefficient when evaluating this curve in the form C2*t² + C1*t + C0</summary>
-		public Vector2 C1 {
-			[MethodImpl( INLINE )] get {
-				ReadyCoefficients();
-				return c1;
-			}
-		}
-
-		/// <summary>The quadratic coefficient when evaluating this curve in the form C2*t² + C1*t + C0</summary>
-		public Vector2 C2 {
-			[MethodImpl( INLINE )] get {
-				ReadyCoefficients();
-				return c2;
-			}
-		}
-
-		/// <summary>The polynomial coefficients in the form c2*t² + c1*t + c0</summary>
-		[MethodImpl( INLINE )] public (Vector2 c2, Vector2 c1, Vector2 c0) GetCoefficients() {
-			ReadyCoefficients();
-			return ( c2, c1, p0 );
+			curve = CharMatrix.quadraticBezier.GetCurve( p0, p1, p2 );
 		}
 
 		#endregion
-
-		// todo: Object Comparison & ToString
-
-		// todo: Type Casting
-
-		#region Core IParamCurve Implementations
-
-		public int Degree {
-			[MethodImpl( INLINE )] get => 2;
-		}
-		public int Count {
-			[MethodImpl( INLINE )] get => 3;
-		}
-
-		[MethodImpl( INLINE )] public Vector2 GetStartPoint() => p0;
-		[MethodImpl( INLINE )] public Vector2 GetEndPoint() => p2;
-
-		public Vector2 Eval( float t ) {
-			ReadyCoefficients();
-			float tt = t * t;
-			return new Vector2( c2.x * tt + c1.x * t + p0.x, c2.y * tt + c1.y * t + p0.y );
-		}
-
-		public Vector2 EvalDerivative( float t ) {
-			ReadyCoefficients();
-			float tx2 = 2 * t;
-			return new Vector2( tx2 * c2.x + c1.x, tx2 * c2.y + c1.y );
-		}
-
-		public Vector2 EvalSecondDerivative( float t = 0 ) {
-			ReadyCoefficients();
-			return new Vector2( 2 * c2.x, 2 * c2.y );
-		}
-
-		#endregion
-
-		// todo: Point Components
 
 		/// <inheritdoc cref="BezierCubic2D.Split(float)"/>
 		public BezierQuad2D Split( float t ) {
@@ -161,19 +101,6 @@ namespace Freya {
 			Vector2 end = Vector2.LerpUnclamped( mid, b, t );
 			return new BezierQuad2D( p0, mid, end );
 		}
-
-		// todo: Bounds
-
-		// todo: exact length
-
-		// todo: Project Point
-
-		// todo: Intersection Tests
-
-		// todo: Polynomial Factors
-
-		// todo: Local Extrema
-
 
 	}
 
