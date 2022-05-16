@@ -136,8 +136,6 @@ namespace Freya {
 
 		#endregion
 
-		// Whole-curve properties & functions
-
 		#region Interpolation
 
 		/// <summary>Returns linear blend between two bézier curves</summary>
@@ -220,9 +218,9 @@ namespace Freya {
 				p0 - 6 * p2 + 6 * p3 );
 		}
 
-		public Hermite2D ToHermite() {
+		public HermiteCubic2D ToHermite() {
 			// todo: channel split for performance
-			return new Hermite2D( p0, ( p1 - p0 ) * 3, p3, ( p3 - p2 ) * 3 );
+			return new HermiteCubic2D( p0, ( p1 - p0 ) * 3, p3, ( p3 - p2 ) * 3 );
 		}
 
 		#endregion

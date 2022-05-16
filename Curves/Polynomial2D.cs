@@ -28,9 +28,9 @@ namespace Freya {
 		/// <summary>Returns the tight axis-aligned bounds of the curve in the unit interval</summary>
 		public Rect GetBounds01() => FloatRange.ToRect( x.OutputRange01, y.OutputRange01 );
 
-		public Hermite2D ToHermiteCurve() {
+		public HermiteCubic2D ToHermiteCurve() {
 			Polynomial2D d = Differentiate();
-			return new Hermite2D( Eval( 0 ), d.Eval( 0 ), Eval( 1 ), d.Eval( 1 ) );
+			return new HermiteCubic2D( Eval( 0 ), d.Eval( 0 ), Eval( 1 ), d.Eval( 1 ) );
 		}
 
 		#region IParamCurve3Diff interface implementations

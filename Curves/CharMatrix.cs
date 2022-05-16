@@ -21,14 +21,21 @@ namespace Freya {
 			-1, 3, -3, 1
 		);
 
-		/// <summary>The characteristic matrix of a cubic uniform B-spline segment</summary>
+		/// <summary>The characteristic matrix of a uniform cubic hermite curve</summary>
+		public static readonly CharMatrix4x4 cubicHermite = new(
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			-3, -2, 3, -1,
+			2, 1, -2, 1
+		);
+
+		/// <summary>The characteristic matrix of a uniform cubic B-spline segment</summary>
 		public static readonly CharMatrix4x4 cubicUniformBspline = new CharMatrix4x4(
 			1, 4, 1, 0,
 			-3, 0, 3, 0,
 			3, -6, 3, 0,
 			-1, 3, -3, 1
 		) / 6;
-
 
 	}
 

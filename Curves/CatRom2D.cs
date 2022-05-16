@@ -212,9 +212,9 @@ namespace Freya {
 			return new BezierCubic2D( p1, p1 + m1 / 3, p2 - m2 / 3, p2 );
 		}
 
-		public Hermite2D ToHermite() {
 			( Vector2 m1, Vector2 m2 ) = GetPointTangents();
 			return new Hermite2D( p1, m1, p2, m2 );
+		public HermiteCubic2D ToHermite() {
 		}
 
 	}
