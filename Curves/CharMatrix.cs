@@ -175,7 +175,7 @@ namespace Freya {
 
 	}
 
-	/// <summary>Data structure representing a cubic characteristic matrix with 4 points. Used for spline evaluation</summary>
+	/// <summary>Data structure representing a quadratic characteristic matrix with 3 points. Used for spline evaluation</summary>
 	public readonly struct CharMatrix3x3 {
 		public readonly float m00, m01, m02;
 		public readonly float m10, m11, m12;
