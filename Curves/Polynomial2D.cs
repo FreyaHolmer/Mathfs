@@ -5,19 +5,37 @@ using UnityEngine;
 
 namespace Freya {
 
+	[Serializable]
 	public struct Polynomial2D : IParamCurve3Diff<Vector2> {
 
 		public Polynomial x;
 		public Polynomial y;
 
-		public Vector2 C0 => new(x.c0, y.c0);
-		public Vector2 C1 => new(x.c1, y.c1);
-		public Vector2 C2 => new(x.c2, y.c2);
-		public Vector2 C3 => new(x.c3, y.c3);
+		public Vector2 C0 {
+			get => new(x.c0, y.c0);
+			set => ( x.c0, y.c0 ) = ( value.x, value.y );
+		}
+		public Vector2 C1 {
+			get => new(x.c1, y.c1);
+			set => ( x.c1, y.c1 ) = ( value.x, value.y );
+		}
+		public Vector2 C2 {
+			get => new(x.c2, y.c2);
+			set => ( x.c2, y.c2 ) = ( value.x, value.y );
+		}
+		public Vector2 C3 {
+			get => new(x.c3, y.c3);
+			set => ( x.c3, y.c3 ) = ( value.x, value.y );
+		}
 
 		public Polynomial this[ int i ] => i switch { 0 => x, 1 => y, _ => throw new IndexOutOfRangeException( "Polynomial2D component index has to be either 0 or 1" ) };
 
 		public Polynomial2D( Polynomial x, Polynomial y ) => ( this.x, this.y ) = ( x, y );
+
+		public Polynomial2D( Vector2 c0, Vector2 c1, Vector2 c2, Vector2 c3 ) {
+			this.x = new Polynomial( c3.x, c2.x, c1.x, c0.x );
+			this.y = new Polynomial( c3.y, c2.y, c1.y, c0.y );
+		}
 
 		/// <inheritdoc cref="Polynomial.Eval(float)"/>
 		public Vector2 Eval( float t ) => new(x.Eval( t ), y.Eval( t ));
