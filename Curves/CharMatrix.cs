@@ -138,6 +138,31 @@ namespace Freya {
 				GetEvalPolynomial( p0.z, p1.z, p2.z, p3.z )
 			);
 
+		/// <summary>Multiplies this characteristic matrix C by a column matrix: C*[p0,p1,p2,p3]^T</summary>
+		/// <param name="p0">The first entry of the column matrix</param>
+		/// <param name="p1">The second entry of the column matrix</param>
+		/// <param name="p2">The third entry of the column matrix</param>
+		/// <param name="p3">The fourth entry of the column matrix</param>
+		public (float, float, float, float) MultiplyColumnVec( float p0, float p1, float p2, float p3 ) =>
+		(
+			p0 * m00 + p1 * m01 + p2 * m02 + p3 * m03,
+			p0 * m10 + p1 * m11 + p2 * m12 + p3 * m13,
+			p0 * m20 + p1 * m21 + p2 * m22 + p3 * m23,
+			p0 * m30 + p1 * m31 + p2 * m32 + p3 * m33
+		);
+
+		/// <inheritdoc cref="MultiplyColumnVec(float,float,float,float)"/>
+		public (Vector2, Vector2, Vector2, Vector2) MultiplyColumnVec( Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3 ) {
+			( float x0, float x1, float x2, float x3 ) = MultiplyColumnVec( p0.x, p1.x, p2.x, p3.x );
+			( float y0, float y1, float y2, float y3 ) = MultiplyColumnVec( p0.y, p1.y, p2.y, p3.y );
+			return (
+				new Vector2( x0, y0 ),
+				new Vector2( x1, y1 ),
+				new Vector2( x2, y2 ),
+				new Vector2( x3, y3 )
+			);
+		}
+
 		public static CharMatrix4x4 operator *( CharMatrix4x4 c, float v ) =>
 			new(c.m00 * v, c.m01 * v, c.m02 * v, c.m03 * v,
 				c.m10 * v, c.m11 * v, c.m12 * v, c.m13 * v,
@@ -145,6 +170,9 @@ namespace Freya {
 				c.m30 * v, c.m31 * v, c.m32 * v, c.m33 * v);
 
 		public static CharMatrix4x4 operator /( CharMatrix4x4 c, float v ) => c * ( 1f / v );
+
+		public override string ToString() => $"{m00},\t{m01},\t{m02},\t{m03}\n{m10},\t{m11},\t{m12},\t{m13}\n{m20},\t{m21},\t{m22},\t{m23}\n{m30},\t{m31},\t{m32},\t{m33}\n";
+
 	}
 
 	/// <summary>Data structure representing a cubic characteristic matrix with 4 points. Used for spline evaluation</summary>
