@@ -142,7 +142,7 @@ namespace Freya {
 
 		#endregion
 
-		// todo: this is untested
+		/// <summary>Returns the bezier representation of the same curve</summary>
 		public BezierCubic2D ToBezier() =>
 			new BezierCubic2D(
 				p1,
@@ -151,7 +151,7 @@ namespace Freya {
 				p2
 			);
 
-		// todo: this is untested
+		/// <summary>Returns the hermite representation of the same curve</summary>
 		public HermiteCubic2D ToHermite() =>
 			new HermiteCubic2D(
 				p1,
@@ -160,7 +160,7 @@ namespace Freya {
 				( p3 - p1 ) / 2f
 			);
 
-		// todo: this is untested
+		/// <summary>Returns the bspline representation of the same curve</summary>
 		public UBSCubic2D ToBSpline() =>
 			new UBSCubic2D(
 				( 7 * p0 - 4 * p1 + 5 * p2 - 2 * p3 ) / 6,
