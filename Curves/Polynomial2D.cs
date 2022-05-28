@@ -164,27 +164,24 @@ namespace Freya {
 
 		// Internal - used by all other intersections
 		private ResultsMax3<float> Intersect( Vector2 origin, Vector2 direction, bool rangeLimited = false, float minRayT = float.NaN, float maxRayT = float.NaN ) {
-			BezierCubic2D bez = this.ToHermiteCurve().ToBezier(); // todo: hack
-			Vector2 p0rel = bez.P0 - origin;
-			Vector2 p1rel = bez.P1 - origin;
-			Vector2 p2rel = bez.P2 - origin;
-			Vector2 p3rel = bez.P3 - origin;
-			float y0 = Mathfs.Determinant( p0rel, direction ); // transform bezier point components into the line space y components
-			float y1 = Mathfs.Determinant( p1rel, direction );
-			float y2 = Mathfs.Determinant( p2rel, direction );
-			float y3 = Mathfs.Determinant( p3rel, direction );
-			Polynomial polynomY = CharMatrix.cubicBezier.GetEvalPolynomial( y0, y1, y2, y3 );
+			Polynomial2D rel = this;
+			rel.C0 -= origin;
+			float y0 = Mathfs.Determinant( rel.C0, direction ); // transform polynomial into the line space y components
+			float y1 = Mathfs.Determinant( rel.C1, direction );
+			float y2 = Mathfs.Determinant( rel.C2, direction );
+			float y3 = Mathfs.Determinant( rel.C3, direction );
+			Polynomial polynomY = new Polynomial( y3, y2, y1, y0 );
 			ResultsMax3<float> roots = polynomY.Roots; // t values of the function
 
 			Polynomial polynomX = default;
 			if( rangeLimited ) {
 				// if we're range limited, we need to verify position along the ray/line/lineSegment
 				// and if we do, we need to be able to go from t -> x coord
-				float x0 = Vector2.Dot( p0rel, direction ); // transform bezier point components into the line space x components
-				float x1 = Vector2.Dot( p1rel, direction );
-				float x2 = Vector2.Dot( p2rel, direction );
-				float x3 = Vector2.Dot( p3rel, direction );
-				polynomX = CharMatrix.cubicBezier.GetEvalPolynomial( x0, x1, x2, x3 );
+				float x0 = Vector2.Dot( rel.C0, direction ); // transform into the line space x components
+				float x1 = Vector2.Dot( rel.C1, direction );
+				float x2 = Vector2.Dot( rel.C2, direction );
+				float x3 = Vector2.Dot( rel.C3, direction );
+				polynomX = new Polynomial( x3, x2, x1, x0 );
 			}
 
 			float CurveTtoRayT( float t ) => polynomX.Eval( t );
@@ -267,6 +264,14 @@ namespace Freya {
 
 		#endregion
 
+		public static Polynomial2D Rotate( Polynomial2D poly, float a ) {
+			return new Polynomial2D(
+				poly.C0.Rotate( a ),
+				poly.C1.Rotate( a ),
+				poly.C2.Rotate( a ),
+				poly.C3.Rotate( a )
+			);
+		}
 	}
 
 }
