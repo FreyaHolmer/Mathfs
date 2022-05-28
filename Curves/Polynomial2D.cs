@@ -46,10 +46,33 @@ namespace Freya {
 		/// <summary>Returns the tight axis-aligned bounds of the curve in the unit interval</summary>
 		public Rect GetBounds01() => FloatRange.ToRect( x.OutputRange01, y.OutputRange01 );
 
-		public HermiteCubic2D ToHermiteCurve() {
-			Polynomial2D d = Differentiate();
-			return new HermiteCubic2D( Eval( 0 ), d.Eval( 0 ), Eval( 1 ), d.Eval( 1 ) );
+		#region Polynomial to spline converters
+
+		/// <summary>Returns the cubic bezier control points for the unit interval of this curve</summary>
+		public BezierCubic2D ToBezier() {
+			( Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3 ) = CharMatrix.cubicBezierInverse.MultiplyColumnVec( C0, C1, C2, C3 );
+			return new BezierCubic2D( p0, p1, p2, p3 );
 		}
+
+		/// <summary>Returns the cubic catmull-rom control points for the unit interval of this curve</summary>
+		public CatRomCubic2D ToCatmullRom() {
+			( Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3 ) = CharMatrix.cubicCatmullRomInverse.MultiplyColumnVec( C0, C1, C2, C3 );
+			return new CatRomCubic2D( p0, p1, p2, p3 );
+		}
+
+		/// <summary>Returns the cubic hermite control points for the unit interval of this curve</summary>
+		public HermiteCubic2D ToHermite() {
+			( Vector2 p0, Vector2 v0, Vector2 p1, Vector2 v1 ) = CharMatrix.cubicHermiteInverse.MultiplyColumnVec( C0, C1, C2, C3 );
+			return new HermiteCubic2D( p0, v0, p1, v1 );
+		}
+
+		/// <summary>Returns the cubic b-spline control points for the unit interval of this curve</summary>
+		public UBSCubic2D ToBSpline() {
+			( Vector2 p0, Vector2 v0, Vector2 p1, Vector2 v1 ) = CharMatrix.cubicUniformBsplineInverse.MultiplyColumnVec( C0, C1, C2, C3 );
+			return new UBSCubic2D( p0, v0, p1, v1 );
+		}
+
+		#endregion
 
 		#region IParamCurve3Diff interface implementations
 
