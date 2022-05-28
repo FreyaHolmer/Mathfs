@@ -12,10 +12,7 @@ namespace Freya {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 
-		/// <summary>Creates a quadratic bezier curve, from 3 control points</summary>
-		/// <param name="p0">The starting point of the curve</param>
-		/// <param name="p1">The second control point of the curve, sometimes called the start tangent point</param>
-		/// <param name="p2">The end point of the curve, sometimes called the end tangent point</param>
+		/// <inheritdoc cref="BezierQuad2D(Vector2,Vector2,Vector2)"/>
 		public BezierQuad3D( Vector3 p0, Vector3 p1, Vector3 p2 ) {
 			( this.p0, this.p1, this.p2 ) = ( p0, p1, p2 );
 			validCoefficients = false;
@@ -34,25 +31,25 @@ namespace Freya {
 
 		[SerializeField] Vector3 p0, p1, p2; // the points of the curve
 
-		/// <summary>The starting point of the curve</summary>
+		/// <inheritdoc cref="BezierQuad2D.P0"/>
 		public Vector3 P0 {
 			[MethodImpl( INLINE )] get => p0;
 			[MethodImpl( INLINE )] set => _ = ( p0 = value, validCoefficients = false );
 		}
 
-		/// <summary>The middle control point of the curve</summary>
+		/// <inheritdoc cref="BezierQuad2D.P1"/>
 		public Vector3 P1 {
 			[MethodImpl( INLINE )] get => p1;
 			[MethodImpl( INLINE )] set => _ = ( p1 = value, validCoefficients = false );
 		}
 
-		/// <summary>The end point of the curve</summary>
+		/// <inheritdoc cref="BezierQuad2D.P2"/>
 		public Vector3 P2 {
 			[MethodImpl( INLINE )] get => p2;
 			[MethodImpl( INLINE )] set => _ = ( p2 = value, validCoefficients = false );
 		}
 
-		/// <summary>Get or set a control point position by index. Valid indices: 0, 1, 2 or 3</summary>
+		/// <inheritdoc cref="BezierQuad2D.this[int]"/>
 		public Vector3 this[ int i ] {
 			get {
 				switch( i ) {
