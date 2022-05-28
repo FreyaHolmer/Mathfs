@@ -1,4 +1,6 @@
-﻿using System;
+﻿// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
+
+using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Serialization;
