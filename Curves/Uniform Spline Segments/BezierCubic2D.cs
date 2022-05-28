@@ -197,7 +197,6 @@ namespace Freya {
 
 		#endregion
 
-
 		#region Conversion
 
 		public UBSCubic2D ToUniformCubicBSpline() {
@@ -209,9 +208,9 @@ namespace Freya {
 				2 * p1 - 7 * p2 + 6 * p3 );
 		}
 
-		public CatRom2D ToUniformCubicCatRom() {
+		public CatRomCubic2D ToUniformCubicCatRom() {
 			// todo: channel split for performance
-			return new CatRom2D(
+			return new CatRomCubic2D(
 				6 * p0 - 6 * p1 + p3,
 				p0,
 				p3,

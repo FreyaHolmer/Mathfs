@@ -29,6 +29,13 @@ namespace Freya {
 			2, 1, -2, 1
 		);
 
+		/// <summary>The characteristic matrix of a uniform cubic catmull-rom curve</summary>
+		public static readonly CharMatrix4x4 cubicCatmullRom = new CharMatrix4x4(
+			0, 2, 0, 0,
+			-1, 0, 1, 0,
+			2, -5, 4, -1,
+			-1, 3, -3, 1
+		) / 2;
 		/// <summary>The characteristic matrix of a uniform cubic B-spline segment</summary>
 		public static readonly CharMatrix4x4 cubicUniformBspline = new CharMatrix4x4(
 			1, 4, 1, 0,
