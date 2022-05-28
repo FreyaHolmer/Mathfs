@@ -6,8 +6,8 @@ using UnityEngine;
 
 namespace Freya {
 
-	/// <summary>An optimized 2D uniform B-spline segment</summary>
-	[Serializable] public struct UBSCubic2D : IParamCubicSplineSegment2D {
+	/// <summary>An optimized 3D uniform B-spline segment</summary>
+	[Serializable] public struct UBSCubic3D : IParamCubicSplineSegment3D {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 
@@ -16,14 +16,14 @@ namespace Freya {
 		/// <param name="p1">The second point of the B-spline hull</param>
 		/// <param name="p2">The third point of the B-spline hull</param>
 		/// <param name="p3">The fourth point of the B-spline hull</param>
-		public UBSCubic2D( Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3 ) {
+		public UBSCubic3D( Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3 ) {
 			( this.p0, this.p1, this.p2, this.p3 ) = ( p0, p1, p2, p3 );
 			validCoefficients = false;
 			curve = default;
 		}
 
-		Polynomial2D curve;
-		public Polynomial2D Curve {
+		Polynomial3D curve;
+		public Polynomial3D Curve {
 			get {
 				ReadyCoefficients();
 				return curve;
@@ -32,34 +32,34 @@ namespace Freya {
 
 		#region Control Points
 
-		[SerializeField] Vector2 p0, p1, p2, p3; // the points of the B-spline hull
+		[SerializeField] Vector3 p0, p1, p2, p3; // the points of the B-spline hull
 
-		/// <summary>The first point of the B-spline hull</summary>
-		public Vector2 P0 {
+		/// <inheritdoc cref="UBSCubic2D.P0"/>
+		public Vector3 P0 {
 			[MethodImpl( INLINE )] get => p0;
 			[MethodImpl( INLINE )] set => _ = ( p0 = value, validCoefficients = false );
 		}
 
-		/// <summary>The second point of the B-spline hull</summary>
-		public Vector2 P1 {
+		/// <inheritdoc cref="UBSCubic2D.P1"/>
+		public Vector3 P1 {
 			[MethodImpl( INLINE )] get => p1;
 			[MethodImpl( INLINE )] set => _ = ( p1 = value, validCoefficients = false );
 		}
 
-		/// <summary>The third point of the B-spline hull</summary>
-		public Vector2 P2 {
+		/// <inheritdoc cref="UBSCubic2D.P2"/>
+		public Vector3 P2 {
 			[MethodImpl( INLINE )] get => p2;
 			[MethodImpl( INLINE )] set => _ = ( p2 = value, validCoefficients = false );
 		}
 
-		/// <summary>The fourth point of the B-spline hull</summary>
-		public Vector2 P3 {
+		/// <inheritdoc cref="UBSCubic2D.P3"/>
+		public Vector3 P3 {
 			[MethodImpl( INLINE )] get => p3;
 			[MethodImpl( INLINE )] set => _ = ( p3 = value, validCoefficients = false );
 		}
 
-		/// <summary>Get or set a control point position by index. Valid indices: 0, 1, 2 or 3</summary>
-		public Vector2 this[ int i ] {
+		/// <inheritdoc cref="UBSCubic2D.this[int]"/>
+		public Vector3 this[ int i ] {
 			get {
 				switch( i ) {
 					case 0:  return P0;
@@ -104,8 +104,8 @@ namespace Freya {
 
 		#endregion
 
-		/// <summary>Returns the exact cubic bézier representation of this segment</summary>
-		public BezierCubic2D ToBezier() {
+		/// <inheritdoc cref="UBSCubic2D.ToBezier"/>
+		public BezierCubic3D ToBezier() {
 			const float _13 = 1f / 3f;
 			const float _23 = 2f / 3f;
 			float ax = p0.x + _23 * ( p1.x - p0.x );
@@ -116,11 +116,11 @@ namespace Freya {
 			float by = p1.y + _13 * ( p2.y - p1.y );
 			float cy = p1.y + _23 * ( p2.y - p1.y );
 			float dy = p2.y + _13 * ( p3.y - p2.y );
-			return new BezierCubic2D(
-				new Vector2( 0.5f * ( ax + bx ), 0.5f * ( ay + by ) ),
-				new Vector2( bx, by ),
-				new Vector2( cx, cy ),
-				new Vector2( 0.5f * ( cx + dx ), 0.5f * ( cy + dy ) )
+			return new BezierCubic3D(
+				new Vector3( 0.5f * ( ax + bx ), 0.5f * ( ay + by ) ),
+				new Vector3( bx, by ),
+				new Vector3( cx, cy ),
+				new Vector3( 0.5f * ( cx + dx ), 0.5f * ( cy + dy ) )
 			);
 		}
 
