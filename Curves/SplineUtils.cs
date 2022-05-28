@@ -151,6 +151,11 @@ namespace Freya {
 		internal static Polynomial2D CalculateCatRomCurve( Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3, float k0, float k1, float k2, float k3 ) {
 			return GetNUCatRomCharMatrix( k0, k1, k2, k3 ).GetCurve( p0, p1, p2, p3 );
 		}
+
+		internal static Polynomial3D CalculateCatRomCurve( Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float k0, float k1, float k2, float k3 ) {
+			return GetNUCatRomCharMatrix( k0, k1, k2, k3 ).GetCurve( p0, p1, p2, p3 );
+		}
+
 	}
 
 }
