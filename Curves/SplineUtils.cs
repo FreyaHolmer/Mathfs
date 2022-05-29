@@ -32,13 +32,33 @@ namespace Freya {
 			return kPrev + sqDist.Pow( 0.5f * alpha ).AtLeast( 0.00001f ); // ensure there are no duplicate knots
 		}
 
+		static (float, float, float, float) GetUniformKnots( bool unitInterval ) => unitInterval ? ( -1, 0, 1, 2 ) : ( 0, 1, 2, 3 );
+
 		public static (float, float, float, float) CalcCatRomKnots( Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3, float alpha, bool unitInterval ) {
 			if( alpha == 0 ) // uniform catrom
-				return ( -1, 0, 1, 2 );
-			float i01 = Vector2.SqrMagnitude( p0 - p1 ).Pow( 0.5f * alpha );
-			float i12 = Vector2.SqrMagnitude( p1 - p2 ).Pow( 0.5f * alpha );
-			float i23 = Vector2.SqrMagnitude( p2 - p3 ).Pow( 0.5f * alpha );
+				return GetUniformKnots( unitInterval );
+			float sqMag01 = Vector2.SqrMagnitude( p0 - p1 );
+			float sqMag12 = Vector2.SqrMagnitude( p1 - p2 );
+			float sqMag23 = Vector2.SqrMagnitude( p2 - p3 );
+			return CalcCatRomKnots( sqMag01, sqMag12, sqMag23, alpha, unitInterval );
+		}
 
+		public static (float, float, float, float) CalcCatRomKnots( Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float alpha, bool unitInterval ) {
+			if( alpha == 0 ) // uniform catrom
+				return GetUniformKnots( unitInterval );
+			float sqMag01 = Vector3.SqrMagnitude( p0 - p1 );
+			float sqMag12 = Vector3.SqrMagnitude( p1 - p2 );
+			float sqMag23 = Vector3.SqrMagnitude( p2 - p3 );
+			return CalcCatRomKnots( sqMag01, sqMag12, sqMag23, alpha, unitInterval );
+		}
+
+		static (float, float, float, float) CalcCatRomKnots( float sqMag01, float sqMag12, float sqMag23, float alpha, bool unitInterval ) {
+			( float i01, float i12, float i23 ) = alpha switch {
+				0 => ( 1, 1, 1 ), // uniform
+				1 => ( sqMag01.Sqrt(), sqMag12.Sqrt(), sqMag23.Sqrt() ), // chordal
+				2 => ( sqMag01, sqMag12, sqMag23 ),
+				_ => ( sqMag01.Pow( 0.5f * alpha ), sqMag12.Pow( 0.5f * alpha ), sqMag23.Pow( 0.5f * alpha ) )
+			};
 			float k0, k1, k2, k3;
 			if( unitInterval ) {
 				return ( -i01 / i12, 0, 1, 1 + i23 / i12 );
