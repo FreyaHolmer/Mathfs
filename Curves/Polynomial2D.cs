@@ -33,8 +33,8 @@ namespace Freya {
 		public Polynomial2D( Polynomial x, Polynomial y ) => ( this.x, this.y ) = ( x, y );
 
 		public Polynomial2D( Vector2 c0, Vector2 c1, Vector2 c2, Vector2 c3 ) {
-			this.x = new Polynomial( c3.x, c2.x, c1.x, c0.x );
-			this.y = new Polynomial( c3.y, c2.y, c1.y, c0.y );
+			this.x = new Polynomial( c0.x, c1.x, c2.x, c3.x );
+			this.y = new Polynomial( c0.y, c1.y, c2.y, c3.y );
 		}
 
 		/// <inheritdoc cref="Polynomial.Eval(float)"/>
@@ -193,7 +193,7 @@ namespace Freya {
 			float y1 = Mathfs.Determinant( rel.C1, direction );
 			float y2 = Mathfs.Determinant( rel.C2, direction );
 			float y3 = Mathfs.Determinant( rel.C3, direction );
-			Polynomial polynomY = new Polynomial( y3, y2, y1, y0 );
+			Polynomial polynomY = new Polynomial( y0, y1, y2, y3 );
 			ResultsMax3<float> roots = polynomY.Roots; // t values of the function
 
 			Polynomial polynomX = default;
@@ -204,7 +204,7 @@ namespace Freya {
 				float x1 = Vector2.Dot( rel.C1, direction );
 				float x2 = Vector2.Dot( rel.C2, direction );
 				float x3 = Vector2.Dot( rel.C3, direction );
-				polynomX = new Polynomial( x3, x2, x1, x0 );
+				polynomX = new Polynomial( x0, x1, x2, x3 );
 			}
 
 			float CurveTtoRayT( float t ) => polynomX.Eval( t );

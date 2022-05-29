@@ -94,10 +94,10 @@ namespace Freya {
 		/// <param name="i">The point index to get the basis function of</param>
 		public Polynomial GetBasisFunction( int i ) {
 			return i switch {
-				0 => new Polynomial( m30, m20, m10, m00 ),
-				1 => new Polynomial( m31, m21, m11, m01 ),
-				2 => new Polynomial( m32, m22, m12, m02 ),
-				3 => new Polynomial( m33, m23, m13, m03 ),
+				0 => new Polynomial( m00, m10, m20, m30 ),
+				1 => new Polynomial( m01, m11, m21, m31 ),
+				2 => new Polynomial( m02, m12, m22, m32 ),
+				3 => new Polynomial( m03, m13, m23, m33 ),
 				_ => throw new IndexOutOfRangeException( "Basis index needs to be between 0 and 3" )
 			};
 		}
@@ -110,10 +110,11 @@ namespace Freya {
 		/// <param name="p3">The value of the fourth point</param>
 		public Polynomial GetEvalPolynomial( float p0, float p1, float p2, float p3 ) =>
 			new(
-				p0 * m30 + p1 * m31 + p2 * m32 + p3 * m33,
-				p0 * m20 + p1 * m21 + p2 * m22 + p3 * m23,
+				p0 * m00 + p1 * m01 + p2 * m02 + p3 * m03,
 				p0 * m10 + p1 * m11 + p2 * m12 + p3 * m13,
-				p0 * m00 + p1 * m01 + p2 * m02 + p3 * m03);
+				p0 * m20 + p1 * m21 + p2 * m22 + p3 * m23,
+				p0 * m30 + p1 * m31 + p2 * m32 + p3 * m33
+			);
 
 		/// <summary>Returns the curve this characteristic matrix represents, given 4 points</summary>
 		/// <param name="p0">The first point</param>
@@ -190,9 +191,9 @@ namespace Freya {
 		/// <inheritdoc cref="CharMatrix4x4.GetBasisFunction(int)"/>
 		public Polynomial GetBasisFunction( int i ) {
 			return i switch {
-				0 => Polynomial.Quadratic( m20, m10, m00 ),
-				1 => Polynomial.Quadratic( m21, m11, m01 ),
-				2 => Polynomial.Quadratic( m22, m12, m02 ),
+				0 => Polynomial.Quadratic( m00, m10, m20 ),
+				1 => Polynomial.Quadratic( m01, m11, m21 ),
+				2 => Polynomial.Quadratic( m02, m12, m22 ),
 				_ => throw new IndexOutOfRangeException( "Basis index needs to be between 0 and 2" )
 			};
 		}
@@ -200,9 +201,10 @@ namespace Freya {
 		/// <inheritdoc cref="CharMatrix4x4.GetEvalPolynomial(float,float,float,float)"/>
 		public Polynomial GetEvalPolynomial( float p0, float p1, float p2 ) =>
 			Polynomial.Quadratic(
-				p0 * m20 + p1 * m21 + p2 * m22,
+				p0 * m00 + p1 * m01 + p2 * m02,
 				p0 * m10 + p1 * m11 + p2 * m12,
-				p0 * m00 + p1 * m01 + p2 * m02 );
+				p0 * m20 + p1 * m21 + p2 * m22
+			);
 
 		/// <inheritdoc cref="CharMatrix4x4.GetCurve(Vector2,Vector2,Vector2,Vector2)"/>
 		public Polynomial2D GetCurve( Vector2 p0, Vector2 p1, Vector2 p2 ) =>
