@@ -11,10 +11,23 @@ namespace Freya {
 		public Polynomial y;
 		public Polynomial z;
 
-		public Vector3 C0 => new(x.c0, y.c0, z.c0);
-		public Vector3 C1 => new(x.c1, y.c1, z.c1);
-		public Vector3 C2 => new(x.c2, y.c2, z.c2);
-		public Vector3 C3 => new(x.c3, y.c3, z.c3);
+		public Vector3 C0 {
+			get => new(x.c0, y.c0, z.c0);
+			set => ( x.c0, y.c0, z.c0 ) = ( value.x, value.y, value.z );
+		}
+		public Vector3 C1 {
+			get => new(x.c1, y.c1, z.c1);
+			set => ( x.c1, y.c1, z.c1 ) = ( value.x, value.y, value.z );
+		}
+		public Vector3 C2 {
+			get => new(x.c2, y.c2, z.c2);
+			set => ( x.c2, y.c2, z.c2 ) = ( value.x, value.y, value.z );
+		}
+		public Vector3 C3 {
+			get => new(x.c3, y.c3, z.c3);
+			set => ( x.c3, y.c3, z.c3 ) = ( value.x, value.y, value.z );
+		}
+
 
 		public Polynomial this[ int i ] => i switch { 0 => x, 1 => y, 2 => z, _ => throw new IndexOutOfRangeException( "Polynomial3D component index has to be either 0, 1, or 2" ) };
 
