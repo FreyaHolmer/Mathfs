@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Freya {
 
-	public class Nurbs2D {
+	public class NURBS2D {
 
 		public Vector2[] points;
 		public float[] knots;
@@ -17,10 +17,10 @@ namespace Freya {
 		public int KnotCount => degree + PointCount + 1;
 		public int SegmentCount => KnotCount - degree * 2 - 1;
 
-		public static Nurbs2D GetUniformBSpline( Vector2[] points, int degree = 3, bool open = true ) {
+		public static NURBS2D GetUniformBSpline( Vector2[] points, int degree = 3, bool open = true ) {
 			int ptCount = points.Length;
 			float[] knots = SplineUtils.GenerateUniformKnots( degree, ptCount, open );
-			return new Nurbs2D( points, knots, null, degree );
+			return new NURBS2D( points, knots, null, degree );
 		}
 
 		public static float[] GetUnweightedWeights( int count ) {
@@ -31,7 +31,7 @@ namespace Freya {
 		}
 
 
-		public Nurbs2D( Vector2[] points, float[] knots, float[] weights, int degree = 3 ) {
+		public NURBS2D( Vector2[] points, float[] knots, float[] weights, int degree = 3 ) {
 			this.points = points;
 			this.knots = knots;
 			this.degree = degree;
