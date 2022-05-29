@@ -221,8 +221,11 @@ namespace Freya {
 
 		static ResultsMax3<float> SolveCubicRoots( float a, float b, float c, float d ) {
 			// first, depress the cubic to make it easier to solve
-			float p = ( 3 * a * c - b * b ) / ( 3 * a * a );
-			float q = ( 2 * b * b * b - 9 * a * b * c + 27 * a * a * d ) / ( 27 * a * a * a );
+			float aa = a * a;
+			float ac = a * c;
+			float bb = b * b;
+			float p = ( 3 * ac - bb ) / ( 3 * aa );
+			float q = ( 2 * bb * b - 9 * ac * b + 27 * aa * d ) / ( 27 * aa * a );
 
 			ResultsMax3<float> dpr = SolveDepressedCubicRoots( p, q );
 
