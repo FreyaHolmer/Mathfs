@@ -1,7 +1,6 @@
 ﻿// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
 using System;
-using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -51,7 +50,7 @@ namespace Freya {
 		}
 
 		/// <summary>The degree of the polynomial</summary>
-		public PolynomialDegree Degree => GetPolynomialDegree( c0, c1, c2, c3 );
+		public int Degree => GetPolynomialDegree( c0, c1, c2, c3 );
 
 		/// <summary>Creates a polynomial up to a cubic</summary>
 		/// <param name="c0">The constant coefficient</param>
@@ -131,25 +130,25 @@ namespace Freya {
 		/// <param name="c3">The cubic coefficient</param>
 		public static Polynomial Cubic( float c0, float c1, float c2, float c3 ) => new Polynomial( c0, c1, c2, c3 );
 
-		static bool ValueAlmost0( float v ) => v.Abs() < 0.00001f;
+		static bool ValueAlmost0( float v ) => Mathfs.Approximately( v, 0 );
 
 		/// <summary>Given the coefficients for a cubic polynomial, returns the net polynomial type/degree, accounting for values very close to 0</summary>
 		/// <param name="c0">The constant coefficient</param>
 		/// <param name="c1">The linear coefficient</param>
 		/// <param name="c2">The quadratic coefficient</param>
 		/// <param name="c3">The cubic coefficient</param>
-		[MethodImpl( INLINE )] public static PolynomialDegree GetPolynomialDegree( float c0, float c1, float c2, float c3 ) => ValueAlmost0( c3 ) ? GetPolynomialDegree( c0, c1, c2 ) : PolynomialDegree.Cubic;
+		[MethodImpl( INLINE )] public static int GetPolynomialDegree( float c0, float c1, float c2, float c3 ) => ValueAlmost0( c3 ) ? GetPolynomialDegree( c0, c1, c2 ) : 3;
 
 		/// <summary>Given the coefficients for a quadratic polynomial, returns the net polynomial degree, accounting for values very close to 0</summary>
 		/// <param name="c0">The constant coefficient</param>
 		/// <param name="c1">The linear coefficient</param>
 		/// <param name="c2">The quadratic coefficient</param>
-		[MethodImpl( INLINE )] public static PolynomialDegree GetPolynomialDegree( float c0, float c1, float c2 ) => ValueAlmost0( c2 ) ? GetPolynomialDegree( c0, c1 ) : PolynomialDegree.Quadratic;
+		[MethodImpl( INLINE )] public static int GetPolynomialDegree( float c0, float c1, float c2 ) => ValueAlmost0( c2 ) ? GetPolynomialDegree( c0, c1 ) : 2;
 
 		/// <summary>Given the coefficients for a linear polynomial, returns the net polynomial degree, accounting for values very close to 0</summary>
 		/// <param name="c0">The constant coefficient</param>
 		/// <param name="c1">The linear coefficient</param>
-		[MethodImpl( INLINE )] public static PolynomialDegree GetPolynomialDegree( float c0, float c1 ) => ValueAlmost0( c1 ) ? PolynomialDegree.Constant : PolynomialDegree.Linear;
+		[MethodImpl( INLINE )] public static int GetPolynomialDegree( float c0, float c1 ) => ValueAlmost0( c1 ) ? 0 : 1;
 
 		/// <summary>Returns the roots/solutions/x-values where this polynomial equals 0. There's either 0, 1, 2 or 3 roots, filled in left to right among the return values</summary>
 		/// <param name="c0">The constant coefficient</param>
@@ -158,11 +157,11 @@ namespace Freya {
 		/// <param name="c3">The cubic coefficient</param>
 		public static ResultsMax3<float> GetCubicRoots( float c0, float c1, float c2, float c3 ) =>
 			GetPolynomialDegree( c0, c1, c2, c3 ) switch {
-				PolynomialDegree.Constant  => default, // either no roots or infinite roots if c == 0
-				PolynomialDegree.Linear    => new ResultsMax3<float>( SolveLinearRoot( c1, c0 ) ),
-				PolynomialDegree.Quadratic => SolveQuadraticRoots( c2, c1, c0 ),
-				PolynomialDegree.Cubic     => SolveCubicRoots( c3, c2, c1, c0 ),
-				_                          => throw new InvalidEnumArgumentException()
+				0 => default, // either no roots or infinite roots if c == 0
+				1 => new ResultsMax3<float>( SolveLinearRoot( c1, c0 ) ),
+				2 => SolveQuadraticRoots( c2, c1, c0 ),
+				3 => SolveCubicRoots( c3, c2, c1, c0 ),
+				_ => throw new IndexOutOfRangeException()
 			};
 
 		/// <summary>Returns the roots/solutions/x-values where this polynomial equals 0. There's either 0, 1 or 2 roots, filled in left to right among the return values</summary>
@@ -171,17 +170,17 @@ namespace Freya {
 		/// <param name="c2">The quadratic coefficient</param>
 		public static ResultsMax2<float> GetQuadraticRoots( float c0, float c1, float c2 ) =>
 			GetPolynomialDegree( c0, c1, c2 ) switch {
-				PolynomialDegree.Constant  => default, // either no roots or infinite roots if c == 0
-				PolynomialDegree.Linear    => new ResultsMax2<float>( SolveLinearRoot( c1, c0 ) ),
-				PolynomialDegree.Quadratic => SolveQuadraticRoots( c2, c1, c0 ),
-				_                          => throw new InvalidEnumArgumentException()
+				0 => default, // either no roots or infinite roots if c == 0
+				1 => new ResultsMax2<float>( SolveLinearRoot( c1, c0 ) ),
+				2 => SolveQuadraticRoots( c2, c1, c0 ),
+				_ => throw new IndexOutOfRangeException()
 			};
 
 		/// <summary>Returns the roots/solutions/x-values where this polynomial equals 0. Returns null if there is no root</summary>
 		/// <param name="c0">The constant coefficient</param>
 		/// <param name="c1">The linear coefficient</param>
 		public static float? GetLinearRoots( float c0, float c1 ) {
-			if( GetPolynomialDegree( c0, c1 ) == PolynomialDegree.Constant )
+			if( GetPolynomialDegree( c0, c1 ) == 0 )
 				return null;
 			return -c0 / c1;
 		}
