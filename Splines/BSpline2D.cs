@@ -84,10 +84,10 @@ namespace Freya {
 
 		#endregion
 
-		#region Derivative
+		#region Differentiation
 
 		/// <summary>Returns the derivative of this B-spline, which is a B-spline in and of itself</summary>
-		public BSpline2D GetDerivative() {
+		public BSpline2D Differentiate() {
 			// knots are the same except we remove the two outermost ones
 			float[] dKnots = new float[KnotCount - 2];
 			for( int i = 0; i < dKnots.Length; i++ )
