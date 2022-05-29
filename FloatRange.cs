@@ -7,6 +7,9 @@ namespace Freya {
 	/// <summary>A value range between two values a and b</summary>
 	public readonly struct FloatRange {
 
+		/// <summary>The unit interval of 0 to 1</summary>
+		public static readonly FloatRange unit = new FloatRange( 0, 1 );
+
 		/// <summary>The start of this range</summary>
 		public readonly float a;
 
