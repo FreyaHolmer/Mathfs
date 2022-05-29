@@ -1,3 +1,5 @@
+// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
+
 using System;
 using UnityEngine;
 
