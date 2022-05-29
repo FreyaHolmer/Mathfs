@@ -89,6 +89,43 @@ namespace Freya {
 			set => _ = ( p3 = value, validCoefficients = false );
 		}
 
+		/// <inheritdoc cref="NUCatRomCubic2D.K0"/>
+		public float K0 {
+			[MethodImpl( INLINE )] get {
+				if( knotCalcMode != KnotCalcMode.Manual )
+					ReadyCoefficients();
+				return k0;
+			}
+			set => _ = ( k0 = value, validCoefficients = false );
+		}
+		/// <inheritdoc cref="NUCatRomCubic2D.K1"/>
+		public float K1 {
+			[MethodImpl( INLINE )] get {
+				if( knotCalcMode != KnotCalcMode.Manual )
+					ReadyCoefficients();
+				return k1;
+			}
+			set => _ = ( k1 = value, validCoefficients = false );
+		}
+		/// <inheritdoc cref="NUCatRomCubic2D.K2"/>
+		public float K2 {
+			[MethodImpl( INLINE )] get {
+				if( knotCalcMode != KnotCalcMode.Manual )
+					ReadyCoefficients();
+				return k2;
+			}
+			set => _ = ( k2 = value, validCoefficients = false );
+		}
+		/// <inheritdoc cref="NUCatRomCubic2D.K3"/>
+		public float K3 {
+			[MethodImpl( INLINE )] get {
+				if( knotCalcMode != KnotCalcMode.Manual )
+					ReadyCoefficients();
+				return k3;
+			}
+			set => _ = ( k3 = value, validCoefficients = false );
+		}
+
 		/// <inheritdoc cref="NUCatRomCubic2D.Alpha"/>
 		public float Alpha {
 			[MethodImpl( INLINE )] get => alpha;

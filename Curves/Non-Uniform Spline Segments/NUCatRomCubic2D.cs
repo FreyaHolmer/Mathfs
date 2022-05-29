@@ -118,6 +118,43 @@ namespace Freya {
 			set => _ = ( p3 = value, validCoefficients = false );
 		}
 
+		/// <summary>The knot value of the first control point of the catrom curve</summary>
+		public float K0 {
+			[MethodImpl( INLINE )] get {
+				if( knotCalcMode != KnotCalcMode.Manual )
+					ReadyCoefficients();
+				return k0;
+			}
+			set => _ = ( k0 = value, validCoefficients = false );
+		}
+		/// <summary>The knot value of the second control point, and the start of the catrom curve</summary>
+		public float K1 {
+			[MethodImpl( INLINE )] get {
+				if( knotCalcMode != KnotCalcMode.Manual )
+					ReadyCoefficients();
+				return k1;
+			}
+			set => _ = ( k1 = value, validCoefficients = false );
+		}
+		/// <summary>The knot value of the third control point, and the end of the catrom curve</summary>
+		public float K2 {
+			[MethodImpl( INLINE )] get {
+				if( knotCalcMode != KnotCalcMode.Manual )
+					ReadyCoefficients();
+				return k2;
+			}
+			set => _ = ( k2 = value, validCoefficients = false );
+		}
+		/// <summary>The knot value of the last control point of the catrom curve</summary>
+		public float K3 {
+			[MethodImpl( INLINE )] get {
+				if( knotCalcMode != KnotCalcMode.Manual )
+					ReadyCoefficients();
+				return k3;
+			}
+			set => _ = ( k3 = value, validCoefficients = false );
+		}
+
 		/// <summary>The alpha parameter, which controls how much the length of each segment should influence the shape of the curve.
 		/// A value of 0 is called a uniform catrom, and is fast to evaluate but has a tendency to overshoot.
 		/// A value of 0.5 is a centripetal catrom, which follows points very tightly, and prevents cusps and loops.
