@@ -14,8 +14,9 @@ namespace Freya {
 
 		/// <inheritdoc cref="Bezier2D.points"/>
 		public readonly Vector3[] points;
+
 		readonly Vector3[] ptEvalBuffer;
-		
+
 		/// <inheritdoc cref="Bezier2D.Count"/>
 		public int Count {
 			[MethodImpl( INLINE )] get => points.Length;

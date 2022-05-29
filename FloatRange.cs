@@ -74,14 +74,14 @@ namespace Freya {
 		/// <param name="rangeX">The range of the X axis</param>
 		/// <param name="rangeY">The range of the Y axis</param>
 		public static Rect ToRect( FloatRange rangeX, FloatRange rangeY ) => new Rect( rangeX.Min, rangeY.Min, rangeX.Length, rangeY.Length );
-		
+
 		/// <summary>Returns the bounding box encapsulating the region defined by a range per axis. Note: The direction of each range is ignored</summary>
 		/// <param name="rangeX">The range of the X axis</param>
 		/// <param name="rangeY">The range of the Y axis</param>
 		/// <param name="rangeZ">The range of the Z axis</param>
 		public static Bounds ToBounds( FloatRange rangeX, FloatRange rangeY, FloatRange rangeZ ) {
-			Vector3 center = new ( rangeX.Center, rangeY.Center, rangeZ.Center );
-			Vector3 size = new ( rangeX.Length, rangeY.Length, rangeZ.Length );
+			Vector3 center = new(rangeX.Center, rangeY.Center, rangeZ.Center);
+			Vector3 size = new(rangeX.Length, rangeY.Length, rangeZ.Length);
 			return new Bounds( center, size );
 		}
 
