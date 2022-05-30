@@ -290,14 +290,16 @@ namespace Freya {
 
 		#endregion
 
-		public static Polynomial2D Rotate( Polynomial2D poly, float a ) {
-			return new Polynomial2D(
-				poly.C0.Rotate( a ),
-				poly.C1.Rotate( a ),
-				poly.C2.Rotate( a ),
-				poly.C3.Rotate( a )
+		/// <summary>Returns the polynomial, rotated around the origin</summary>
+		/// <param name="poly">The polynomial to rotate</param>
+		/// <param name="angle">The angle to rotate by (in radians)</param>
+		public static Polynomial2D Rotate( Polynomial2D poly, float angle ) =>
+			new(
+				poly.C0.Rotate( angle ),
+				poly.C1.Rotate( angle ),
+				poly.C2.Rotate( angle ),
+				poly.C3.Rotate( angle )
 			);
-		}
 	}
 
 }
