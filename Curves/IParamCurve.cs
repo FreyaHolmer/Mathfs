@@ -57,19 +57,21 @@ namespace Freya {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 
-		/// <summary>Returns the approximate length of the curve</summary>
+		/// <summary>Returns the approximate length of the curve in the 0 to 1 interval</summary>
 		/// <param name="accuracy">The number of subdivisions to approximate the length with. Higher values are more accurate, but more expensive to calculate</param>
-		public static float GetLength<T>( this T curve, int accuracy = 8 ) where T : IParamCurve<Vector2> {
-			Vector2 start = curve.Eval( 0 );
-			Vector2 end = curve.Eval( 1 );
-			if( accuracy <= 2 )
-				return ( start - end ).magnitude;
+		[MethodImpl( INLINE )] public static float GetArcLength<T>( this T curve, int accuracy = 8 ) where T : IParamCurve<Vector2> => curve.GetArcLength( FloatRange.unit, accuracy );
 
+		/// <summary>Returns the approximate length of the curve in the given interval</summary>
+		/// <param name="interval">The parameter interval of the curve to get the length of</param>
+		/// <param name="accuracy">The number of subdivisions to approximate the length with. Higher values are more accurate, but more expensive to calculate</param>
+		public static float GetArcLength<T>( this T curve, FloatRange interval, int accuracy = 8 ) where T : IParamCurve<Vector2> {
+			accuracy = accuracy.AtLeast( 2 );
+			bool unit = interval == FloatRange.unit;
 			float totalDist = 0;
-			Vector2 prev = start;
+			Vector2 prev = curve.Eval( interval.a );
 			for( int i = 1; i < accuracy; i++ ) {
 				float t = i / ( accuracy - 1f );
-				Vector2 p = curve.Eval( t );
+				Vector2 p = curve.Eval( unit ? t : interval.Lerp( t ) );
 				float dx = p.x - prev.x;
 				float dy = p.y - prev.y;
 				totalDist += Mathf.Sqrt( dx * dx + dy * dy );
@@ -78,7 +80,6 @@ namespace Freya {
 
 			return totalDist;
 		}
-
 	}
 
 	/// <summary>Shared functionality for all 3D parametric curves</summary>
@@ -86,28 +87,27 @@ namespace Freya {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 
-		/// <summary>Returns the approximate length of the curve</summary>
-		/// <param name="accuracy">The number of subdivisions to approximate the length with. Higher values are more accurate, but more expensive to calculate</param>
-		public static float GetLength<T>( this T curve, int accuracy = 8 ) where T : IParamCurve<Vector3> {
-			Vector3 start = curve.Eval( 0 );
-			Vector3 end = curve.Eval( 1 );
-			if( accuracy <= 2 )
-				return ( start - end ).magnitude;
+		/// <inheritdoc cref="IParamCurveExt2D.GetArcLength{T}"/>
+		[MethodImpl( INLINE )] public static float GetArcLength<T>( this T curve, int accuracy = 8 ) where T : IParamCurve<Vector3> => curve.GetArcLength( FloatRange.unit, accuracy );
 
+		/// <inheritdoc cref="IParamCurveExt2D.GetArcLength{T}(T,Freya.FloatRange,int)"/>
+		public static float GetArcLength<T>( this T curve, FloatRange interval, int accuracy = 8 ) where T : IParamCurve<Vector3> {
+			accuracy = accuracy.AtLeast( 2 );
+			bool unit = interval == FloatRange.unit;
 			float totalDist = 0;
-			Vector3 prev = start;
+			Vector3 prev = curve.Eval( interval.a );
 			for( int i = 1; i < accuracy; i++ ) {
 				float t = i / ( accuracy - 1f );
-				Vector3 p = curve.Eval( t );
+				Vector3 p = curve.Eval( unit ? t : interval.Lerp( t ) );
 				float dx = p.x - prev.x;
 				float dy = p.y - prev.y;
-				totalDist += Mathf.Sqrt( dx * dx + dy * dy );
+				float dz = p.z - prev.z;
+				totalDist += Mathf.Sqrt( dx * dx + dy * dy + dz * dz );
 				prev = p;
 			}
 
 			return totalDist;
 		}
-
 	}
 
 	/// <summary>Shared functionality for 2D parametric curves of degree 1 or higher</summary>
