@@ -1,5 +1,6 @@
 ﻿// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
+using System;
 using UnityEngine;
 
 namespace Freya {
@@ -86,6 +87,11 @@ namespace Freya {
 		}
 
 		public static implicit operator FloatRange( (float a, float b) tuple ) => new FloatRange( tuple.a, tuple.b );
+		public static bool operator ==( FloatRange a, FloatRange b ) => a.a == b.a && a.b == b.b;
+		public static bool operator !=( FloatRange a, FloatRange b ) => a.a != b.a || a.b != b.b;
+		public bool Equals( FloatRange other ) => a.Equals( other.a ) && b.Equals( other.b );
+		public override bool Equals( object obj ) => obj is FloatRange other && Equals( other );
+		public override int GetHashCode() => HashCode.Combine( a, b );
 
 	}
 
