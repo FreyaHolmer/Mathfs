@@ -43,6 +43,9 @@ namespace Freya {
 		/// <inheritdoc cref="Polynomial.Differentiate(int)"/>
 		public Polynomial2D Differentiate( int n = 1 ) => new(x.Differentiate( n ), y.Differentiate( n ));
 
+		/// <inheritdoc cref="Polynomial.Compose(float,float)"/>
+		public Polynomial2D Compose( float g0, float g1 ) => new(x.Compose( g0, g1 ), y.Compose( g0, g1 ));
+
 		/// <summary>Returns the tight axis-aligned bounds of the curve in the unit interval</summary>
 		public Rect GetBounds01() => FloatRange.ToRect( x.OutputRange01, y.OutputRange01 );
 

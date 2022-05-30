@@ -75,6 +75,25 @@ namespace Freya {
 			};
 		}
 
+		/// <summary>Given an inner function g(x), returns f(g(x))</summary>
+		/// <param name="g0">The constant coefficient of the inner function g(x)</param>
+		/// <param name="g1">The linear coefficient of the inner function g(x)</param>
+		public Polynomial Compose( float g0, float g1 ) {
+			float ss = g1 * g1;
+			float sss = ss * g1;
+			float oo = g0 * g0;
+			float ooo = oo * g0;
+			float _3c3 = 3 * c3;
+			float c2g0 = c2 * g0;
+
+			return new Polynomial(
+				c3 * ooo + c2 * oo + c2g0 + c0,
+				g1 * ( _3c3 * oo + 2 * c2g0 + c1 ),
+				ss * ( _3c3 * g0 + c2 ),
+				sss * c3
+			);
+		}
+
 		/// <summary>Calculates the roots (values where this polynomial = 0)</summary>
 		public ResultsMax3<float> Roots => GetCubicRoots( c0, c1, c2, c3 );
 

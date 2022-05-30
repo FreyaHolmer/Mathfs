@@ -39,6 +39,9 @@ namespace Freya {
 		/// <inheritdoc cref="Polynomial.Differentiate(int)"/>
 		public Polynomial3D Differentiate( int n = 1 ) => new(x.Differentiate( n ), y.Differentiate( n ), z.Differentiate( n ));
 
+		/// <inheritdoc cref="Polynomial.Compose(float,float)"/>
+		public Polynomial3D Compose( float g0, float g1 ) => new(x.Compose( g0, g1 ), y.Compose( g0, g1 ), z.Compose( g0, g1 ));
+
 		/// <inheritdoc cref="Polynomial2D.GetBounds01"/>
 		public Bounds GetBounds01() => FloatRange.ToBounds( x.OutputRange01, y.OutputRange01, z.OutputRange01 );
 
