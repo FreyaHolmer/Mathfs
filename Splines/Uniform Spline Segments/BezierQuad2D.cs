@@ -15,7 +15,7 @@ namespace Freya {
 		/// <summary>Creates a quadratic bezier curve, from 3 control points</summary>
 		/// <param name="p0">The starting point of the curve</param>
 		/// <param name="p1">The second control point of the curve, sometimes called the start tangent point</param>
-		/// <param name="p2">The end point of the curve, sometimes called the end tangent point</param>
+		/// <param name="p2">The end point of the curve</param>
 		public BezierQuad2D( Vector2 p0, Vector2 p1, Vector2 p2 ) {
 			( this.p0, this.p1, this.p2 ) = ( p0, p1, p2 );
 			validCoefficients = false;

@@ -60,15 +60,14 @@ namespace Freya {
 
 		/// <summary>Get or set a control point position by index. Valid indices: 0, 1, 2 or 3</summary>
 		public Vector2 this[ int i ] {
-			get {
-				switch( i ) {
-					case 0:  return P0;
-					case 1:  return P1;
-					case 2:  return P2;
-					case 3:  return P3;
-					default: throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" );
-				}
-			}
+			get =>
+				i switch {
+					0 => P0,
+					1 => P1,
+					2 => P2,
+					3 => P3,
+					_ => throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" )
+				};
 			set {
 				switch( i ) {
 					case 0:
@@ -106,22 +105,14 @@ namespace Freya {
 
 		#region Object Comparison & ToString
 
-		public static bool operator ==( CatRomCubic2D a, CatRomCubic2D b ) => a.P0 == b.P0 && a.P1 == b.P1 && a.P2 == b.P2 && a.P3 == b.P3;
+		public static bool operator ==( CatRomCubic2D a, CatRomCubic2D b ) => a.p0 == b.p0 && a.p1 == b.p1 && a.p2 == b.p2 && a.p3 == b.p3;
 		public static bool operator !=( CatRomCubic2D a, CatRomCubic2D b ) => !( a == b );
-		public bool Equals( CatRomCubic2D other ) => P0.Equals( other.P0 ) && P1.Equals( other.P1 ) && P2.Equals( other.P2 ) && P3.Equals( other.P3 );
+		public bool Equals( CatRomCubic2D other ) => p0.Equals( other.p0 ) && p1.Equals( other.p1 ) && p2.Equals( other.p2 ) && p3.Equals( other.p3 );
 		public override bool Equals( object obj ) => obj is CatRomCubic2D other && Equals( other );
 
-		public override int GetHashCode() {
-			unchecked {
-				int hashCode = P0.GetHashCode();
-				hashCode = ( hashCode * 397 ) ^ P1.GetHashCode();
-				hashCode = ( hashCode * 397 ) ^ P2.GetHashCode();
-				hashCode = ( hashCode * 397 ) ^ P3.GetHashCode();
-				return hashCode;
-			}
-		}
+		public override int GetHashCode() => HashCode.Combine( p0, p1, p2, p3 );
 
-		public override string ToString() => $"{P0}, {P1}, {P2}, {P3}";
+		public override string ToString() => $"{p0}, {p1}, {p2}, {p3}";
 
 		#endregion
 
@@ -131,14 +122,13 @@ namespace Freya {
 		/// <param name="a">The first curve</param>
 		/// <param name="b">The second curve</param>
 		/// <param name="t">A value from 0 to 1 to blend between <c>a</c> and <c>b</c></param>
-		public static CatRomCubic2D Lerp( CatRomCubic2D a, CatRomCubic2D b, float t ) {
-			return new CatRomCubic2D(
+		public static CatRomCubic2D Lerp( CatRomCubic2D a, CatRomCubic2D b, float t ) =>
+			new(
 				Vector2.LerpUnclamped( a.p0, b.p0, t ),
 				Vector2.LerpUnclamped( a.p1, b.p1, t ),
 				Vector2.LerpUnclamped( a.p2, b.p2, t ),
 				Vector2.LerpUnclamped( a.p3, b.p3, t )
 			);
-		}
 
 		#endregion
 
