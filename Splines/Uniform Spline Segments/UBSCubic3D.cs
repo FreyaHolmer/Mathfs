@@ -96,6 +96,11 @@ namespace Freya {
 			validCoefficients = true;
 			curve = CharMatrix.cubicUniformBspline.GetCurve( p0, p1, p2, p3 );
 		}
+		public static bool operator ==( UBSCubic3D a, UBSCubic3D b ) => a.P0 == b.P0 && a.P1 == b.P1 && a.P2 == b.P2 && a.P3 == b.P3;
+		public static bool operator !=( UBSCubic3D a, UBSCubic3D b ) => !( a == b );
+		public bool Equals( UBSCubic3D other ) => P0.Equals( other.P0 ) && P1.Equals( other.P1 ) && P2.Equals( other.P2 ) && P3.Equals( other.P3 );
+		public override bool Equals( object obj ) => obj is UBSCubic3D other && Equals( other );
+		public override int GetHashCode() => HashCode.Combine( p0, p1, p2, p3 );
 
 		/// <inheritdoc cref="UBSCubic2D.ToBezier"/>
 		public BezierCubic3D ToBezier() {
@@ -116,6 +121,22 @@ namespace Freya {
 				new Vector3( 0.5f * ( cx + dx ), 0.5f * ( cy + dy ) )
 			);
 		}
-
+		public override string ToString() => $"({p0}, {p1}, {p2}, {p3})";
+		/// <summary>Returns this curve flattened to 2D. Effectively setting z = 0</summary>
+		/// <param name="curve3D">The 3D curve to flatten to the Z plane</param>
+		public static explicit operator UBSCubic2D( UBSCubic3D curve3D ) {
+			return new UBSCubic2D( curve3D.p0, curve3D.p1, curve3D.p2, curve3D.p3 );
+		}
+		/// <summary>Returns a linear blend between two b-spline curves</summary>
+		/// <param name="a">The first spline segment</param>
+		/// <param name="b">The second spline segment</param>
+		/// <param name="t">A value from 0 to 1 to blend between <c>a</c> and <c>b</c></param>
+		public static UBSCubic3D Lerp( UBSCubic3D a, UBSCubic3D b, float t ) =>
+			new(
+				Vector3.LerpUnclamped( a.p0, b.p0, t ),
+				Vector3.LerpUnclamped( a.p1, b.p1, t ),
+				Vector3.LerpUnclamped( a.p2, b.p2, t ),
+				Vector3.LerpUnclamped( a.p3, b.p3, t )
+			);
 	}
 }

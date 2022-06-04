@@ -103,7 +103,11 @@ namespace Freya {
 		public override int GetHashCode() => HashCode.Combine( p0, p1, p2, p3 );
 
 		public override string ToString() => $"({p0}, {p1}, {p2}, {p3})";
-
+		/// <summary>Returns this spline segment in 3D, where z = 0</summary>
+		/// <param name="curve2D">The 2D curve to cast to 3D</param>
+		public static explicit operator CatRomCubic3D( CatRomCubic2D curve2D ) {
+			return new CatRomCubic3D( curve2D.p0, curve2D.p1, curve2D.p2, curve2D.p3 );
+		}
 		/// <summary>Returns a linear blend between two catmull-rom curves</summary>
 		/// <param name="a">The first spline segment</param>
 		/// <param name="b">The second spline segment</param>

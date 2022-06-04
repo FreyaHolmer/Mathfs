@@ -85,6 +85,11 @@ namespace Freya {
 			validCoefficients = true;
 			curve = CharMatrix.quadraticBezier.GetCurve( p0, p1, p2 );
 		}
+		public static bool operator ==( BezierQuad3D a, BezierQuad3D b ) => a.P0 == b.P0 && a.P1 == b.P1 && a.P2 == b.P2;
+		public static bool operator !=( BezierQuad3D a, BezierQuad3D b ) => !( a == b );
+		public bool Equals( BezierQuad3D other ) => P0.Equals( other.P0 ) && P1.Equals( other.P1 ) && P2.Equals( other.P2 );
+		public override bool Equals( object obj ) => obj is BezierQuad3D other && Equals( other );
+		public override int GetHashCode() => HashCode.Combine( p0, p1, p2 );
 
 		/// <inheritdoc cref="BezierCubic2D.Split(float)"/>
 		public BezierQuad3D Split( float t ) {
@@ -94,5 +99,16 @@ namespace Freya {
 			return new BezierQuad3D( p0, mid, end );
 		}
 
+		public override string ToString() => $"({p0}, {p1}, {p2})";
+		/// <summary>Returns a linear blend between two bézier curves</summary>
+		/// <param name="a">The first spline segment</param>
+		/// <param name="b">The second spline segment</param>
+		/// <param name="t">A value from 0 to 1 to blend between <c>a</c> and <c>b</c></param>
+		public static BezierQuad3D Lerp( BezierQuad3D a, BezierQuad3D b, float t ) =>
+			new(
+				Vector3.LerpUnclamped( a.p0, b.p0, t ),
+				Vector3.LerpUnclamped( a.p1, b.p1, t ),
+				Vector3.LerpUnclamped( a.p2, b.p2, t )
+			);
 	}
 }

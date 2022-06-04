@@ -116,6 +116,28 @@ namespace Freya {
 				new Vector2( 0.5f * ( cx + dx ), 0.5f * ( cy + dy ) )
 			);
 		}
+		public static bool operator ==( UBSCubic2D a, UBSCubic2D b ) => a.P0 == b.P0 && a.P1 == b.P1 && a.P2 == b.P2 && a.P3 == b.P3;
+		public static bool operator !=( UBSCubic2D a, UBSCubic2D b ) => !( a == b );
+		public bool Equals( UBSCubic2D other ) => P0.Equals( other.P0 ) && P1.Equals( other.P1 ) && P2.Equals( other.P2 ) && P3.Equals( other.P3 );
+		public override bool Equals( object obj ) => obj is UBSCubic2D other && Equals( other );
+		public override int GetHashCode() => HashCode.Combine( p0, p1, p2, p3 );
 
+		public override string ToString() => $"({p0}, {p1}, {p2}, {p3})";
+		/// <summary>Returns this spline segment in 3D, where z = 0</summary>
+		/// <param name="curve2D">The 2D curve to cast to 3D</param>
+		public static explicit operator UBSCubic3D( UBSCubic2D curve2D ) {
+			return new UBSCubic3D( curve2D.p0, curve2D.p1, curve2D.p2, curve2D.p3 );
+		}
+		/// <summary>Returns a linear blend between two b-spline curves</summary>
+		/// <param name="a">The first spline segment</param>
+		/// <param name="b">The second spline segment</param>
+		/// <param name="t">A value from 0 to 1 to blend between <c>a</c> and <c>b</c></param>
+		public static UBSCubic2D Lerp( UBSCubic2D a, UBSCubic2D b, float t ) =>
+			new(
+				Vector2.LerpUnclamped( a.p0, b.p0, t ),
+				Vector2.LerpUnclamped( a.p1, b.p1, t ),
+				Vector2.LerpUnclamped( a.p2, b.p2, t ),
+				Vector2.LerpUnclamped( a.p3, b.p3, t )
+			);
 	}
 }

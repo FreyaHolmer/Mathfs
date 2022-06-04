@@ -58,9 +58,36 @@ namespace Freya {
 			[MethodImpl( INLINE )] set => _ = ( v1 = value, validCoefficients = false );
 		}
 
+		/// <summary>Get or set a control point position by index. Valid indices from 0 to 3</summary>
+		public Vector3 this[ int i ] {
+			get =>
+				i switch {
+					0 => P0,
+					1 => V0,
+					2 => P1,
+					3 => V1,
+					_ => throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" )
+				};
+			set {
+				switch( i ) {
+					case 0:
+						P0 = value;
+						break;
+					case 1:
+						V0 = value;
+						break;
+					case 2:
+						P1 = value;
+						break;
+					case 3:
+						V1 = value;
+						break;
+					default: throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" );
+				}
+			}
+		}
+
 		#endregion
-
-
 		[NonSerialized] bool validCoefficients;
 
 		[MethodImpl( INLINE )] void ReadyCoefficients() {
@@ -69,8 +96,30 @@ namespace Freya {
 			validCoefficients = true;
 			curve = CharMatrix.cubicHermite.GetCurve( p0, v0, p1, v1 );
 		}
+		public static bool operator ==( HermiteCubic3D a, HermiteCubic3D b ) => a.P0 == b.P0 && a.V0 == b.V0 && a.P1 == b.P1 && a.V1 == b.V1;
+		public static bool operator !=( HermiteCubic3D a, HermiteCubic3D b ) => !( a == b );
+		public bool Equals( HermiteCubic3D other ) => P0.Equals( other.P0 ) && V0.Equals( other.V0 ) && P1.Equals( other.P1 ) && V1.Equals( other.V1 );
+		public override bool Equals( object obj ) => obj is HermiteCubic3D other && Equals( other );
+		public override int GetHashCode() => HashCode.Combine( p0, v0, p1, v1 );
 
 		public BezierCubic3D ToBezier() => new BezierCubic3D( p0, p0 + v0 / 3, p1 - v1 / 3, p1 );
 
+		public override string ToString() => $"({p0}, {v0}, {p1}, {v1})";
+		/// <summary>Returns this curve flattened to 2D. Effectively setting z = 0</summary>
+		/// <param name="curve3D">The 3D curve to flatten to the Z plane</param>
+		public static explicit operator HermiteCubic2D( HermiteCubic3D curve3D ) {
+			return new HermiteCubic2D( curve3D.p0, curve3D.v0, curve3D.p1, curve3D.v1 );
+		}
+		/// <summary>Returns a linear blend between two hermite curves</summary>
+		/// <param name="a">The first spline segment</param>
+		/// <param name="b">The second spline segment</param>
+		/// <param name="t">A value from 0 to 1 to blend between <c>a</c> and <c>b</c></param>
+		public static HermiteCubic3D Lerp( HermiteCubic3D a, HermiteCubic3D b, float t ) =>
+			new(
+				Vector3.LerpUnclamped( a.p0, b.p0, t ),
+				Vector3.LerpUnclamped( a.v0, b.v0, t ),
+				Vector3.LerpUnclamped( a.p1, b.p1, t ),
+				Vector3.LerpUnclamped( a.v1, b.v1, t )
+			);
 	}
 }

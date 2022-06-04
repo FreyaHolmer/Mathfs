@@ -30,7 +30,6 @@ namespace Freya {
 				return curve;
 			}
 		}
-
 		#region Control Points
 
 		[SerializeField] Vector2 p0, v0, p1, v1;
@@ -59,9 +58,36 @@ namespace Freya {
 			[MethodImpl( INLINE )] set => _ = ( v1 = value, validCoefficients = false );
 		}
 
+		/// <summary>Get or set a control point position by index. Valid indices from 0 to 3</summary>
+		public Vector2 this[ int i ] {
+			get =>
+				i switch {
+					0 => P0,
+					1 => V0,
+					2 => P1,
+					3 => V1,
+					_ => throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" )
+				};
+			set {
+				switch( i ) {
+					case 0:
+						P0 = value;
+						break;
+					case 1:
+						V0 = value;
+						break;
+					case 2:
+						P1 = value;
+						break;
+					case 3:
+						V1 = value;
+						break;
+					default: throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" );
+				}
+			}
+		}
+
 		#endregion
-
-
 		[NonSerialized] bool validCoefficients;
 
 		[MethodImpl( INLINE )] void ReadyCoefficients() {
@@ -72,6 +98,28 @@ namespace Freya {
 		}
 
 		public BezierCubic2D ToBezier() => new BezierCubic2D( p0, p0 + v0 / 3, p1 - v1 / 3, p1 );
+		public static bool operator ==( HermiteCubic2D a, HermiteCubic2D b ) => a.P0 == b.P0 && a.V0 == b.V0 && a.P1 == b.P1 && a.V1 == b.V1;
+		public static bool operator !=( HermiteCubic2D a, HermiteCubic2D b ) => !( a == b );
+		public bool Equals( HermiteCubic2D other ) => P0.Equals( other.P0 ) && V0.Equals( other.V0 ) && P1.Equals( other.P1 ) && V1.Equals( other.V1 );
+		public override bool Equals( object obj ) => obj is HermiteCubic2D other && Equals( other );
+		public override int GetHashCode() => HashCode.Combine( p0, v0, p1, v1 );
 
+		public override string ToString() => $"({p0}, {v0}, {p1}, {v1})";
+		/// <summary>Returns this spline segment in 3D, where z = 0</summary>
+		/// <param name="curve2D">The 2D curve to cast to 3D</param>
+		public static explicit operator HermiteCubic3D( HermiteCubic2D curve2D ) {
+			return new HermiteCubic3D( curve2D.p0, curve2D.v0, curve2D.p1, curve2D.v1 );
+		}
+		/// <summary>Returns a linear blend between two hermite curves</summary>
+		/// <param name="a">The first spline segment</param>
+		/// <param name="b">The second spline segment</param>
+		/// <param name="t">A value from 0 to 1 to blend between <c>a</c> and <c>b</c></param>
+		public static HermiteCubic2D Lerp( HermiteCubic2D a, HermiteCubic2D b, float t ) =>
+			new(
+				Vector2.LerpUnclamped( a.p0, b.p0, t ),
+				Vector2.LerpUnclamped( a.v0, b.v0, t ),
+				Vector2.LerpUnclamped( a.p1, b.p1, t ),
+				Vector2.LerpUnclamped( a.v1, b.v1, t )
+			);
 	}
 }
