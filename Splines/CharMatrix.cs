@@ -129,11 +129,7 @@ namespace Freya {
 				GetEvalPolynomial( p0.y, p1.y, p2.y, p3.y )
 			);
 
-		/// <summary>Returns the curve this characteristic matrix represents, given 4 points</summary>
-		/// <param name="p0">The first point</param>
-		/// <param name="p1">The second point</param>
-		/// <param name="p2">The third point</param>
-		/// <param name="p3">The fourth point</param>
+		/// <inheritdoc cref="GetCurve(Vector2,Vector2,Vector2,Vector2)"/>
 		public Polynomial3D GetCurve( Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3 ) =>
 			new(
 				GetEvalPolynomial( p0.x, p1.x, p2.x, p3.x ),
