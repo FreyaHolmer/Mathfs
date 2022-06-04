@@ -30,7 +30,6 @@ namespace Freya {
 				return curve;
 			}
 		}
-
 		#region Control Points
 
 		[SerializeField] Vector2 p0, p1, p2, p3;
@@ -89,10 +88,6 @@ namespace Freya {
 		}
 
 		#endregion
-
-
-		#region Coefficients
-
 		[NonSerialized] bool validCoefficients;
 
 		[MethodImpl( INLINE )] void ReadyCoefficients() {
@@ -101,12 +96,6 @@ namespace Freya {
 			validCoefficients = true;
 			curve = CharMatrix.cubicBezier.GetCurve( p0, p1, p2, p3 );
 		}
-
-		#endregion
-
-
-		#region Object Comparison & ToString
-
 		public static bool operator ==( BezierCubic2D a, BezierCubic2D b ) => a.P0 == b.P0 && a.P1 == b.P1 && a.P2 == b.P2 && a.P3 == b.P3;
 		public static bool operator !=( BezierCubic2D a, BezierCubic2D b ) => !( a == b );
 		public bool Equals( BezierCubic2D other ) => P0.Equals( other.P0 ) && P1.Equals( other.P1 ) && P2.Equals( other.P2 ) && P3.Equals( other.P3 );
@@ -114,21 +103,11 @@ namespace Freya {
 		public override int GetHashCode() => HashCode.Combine( p0, p1, p2, p3 );
 
 		public override string ToString() => $"({p0}, {p1}, {p2}, {p3})";
-
-		#endregion
-
-		#region Type Casting
-
 		/// <summary>Returns this spline segment in 3D, where z = 0</summary>
 		/// <param name="curve2D">The 2D curve to cast to 3D</param>
 		public static explicit operator BezierCubic3D( BezierCubic2D curve2D ) {
 			return new BezierCubic3D( curve2D.p0, curve2D.p1, curve2D.p2, curve2D.p3 );
 		}
-
-		#endregion
-
-		#region Interpolation
-
 		/// <summary>Returns a linear blend between two bézier curves</summary>
 		/// <param name="a">The first spline segment</param>
 		/// <param name="b">The second spline segment</param>
@@ -156,10 +135,6 @@ namespace Freya {
 			);
 		}
 
-		#endregion
-
-		#region Splitting
-
 		/// <summary>Splits this curve at the given t-value, into two curves of the exact same shape</summary>
 		/// <param name="t">The t-value along the curve to sample</param>
 		public (BezierCubic2D pre, BezierCubic2D post) Split( float t ) {
@@ -183,10 +158,6 @@ namespace Freya {
 			return ( new BezierCubic2D( P0, a, d, p ), new BezierCubic2D( p, e, c, P3 ) );
 		}
 
-		#endregion
-
-		#region Conversion
-
 		public UBSCubic2D ToUniformCubicBSpline() {
 			// todo: channel split for performance
 			return new UBSCubic2D(
@@ -209,9 +180,5 @@ namespace Freya {
 			// todo: channel split for performance
 			return new HermiteCubic2D( p0, ( p1 - p0 ) * 3, p3, ( p3 - p2 ) * 3 );
 		}
-
-		#endregion
-
 	}
-
 }

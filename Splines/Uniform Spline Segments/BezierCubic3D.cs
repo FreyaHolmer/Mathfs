@@ -30,7 +30,6 @@ namespace Freya {
 				return curve;
 			}
 		}
-
 		#region Control Points
 
 		[SerializeField] Vector3 p0, p1, p2, p3;
@@ -89,10 +88,6 @@ namespace Freya {
 		}
 
 		#endregion
-
-
-		#region Coefficients
-
 		[NonSerialized] bool validCoefficients;
 
 		[MethodImpl( INLINE )] void ReadyCoefficients() {
@@ -101,12 +96,6 @@ namespace Freya {
 			validCoefficients = true;
 			curve = CharMatrix.cubicBezier.GetCurve( p0, p1, p2, p3 );
 		}
-
-		#endregion
-
-
-		#region Object Comparison & ToString
-
 		public static bool operator ==( BezierCubic3D a, BezierCubic3D b ) => a.P0 == b.P0 && a.P1 == b.P1 && a.P2 == b.P2 && a.P3 == b.P3;
 		public static bool operator !=( BezierCubic3D a, BezierCubic3D b ) => !( a == b );
 		public bool Equals( BezierCubic3D other ) => P0.Equals( other.P0 ) && P1.Equals( other.P1 ) && P2.Equals( other.P2 ) && P3.Equals( other.P3 );
@@ -114,21 +103,11 @@ namespace Freya {
 		public override int GetHashCode() => HashCode.Combine( p0, p1, p2, p3 );
 
 		public override string ToString() => $"({p0}, {p1}, {p2}, {p3})";
-
-		#endregion
-
-		#region Type Casting
-
 		/// <summary>Returns this curve flattened to 2D. Effectively setting z = 0</summary>
 		/// <param name="curve3D">The 3D curve to flatten to the Z plane</param>
 		public static explicit operator BezierCubic2D( BezierCubic3D curve3D ) {
 			return new BezierCubic2D( curve3D.p0, curve3D.p1, curve3D.p2, curve3D.p3 );
 		}
-
-		#endregion
-
-		#region Interpolation
-
 		/// <summary>Returns a linear blend between two bézier curves</summary>
 		/// <param name="a">The first spline segment</param>
 		/// <param name="b">The second spline segment</param>
@@ -155,10 +134,6 @@ namespace Freya {
 				p3
 			);
 		}
-
-		#endregion
-
-		#region Splitting
 
 		/// <inheritdoc cref="BezierCubic2D.Split(float)"/>
 		public (BezierCubic3D pre, BezierCubic3D post) Split( float t ) {
@@ -188,8 +163,5 @@ namespace Freya {
 			return ( new BezierCubic3D( P0, a, d, p ), new BezierCubic3D( p, e, c, P3 ) );
 		}
 
-		#endregion
-
 	}
-
 }

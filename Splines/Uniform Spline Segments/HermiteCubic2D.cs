@@ -62,8 +62,6 @@ namespace Freya {
 		#endregion
 
 
-		#region Coefficients
-
 		[NonSerialized] bool validCoefficients;
 
 		[MethodImpl( INLINE )] void ReadyCoefficients() {
@@ -73,10 +71,7 @@ namespace Freya {
 			curve = CharMatrix.cubicHermite.GetCurve( p0, v0, p1, v1 );
 		}
 
-		#endregion
-
 		public BezierCubic2D ToBezier() => new BezierCubic2D( p0, p0 + v0 / 3, p1 - v1 / 3, p1 );
 
 	}
-
 }

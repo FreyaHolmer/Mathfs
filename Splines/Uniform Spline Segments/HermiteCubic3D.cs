@@ -30,7 +30,6 @@ namespace Freya {
 				return curve;
 			}
 		}
-
 		#region Control Points
 
 		[SerializeField] Vector3 p0, v0, p1, v1;
@@ -62,8 +61,6 @@ namespace Freya {
 		#endregion
 
 
-		#region Coefficients
-
 		[NonSerialized] bool validCoefficients;
 
 		[MethodImpl( INLINE )] void ReadyCoefficients() {
@@ -73,10 +70,7 @@ namespace Freya {
 			curve = CharMatrix.cubicHermite.GetCurve( p0, v0, p1, v1 );
 		}
 
-		#endregion
-
 		public BezierCubic3D ToBezier() => new BezierCubic3D( p0, p0 + v0 / 3, p1 - v1 / 3, p1 );
 
 	}
-
 }

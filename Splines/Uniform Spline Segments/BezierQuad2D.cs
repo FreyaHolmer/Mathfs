@@ -29,7 +29,6 @@ namespace Freya {
 				return curve;
 			}
 		}
-
 		#region Control Points
 
 		[SerializeField] Vector2 p0, p1, p2;
@@ -78,10 +77,6 @@ namespace Freya {
 		}
 
 		#endregion
-
-
-		#region Coefficients
-
 		[NonSerialized] bool validCoefficients;
 
 		[MethodImpl( INLINE )] void ReadyCoefficients() {
@@ -90,8 +85,6 @@ namespace Freya {
 			validCoefficients = true;
 			curve = CharMatrix.quadraticBezier.GetCurve( p0, p1, p2 );
 		}
-
-		#endregion
 
 		/// <inheritdoc cref="BezierCubic2D.Split(float)"/>
 		public BezierQuad2D Split( float t ) {
@@ -102,5 +95,4 @@ namespace Freya {
 		}
 
 	}
-
 }

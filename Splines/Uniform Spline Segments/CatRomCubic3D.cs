@@ -30,7 +30,6 @@ namespace Freya {
 				return curve;
 			}
 		}
-
 		#region Control Points
 
 		[SerializeField] Vector3 p0, p1, p2, p3;
@@ -89,10 +88,6 @@ namespace Freya {
 		}
 
 		#endregion
-
-
-		#region Coefficients
-
 		[NonSerialized] bool validCoefficients;
 
 		[MethodImpl( INLINE )] void ReadyCoefficients() {
@@ -101,12 +96,6 @@ namespace Freya {
 			validCoefficients = true;
 			curve = CharMatrix.cubicCatmullRom.GetCurve( p0, p1, p2, p3 );
 		}
-
-		#endregion
-
-
-		#region Object Comparison & ToString
-
 		public static bool operator ==( CatRomCubic3D a, CatRomCubic3D b ) => a.P0 == b.P0 && a.P1 == b.P1 && a.P2 == b.P2 && a.P3 == b.P3;
 		public static bool operator !=( CatRomCubic3D a, CatRomCubic3D b ) => !( a == b );
 		public bool Equals( CatRomCubic3D other ) => P0.Equals( other.P0 ) && P1.Equals( other.P1 ) && P2.Equals( other.P2 ) && P3.Equals( other.P3 );
@@ -114,11 +103,6 @@ namespace Freya {
 		public override int GetHashCode() => HashCode.Combine( p0, p1, p2, p3 );
 
 		public override string ToString() => $"({p0}, {p1}, {p2}, {p3})";
-
-		#endregion
-
-
-		#region Interpolation
 
 		/// <summary>Returns a linear blend between two catmull-rom curves</summary>
 		/// <param name="a">The first spline segment</param>
@@ -131,8 +115,6 @@ namespace Freya {
 				Vector3.LerpUnclamped( a.p2, b.p2, t ),
 				Vector3.LerpUnclamped( a.p3, b.p3, t )
 			);
-
-		#endregion
 
 		/// <inheritdoc cref="CatRomCubic2D.ToBezier()"/>
 		public BezierCubic3D ToBezier() =>
@@ -162,5 +144,4 @@ namespace Freya {
 			);
 
 	}
-
 }
