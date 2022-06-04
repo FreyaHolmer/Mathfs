@@ -45,6 +45,14 @@ namespace Freya {
 		/// <inheritdoc cref="Polynomial2D.GetBounds01"/>
 		public Bounds GetBounds01() => FloatRange.ToBounds( x.OutputRange01, y.OutputRange01, z.OutputRange01 );
 
+		/// <inheritdoc cref="Polynomial.Split01"/>
+		public (Polynomial3D pre, Polynomial3D post) Split01( float u ) {
+			( Polynomial xPre, Polynomial xPost ) = x.Split01( u );
+			( Polynomial yPre, Polynomial yPost ) = y.Split01( u );
+			( Polynomial zPre, Polynomial zPost ) = z.Split01( u );
+			return ( new Polynomial3D( xPre, yPre, zPre ), new Polynomial3D( xPost, yPost, zPost ) );
+		}
+
 		#region Polynomial to spline converters
 
 		/// <inheritdoc cref="Polynomial2D.ToBezier"/>

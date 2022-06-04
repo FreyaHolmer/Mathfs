@@ -93,6 +93,25 @@ namespace Freya {
 				sss * c3
 			);
 		}
+		
+		/// <summary>Splits the 0-1 range into two distinct polynomials at the given parameter value u, where both new curves cover the same total range with their individual 0-1 ranges</summary>
+		/// <param name="u">The parameter value to split at</param>
+		public (Polynomial pre, Polynomial post) Split01( float u ) {
+			float d = 1f - u;
+			float dd = d * d;
+			float ddd = d * d * d;
+			float uu = u * u;
+			float uuu = u * u * u;
+
+			Polynomial pre = new Polynomial( c0, c1 * u, c2 * uu, c3 * uuu );
+			Polynomial post = new Polynomial(
+				Eval( u ),
+				d * Differentiate( 1 ).Eval( u ),
+				( dd / 2 ) * Differentiate( 2 ).Eval( u ),
+				( ddd / 6 ) * Differentiate( 3 ).Eval( u )
+			);
+			return ( pre, post );
+		}
 
 		/// <summary>Calculates the roots (values where this polynomial = 0)</summary>
 		public ResultsMax3<float> Roots => GetCubicRoots( c0, c1, c2, c3 );

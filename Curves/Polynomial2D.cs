@@ -49,6 +49,13 @@ namespace Freya {
 		/// <summary>Returns the tight axis-aligned bounds of the curve in the unit interval</summary>
 		public Rect GetBounds01() => FloatRange.ToRect( x.OutputRange01, y.OutputRange01 );
 
+		/// <inheritdoc cref="Polynomial.Split01"/>
+		public (Polynomial2D pre, Polynomial2D post) Split01( float u ) {
+			( Polynomial xPre, Polynomial xPost ) = x.Split01( u );
+			( Polynomial yPre, Polynomial yPost ) = y.Split01( u );
+			return ( new Polynomial2D( xPre, yPre ), new Polynomial2D( xPost, yPost ) );
+		}
+
 		#region Polynomial to spline converters
 
 		/// <summary>Returns the cubic bezier control points for the unit interval of this curve</summary>
