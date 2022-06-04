@@ -1,4 +1,4 @@
-﻿// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
+// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
 using System;
 using System.Runtime.CompilerServices;
@@ -6,12 +6,12 @@ using UnityEngine;
 
 namespace Freya {
 
-	/// <summary>An optimized 2D uniform B-spline segment</summary>
+	/// <summary>An optimized uniform 2D Cubic b-spline segment, with 4 control points</summary>
 	[Serializable] public struct UBSCubic2D : IParamCubicSplineSegment2D {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 
-		/// <summary>Creates a uniform cubic B-spline segment, given 4 control points</summary>
+		/// <summary>Creates a uniform 2D Cubic b-spline segment, from 4 control points</summary>
 		/// <param name="p0">The first point of the B-spline hull</param>
 		/// <param name="p1">The second point of the B-spline hull</param>
 		/// <param name="p2">The third point of the B-spline hull</param>
@@ -32,7 +32,7 @@ namespace Freya {
 
 		#region Control Points
 
-		[SerializeField] Vector2 p0, p1, p2, p3; // the points of the B-spline hull
+		[SerializeField] Vector2 p0, p1, p2, p3;
 
 		/// <summary>The first point of the B-spline hull</summary>
 		public Vector2 P0 {
@@ -58,17 +58,16 @@ namespace Freya {
 			[MethodImpl( INLINE )] set => _ = ( p3 = value, validCoefficients = false );
 		}
 
-		/// <summary>Get or set a control point position by index. Valid indices: 0, 1, 2 or 3</summary>
+		/// <summary>Get or set a control point position by index. Valid indices from 0 to 3</summary>
 		public Vector2 this[ int i ] {
-			get {
-				switch( i ) {
-					case 0:  return P0;
-					case 1:  return P1;
-					case 2:  return P2;
-					case 3:  return P3;
-					default: throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" );
-				}
-			}
+			get =>
+				i switch {
+					0 => P0,
+					1 => P1,
+					2 => P2,
+					3 => P3,
+					_ => throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" )
+				};
 			set {
 				switch( i ) {
 					case 0:
@@ -90,11 +89,11 @@ namespace Freya {
 
 		#endregion
 
+
 		#region Coefficients
 
-		[NonSerialized] bool validCoefficients; // inverted isDirty flag (can't default to true in structs)
+		[NonSerialized] bool validCoefficients;
 
-		// Coefficient Calculation
 		[MethodImpl( INLINE )] void ReadyCoefficients() {
 			if( validCoefficients )
 				return; // no need to update

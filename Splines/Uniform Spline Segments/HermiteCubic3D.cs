@@ -1,4 +1,4 @@
-﻿// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
+// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
 using System;
 using System.Runtime.CompilerServices;
@@ -6,12 +6,16 @@ using UnityEngine;
 
 namespace Freya {
 
-	/// <summary>An optimized 3D cubic Hermite curve segment</summary>
+	/// <summary>An optimized uniform 3D Cubic hermite segment, with 4 control points</summary>
 	[Serializable] public struct HermiteCubic3D : IParamCubicSplineSegment3D {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 
-		/// <inheritdoc cref="HermiteCubic2D(Vector2,Vector2,Vector2,Vector2)"/>
+		/// <summary>Creates a uniform 3D Cubic hermite segment, from 4 control points</summary>
+		/// <param name="p0">The starting point of the curve</param>
+		/// <param name="v0">The rate of change (velocity) at the start of the curve</param>
+		/// <param name="p1">The end point of the curve</param>
+		/// <param name="v1">The rate of change (velocity) at the end of the curve</param>
 		public HermiteCubic3D( Vector3 p0, Vector3 v0, Vector3 p1, Vector3 v1 ) {
 			( this.p0, this.v0, this.p1, this.v1 ) = ( p0, v0, p1, v1 );
 			validCoefficients = false;
@@ -28,30 +32,27 @@ namespace Freya {
 
 		#region Control Points
 
-		[SerializeField] Vector3 p0;
-		[SerializeField] Vector3 v0;
-		[SerializeField] Vector3 p1;
-		[SerializeField] Vector3 v1;
+		[SerializeField] Vector3 p0, v0, p1, v1;
 
-		/// <inheritdoc cref="HermiteCubic2D.P0"/>
+		/// <summary>The starting point of the curve</summary>
 		public Vector3 P0 {
 			[MethodImpl( INLINE )] get => p0;
 			[MethodImpl( INLINE )] set => _ = ( p0 = value, validCoefficients = false );
 		}
 
-		/// <inheritdoc cref="HermiteCubic2D.V0"/>
+		/// <summary>The rate of change (velocity) at the start of the curve</summary>
 		public Vector3 V0 {
 			[MethodImpl( INLINE )] get => v0;
 			[MethodImpl( INLINE )] set => _ = ( v0 = value, validCoefficients = false );
 		}
 
-		/// <inheritdoc cref="HermiteCubic2D.P1"/>
+		/// <summary>The end point of the curve</summary>
 		public Vector3 P1 {
 			[MethodImpl( INLINE )] get => p1;
 			[MethodImpl( INLINE )] set => _ = ( p1 = value, validCoefficients = false );
 		}
 
-		/// <inheritdoc cref="HermiteCubic2D.V1"/>
+		/// <summary>The rate of change (velocity) at the end of the curve</summary>
 		public Vector3 V1 {
 			[MethodImpl( INLINE )] get => v1;
 			[MethodImpl( INLINE )] set => _ = ( v1 = value, validCoefficients = false );
@@ -59,11 +60,11 @@ namespace Freya {
 
 		#endregion
 
+
 		#region Coefficients
 
-		[NonSerialized] bool validCoefficients; // inverted isDirty flag (can't default to true in structs)
+		[NonSerialized] bool validCoefficients;
 
-		// Coefficient Calculation
 		[MethodImpl( INLINE )] void ReadyCoefficients() {
 			if( validCoefficients )
 				return; // no need to update

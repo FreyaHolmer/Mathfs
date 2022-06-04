@@ -1,4 +1,4 @@
-﻿// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
+// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
 using System;
 using System.Runtime.CompilerServices;
@@ -6,12 +6,12 @@ using UnityEngine;
 
 namespace Freya {
 
-	/// <summary>An optimized uniform cubic catmull-rom 2D curve, with 4 control points</summary>
+	/// <summary>An optimized uniform 2D Cubic catmull-rom segment, with 4 control points</summary>
 	[Serializable] public struct CatRomCubic2D : IParamCubicSplineSegment2D {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 
-		/// <summary>Creates a uniform cubic catmull-rom curve, from 4 control points</summary>
+		/// <summary>Creates a uniform 2D Cubic catmull-rom segment, from 4 control points</summary>
 		/// <param name="p0">The first control point of the catmull-rom curve. Note that this point is not included in the curve itself, and only helps to shape it</param>
 		/// <param name="p1">The second control point, and the start of the catmull-rom curve</param>
 		/// <param name="p2">The third control point, and the end of the catmull-rom curve</param>
@@ -32,7 +32,7 @@ namespace Freya {
 
 		#region Control Points
 
-		[SerializeField] Vector2 p0, p1, p2, p3; // the points of the curve
+		[SerializeField] Vector2 p0, p1, p2, p3;
 
 		/// <summary>The first control point of the catmull-rom curve. Note that this point is not included in the curve itself, and only helps to shape it</summary>
 		public Vector2 P0 {
@@ -58,7 +58,7 @@ namespace Freya {
 			[MethodImpl( INLINE )] set => _ = ( p3 = value, validCoefficients = false );
 		}
 
-		/// <summary>Get or set a control point position by index. Valid indices: 0, 1, 2 or 3</summary>
+		/// <summary>Get or set a control point position by index. Valid indices from 0 to 3</summary>
 		public Vector2 this[ int i ] {
 			get =>
 				i switch {
@@ -89,11 +89,11 @@ namespace Freya {
 
 		#endregion
 
+
 		#region Coefficients
 
-		[NonSerialized] bool validCoefficients; // inverted isDirty flag (can't default to true in structs)
+		[NonSerialized] bool validCoefficients;
 
-		// Coefficient Calculation
 		[MethodImpl( INLINE )] void ReadyCoefficients() {
 			if( validCoefficients )
 				return; // no need to update
@@ -103,24 +103,25 @@ namespace Freya {
 
 		#endregion
 
+
 		#region Object Comparison & ToString
 
-		public static bool operator ==( CatRomCubic2D a, CatRomCubic2D b ) => a.p0 == b.p0 && a.p1 == b.p1 && a.p2 == b.p2 && a.p3 == b.p3;
+		public static bool operator ==( CatRomCubic2D a, CatRomCubic2D b ) => a.P0 == b.P0 && a.P1 == b.P1 && a.P2 == b.P2 && a.P3 == b.P3;
 		public static bool operator !=( CatRomCubic2D a, CatRomCubic2D b ) => !( a == b );
-		public bool Equals( CatRomCubic2D other ) => p0.Equals( other.p0 ) && p1.Equals( other.p1 ) && p2.Equals( other.p2 ) && p3.Equals( other.p3 );
+		public bool Equals( CatRomCubic2D other ) => P0.Equals( other.P0 ) && P1.Equals( other.P1 ) && P2.Equals( other.P2 ) && P3.Equals( other.P3 );
 		public override bool Equals( object obj ) => obj is CatRomCubic2D other && Equals( other );
-
 		public override int GetHashCode() => HashCode.Combine( p0, p1, p2, p3 );
 
-		public override string ToString() => $"{p0}, {p1}, {p2}, {p3}";
+		public override string ToString() => $"({p0}, {p1}, {p2}, {p3})";
 
 		#endregion
+
 
 		#region Interpolation
 
 		/// <summary>Returns a linear blend between two catmull-rom curves</summary>
-		/// <param name="a">The first curve</param>
-		/// <param name="b">The second curve</param>
+		/// <param name="a">The first spline segment</param>
+		/// <param name="b">The second spline segment</param>
 		/// <param name="t">A value from 0 to 1 to blend between <c>a</c> and <c>b</c></param>
 		public static CatRomCubic2D Lerp( CatRomCubic2D a, CatRomCubic2D b, float t ) =>
 			new(

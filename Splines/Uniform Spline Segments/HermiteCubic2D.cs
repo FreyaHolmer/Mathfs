@@ -1,18 +1,17 @@
-﻿// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
+// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
 using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Freya {
 
-	/// <summary>An optimized 2D cubic Hermite curve segment</summary>
+	/// <summary>An optimized uniform 2D Cubic hermite segment, with 4 control points</summary>
 	[Serializable] public struct HermiteCubic2D : IParamCubicSplineSegment2D {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 
-		/// <summary>Creates a cubic Hermite curve, from two control points and two tangents</summary>
+		/// <summary>Creates a uniform 2D Cubic hermite segment, from 4 control points</summary>
 		/// <param name="p0">The starting point of the curve</param>
 		/// <param name="v0">The rate of change (velocity) at the start of the curve</param>
 		/// <param name="p1">The end point of the curve</param>
@@ -33,10 +32,7 @@ namespace Freya {
 
 		#region Control Points
 
-		[SerializeField] Vector2 p0;
-		[FormerlySerializedAs( "m0" )] [SerializeField] Vector2 v0;
-		[SerializeField] Vector2 p1;
-		[FormerlySerializedAs( "m1" )] [SerializeField] Vector2 v1;
+		[SerializeField] Vector2 p0, v0, p1, v1;
 
 		/// <summary>The starting point of the curve</summary>
 		public Vector2 P0 {
@@ -64,11 +60,11 @@ namespace Freya {
 
 		#endregion
 
+
 		#region Coefficients
 
-		[NonSerialized] bool validCoefficients; // inverted isDirty flag (can't default to true in structs)
+		[NonSerialized] bool validCoefficients;
 
-		// Coefficient Calculation
 		[MethodImpl( INLINE )] void ReadyCoefficients() {
 			if( validCoefficients )
 				return; // no need to update

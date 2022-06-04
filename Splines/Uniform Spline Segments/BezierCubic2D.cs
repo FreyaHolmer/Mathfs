@@ -1,5 +1,4 @@
-﻿// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
-// a lot of stuff here made possible by this excellent writeup on bezier curves: https://pomax.github.io/bezierinfo/
+// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
 using System;
 using System.Runtime.CompilerServices;
@@ -7,12 +6,12 @@ using UnityEngine;
 
 namespace Freya {
 
-	/// <summary>An optimized 2D cubic bezier curve, with 4 control points</summary>
+	/// <summary>An optimized uniform 2D Cubic bézier segment, with 4 control points</summary>
 	[Serializable] public struct BezierCubic2D : IParamCubicSplineSegment2D {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 
-		/// <summary>Creates a cubic bezier curve, from 4 control points</summary>
+		/// <summary>Creates a uniform 2D Cubic bézier segment, from 4 control points</summary>
 		/// <param name="p0">The starting point of the curve</param>
 		/// <param name="p1">The second control point of the curve, sometimes called the start tangent point</param>
 		/// <param name="p2">The third control point of the curve, sometimes called the end tangent point</param>
@@ -33,7 +32,7 @@ namespace Freya {
 
 		#region Control Points
 
-		[SerializeField] Vector2 p0, p1, p2, p3; // the points of the curve
+		[SerializeField] Vector2 p0, p1, p2, p3;
 
 		/// <summary>The starting point of the curve</summary>
 		public Vector2 P0 {
@@ -59,17 +58,16 @@ namespace Freya {
 			[MethodImpl( INLINE )] set => _ = ( p3 = value, validCoefficients = false );
 		}
 
-		/// <summary>Get or set a control point position by index. Valid indices: 0, 1, 2 or 3</summary>
+		/// <summary>Get or set a control point position by index. Valid indices from 0 to 3</summary>
 		public Vector2 this[ int i ] {
-			get {
-				switch( i ) {
-					case 0:  return P0;
-					case 1:  return P1;
-					case 2:  return P2;
-					case 3:  return P3;
-					default: throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" );
-				}
-			}
+			get =>
+				i switch {
+					0 => P0,
+					1 => P1,
+					2 => P2,
+					3 => P3,
+					_ => throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" )
+				};
 			set {
 				switch( i ) {
 					case 0:
@@ -91,11 +89,11 @@ namespace Freya {
 
 		#endregion
 
+
 		#region Coefficients
 
-		[NonSerialized] bool validCoefficients; // inverted isDirty flag (can't default to true in structs)
+		[NonSerialized] bool validCoefficients;
 
-		// Coefficient Calculation
 		[MethodImpl( INLINE )] void ReadyCoefficients() {
 			if( validCoefficients )
 				return; // no need to update
@@ -105,24 +103,16 @@ namespace Freya {
 
 		#endregion
 
+
 		#region Object Comparison & ToString
 
 		public static bool operator ==( BezierCubic2D a, BezierCubic2D b ) => a.P0 == b.P0 && a.P1 == b.P1 && a.P2 == b.P2 && a.P3 == b.P3;
 		public static bool operator !=( BezierCubic2D a, BezierCubic2D b ) => !( a == b );
 		public bool Equals( BezierCubic2D other ) => P0.Equals( other.P0 ) && P1.Equals( other.P1 ) && P2.Equals( other.P2 ) && P3.Equals( other.P3 );
 		public override bool Equals( object obj ) => obj is BezierCubic2D other && Equals( other );
+		public override int GetHashCode() => HashCode.Combine( p0, p1, p2, p3 );
 
-		public override int GetHashCode() {
-			unchecked {
-				int hashCode = P0.GetHashCode();
-				hashCode = ( hashCode * 397 ) ^ P1.GetHashCode();
-				hashCode = ( hashCode * 397 ) ^ P2.GetHashCode();
-				hashCode = ( hashCode * 397 ) ^ P3.GetHashCode();
-				return hashCode;
-			}
-		}
-
-		public override string ToString() => $"{P0}, {P1}, {P2}, {P3}";
+		public override string ToString() => $"({p0}, {p1}, {p2}, {p3})";
 
 		#endregion
 
@@ -138,24 +128,21 @@ namespace Freya {
 
 		#region Interpolation
 
-		/// <summary>Returns linear blend between two bézier curves</summary>
-		/// <param name="a">The first curve</param>
-		/// <param name="b">The second curve</param>
+		/// <summary>Returns a linear blend between two bézier curves</summary>
+		/// <param name="a">The first spline segment</param>
+		/// <param name="b">The second spline segment</param>
 		/// <param name="t">A value from 0 to 1 to blend between <c>a</c> and <c>b</c></param>
-		public static BezierCubic2D Lerp( BezierCubic2D a, BezierCubic2D b, float t ) {
-			return new BezierCubic2D(
+		public static BezierCubic2D Lerp( BezierCubic2D a, BezierCubic2D b, float t ) =>
+			new(
 				Vector2.LerpUnclamped( a.p0, b.p0, t ),
 				Vector2.LerpUnclamped( a.p1, b.p1, t ),
 				Vector2.LerpUnclamped( a.p2, b.p2, t ),
 				Vector2.LerpUnclamped( a.p3, b.p3, t )
 			);
-		}
 
-		/// <summary>Returns blend between two bézier curves,
-		/// where the endpoints are linearly interpolated,
-		/// while the tangents are spherically interpolated relative to their corresponding endpoint</summary>
-		/// <param name="a">The first curve</param>
-		/// <param name="b">The second curve</param>
+		/// <summary>Returns a linear blend between two bézier curves, where the tangent directions are spherically interpolated</summary>
+		/// <param name="a">The first spline segment</param>
+		/// <param name="b">The second spline segment</param>
 		/// <param name="t">A value from 0 to 1 to blend between <c>a</c> and <c>b</c></param>
 		public static BezierCubic2D Slerp( BezierCubic2D a, BezierCubic2D b, float t ) {
 			Vector2 p0 = Vector2.LerpUnclamped( a.p0, b.p0, t );
