@@ -50,7 +50,6 @@ namespace Freya {
 
 			public RegionScope( CodeGenerator gen, string s ) {
 				this.gen = gen;
-				gen.LineBreak();
 				gen.Append( $"#region {s}" );
 				gen.LineBreak();
 			}
@@ -58,7 +57,6 @@ namespace Freya {
 			public void Dispose() {
 				gen.LineBreak();
 				gen.Append( "#endregion" );
-				gen.LineBreak();
 			}
 		}
 	}

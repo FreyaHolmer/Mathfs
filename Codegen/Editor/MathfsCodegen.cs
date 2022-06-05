@@ -202,73 +202,69 @@ namespace Freya {
 					}
 
 					// Coefficients
-					using( code.ScopeRegion( "Coefficients" ) ) {
-						code.Append( "[NonSerialized] bool validCoefficients;" );
-						code.LineBreak();
-						using( code.BracketScope( "[MethodImpl( INLINE )] void ReadyCoefficients()" ) ) {
-							using( code.Scope( "if( validCoefficients )" ) )
-								code.Append( "return; // no need to update" );
-							code.Append( "validCoefficients = true;" );
-							code.Append( $"curve = CharMatrix.{type.matrixName}.{curveFunc}( {string.Join( ", ", points )} );" );
-						}
+					code.Append( "[NonSerialized] bool validCoefficients;" );
+					code.LineBreak();
+					using( code.BracketScope( "[MethodImpl( INLINE )] void ReadyCoefficients()" ) ) {
+						using( code.Scope( "if( validCoefficients )" ) )
+							code.Append( "return; // no need to update" );
+						code.Append( "validCoefficients = true;" );
+						// todo: unroll matrix multiply for performance
+						code.Append( $"curve = CharMatrix.{type.matrixName}.{curveFunc}( {string.Join( ", ", points )} );" );
 					}
 
 					// equality checks
-					using( code.ScopeRegion( "Object Comparison & ToString" ) ) {
-						code.Append( $"public static bool operator ==( {structName} a, {structName} b ) => {string.Join( " && ", points.Select( p => $"a.{p.ToUpperInvariant()} == b.{p.ToUpperInvariant()}" ) )};" );
-						code.Append( $"public static bool operator !=( {structName} a, {structName} b ) => !( a == b );" );
-						code.Append( $"public bool Equals( {structName} other ) => {string.Join( " && ", points.Select( p => $"{p.ToUpperInvariant()}.Equals( other.{p.ToUpperInvariant()} )" ) )};" );
-						code.Append( $"public override bool Equals( object obj ) => obj is {structName} other && Equals( other );" );
-						code.Append( $"public override int GetHashCode() => HashCode.Combine( {string.Join( ", ", points )} );" );
-						code.LineBreak();
-						code.Append( $"public override string ToString() => $\"({string.Join( ", ", points.Select( p => $"{{{p}}}" ) )})\";" );
-					}
+					code.Append( $"public static bool operator ==( {structName} a, {structName} b ) => {string.Join( " && ", points.Select( p => $"a.{p.ToUpperInvariant()} == b.{p.ToUpperInvariant()}" ) )};" );
+					code.Append( $"public static bool operator !=( {structName} a, {structName} b ) => !( a == b );" );
+					code.Append( $"public bool Equals( {structName} other ) => {string.Join( " && ", points.Select( p => $"{p.ToUpperInvariant()}.Equals( other.{p.ToUpperInvariant()} )" ) )};" );
+					code.Append( $"public override bool Equals( object obj ) => obj is {structName} other && Equals( other );" );
+					code.Append( $"public override int GetHashCode() => HashCode.Combine( {string.Join( ", ", points )} );" );
+					code.LineBreak();
+					code.Append( $"public override string ToString() => $\"({string.Join( ", ", points.Select( p => $"{{{p}}}" ) )})\";" );
 
 					// typecasting
-					if( dim is 2 or 3 && degree is 3 )
-						using( code.ScopeRegion( "Type Casting" ) ) {
-							if( dim == 2 ) {
-								// Typecast to 3D where z = 0
-								string structName3D = $"{type.className}{degShortCapital}3D";
-								code.Summary( "Returns this spline segment in 3D, where z = 0" );
-								code.Param( "curve2D", "The 2D curve to cast to 3D" );
-								using( code.BracketScope( $"public static explicit operator {structName3D}( {structName} curve2D )" ) ) {
-									code.Append( $"return new {structName3D}( {string.Join( ", ", points.Select( p => $"curve2D.{p}" ) )} );" );
-								}
-							}
-
-							if( dim == 3 ) {
-								// typecast to 2D where z is omitted
-								string structName2D = $"{type.className}{degShortCapital}2D";
-								code.Summary( "Returns this curve flattened to 2D. Effectively setting z = 0" );
-								code.Param( "curve3D", "The 3D curve to flatten to the Z plane" );
-								using( code.BracketScope( $"public static explicit operator {structName2D}( {structName} curve3D )" ) ) {
-									code.Append( $"return new {structName2D}( {string.Join( ", ", points.Select( p => $"curve3D.{p}" ) )} );" );
-								}
-
-								// todo: conversion to other cubic splines
+					if( dim is 2 or 3 && degree is 3 ) {
+						if( dim == 2 ) {
+							// Typecast to 3D where z = 0
+							string structName3D = $"{type.className}{degShortCapital}3D";
+							code.Summary( "Returns this spline segment in 3D, where z = 0" );
+							code.Param( "curve2D", "The 2D curve to cast to 3D" );
+							using( code.BracketScope( $"public static explicit operator {structName3D}( {structName} curve2D )" ) ) {
+								code.Append( $"return new {structName3D}( {string.Join( ", ", points.Select( p => $"curve2D.{p}" ) )} );" );
 							}
 						}
 
-					// Interpolation
-					using( code.ScopeRegion( "Interpolation" ) ) {
-						code.Summary( $"Returns a linear blend between two {type.prettyNameLower} curves" );
-						code.Param( "a", "The first spline segment" );
-						code.Param( "b", "The second spline segment" );
-						code.Param( "t", "A value from 0 to 1 to blend between <c>a</c> and <c>b</c>" );
-						using( code.Scope( $"public static {structName} Lerp( {structName} a, {structName} b, float t ) =>" ) ) {
-							using( code.Scope( "new(" ) ) {
-								for( int i = 0; i < ptCount; i++ ) {
-									code.Append( $"{lerpName}( a.{points[i]}, b.{points[i]}, t )" + ( i == ptCount - 1 ? "" : "," ) );
-								}
+						if( dim == 3 ) {
+							// typecast to 2D where z is omitted
+							string structName2D = $"{type.className}{degShortCapital}2D";
+							code.Summary( "Returns this curve flattened to 2D. Effectively setting z = 0" );
+							code.Param( "curve3D", "The 3D curve to flatten to the Z plane" );
+							using( code.BracketScope( $"public static explicit operator {structName2D}( {structName} curve3D )" ) ) {
+								code.Append( $"return new {structName2D}( {string.Join( ", ", points.Select( p => $"curve3D.{p}" ) )} );" );
 							}
 
-							code.Append( ");" );
+							// todo: conversion to other cubic splines
 						}
 					}
+
+					// Interpolation
+					code.Summary( $"Returns a linear blend between two {type.prettyNameLower} curves" );
+					code.Param( "a", "The first spline segment" );
+					code.Param( "b", "The second spline segment" );
+					code.Param( "t", "A value from 0 to 1 to blend between <c>a</c> and <c>b</c>" );
+					using( code.Scope( $"public static {structName} Lerp( {structName} a, {structName} b, float t ) =>" ) ) {
+						using( code.Scope( "new(" ) ) {
+							for( int i = 0; i < ptCount; i++ ) {
+								code.Append( $"{lerpName}( a.{points[i]}, b.{points[i]}, t )" + ( i == ptCount - 1 ? "" : "," ) );
+							}
+						}
+
+						code.Append( ");" );
+					}
+
 
 					// special case slerps for cubic beziers in 2D and 3D
 					if( dim > 1 && degree is 2 or 3 && type == typeBezier ) {
+						// todo: hermite slerp
 						string slerpCast = dim == 2 ? "(Vector2)" : "";
 						code.LineBreak();
 						code.Summary( $"Returns a linear blend between two {type.prettyNameLower} curves, where the tangent directions are spherically interpolated" );
