@@ -134,34 +134,34 @@ namespace Freya {
 				p3
 			);
 		}
-
-		/// <inheritdoc cref="BezierCubic2D.Split(float)"/>
+		/// <summary>Splits this curve at the given t-value, into two curves that together form the exact same shape</summary>
+		/// <param name="t">The t-value to split at</param>
 		public (BezierCubic3D pre, BezierCubic3D post) Split( float t ) {
 			Vector3 a = new Vector3(
-				P0.x + ( P1.x - P0.x ) * t,
-				P0.y + ( P1.y - P0.y ) * t,
-				P0.z + ( P1.z - P0.z ) * t );
-			float bx = P1.x + ( P2.x - P1.x ) * t;
-			float by = P1.y + ( P2.y - P1.y ) * t;
-			float bz = P1.z + ( P2.z - P1.z ) * t;
+				p0.x + ( p1.x - p0.x ) * t,
+				p0.y + ( p1.y - p0.y ) * t,
+				p0.z + ( p1.z - p0.z ) * t );
+			Vector3 b = new Vector3(
+				p1.x + ( p2.x - p1.x ) * t,
+				p1.y + ( p2.y - p1.y ) * t,
+				p1.z + ( p2.z - p1.z ) * t );
 			Vector3 c = new Vector3(
-				P2.x + ( P3.x - P2.x ) * t,
-				P2.y + ( P3.y - P2.y ) * t,
-				P2.z + ( P3.z - P2.z ) * t );
+				p2.x + ( p3.x - p2.x ) * t,
+				p2.y + ( p3.y - p2.y ) * t,
+				p2.z + ( p3.z - p2.z ) * t );
 			Vector3 d = new Vector3(
-				a.x + ( bx - a.x ) * t,
-				a.y + ( by - a.y ) * t,
-				a.z + ( bz - a.z ) * t );
+				a.x + ( b.x - a.x ) * t,
+				a.y + ( b.y - a.y ) * t,
+				a.z + ( b.z - a.z ) * t );
 			Vector3 e = new Vector3(
-				bx + ( c.x - bx ) * t,
-				by + ( c.y - by ) * t,
-				bz + ( c.z - bz ) * t );
+				b.x + ( c.x - b.x ) * t,
+				b.y + ( c.y - b.y ) * t,
+				b.z + ( c.z - b.z ) * t );
 			Vector3 p = new Vector3(
 				d.x + ( e.x - d.x ) * t,
 				d.y + ( e.y - d.y ) * t,
 				d.z + ( e.z - d.z ) * t );
-			return ( new BezierCubic3D( P0, a, d, p ), new BezierCubic3D( p, e, c, P3 ) );
+			return ( new BezierCubic3D( p0, a, d, p ), new BezierCubic3D( p, e, c, p3 ) );
 		}
-
 	}
 }

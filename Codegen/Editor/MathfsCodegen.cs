@@ -288,6 +288,16 @@ namespace Freya {
 							code.Append( ");" );
 						}
 					}
+
+					// special case splits
+					bool hasSplit = type == typeBezier || type == typeBezierQuad;
+					if( hasSplit ) {
+						code.Summary( "Splits this curve at the given t-value, into two curves that together form the exact same shape" );
+						code.Param( "t", "The t-value to split at" );
+						using( code.BracketScope( $"public ({structName} pre, {structName} post) Split( float t )" ) ) {
+							AppendBezierSplit( code, structName, dataType, degree, dim );
+						}
+					}
 				}
 			}
 
@@ -304,6 +314,38 @@ namespace Freya {
 				5 => "Quintic",
 				_ => throw new IndexOutOfRangeException()
 			};
+		}
+
+		static readonly string[] comp = { "x", "y", "z" };
+
+		public static void AppendBezierSplit( CodeGenerator code, string structName, string dataType, int degree, int dim ) {
+			string LerpStr( string A, string B, int c ) => $"{A}.{comp[c]} + ( {B}.{comp[c]} - {A}.{comp[c]} ) * t";
+
+			void AppendLerps( string varName, string A, string B ) {
+				if( dim > 1 ) {
+					using( code.Scope( $"{dataType} {varName} = new {dataType}(" ) ) {
+						for( int c = 0; c < dim; c++ ) {
+							string end = c == dim - 1 ? " );" : ",";
+							code.Append( $"{LerpStr( A, B, c )}{end}" );
+						}
+					}
+				} else { // floats
+					code.Append( $"{dataType} {varName} = {A} + ( {B} - {A} ) * t;" );
+				}
+			}
+
+			AppendLerps( "a", "p0", "p1" );
+			AppendLerps( "b", "p1", "p2" ); // this could be unrolled/optimized for the cubic case, as b is never used for the output
+			if( degree == 3 ) {
+				AppendLerps( "c", "p2", "p3" );
+				AppendLerps( "d", "a", "b" );
+				AppendLerps( "e", "b", "c" );
+				AppendLerps( "p", "d", "e" );
+				code.Append( $"return ( new {structName}( p0, a, d, p ), new {structName}( p, e, c, p3 ) );" );
+			} else if( degree == 2 ) {
+				AppendLerps( "p", "a", "b" );
+				code.Append( $"return ( new {structName}( p0, a, p ), new {structName}( p, b, p2 ) );" );
+			}
 		}
 
 	}

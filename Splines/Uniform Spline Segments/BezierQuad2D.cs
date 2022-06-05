@@ -91,14 +91,6 @@ namespace Freya {
 		public override bool Equals( object obj ) => obj is BezierQuad2D other && Equals( other );
 		public override int GetHashCode() => HashCode.Combine( p0, p1, p2 );
 
-		/// <inheritdoc cref="BezierCubic2D.Split(float)"/>
-		public BezierQuad2D Split( float t ) {
-			Vector2 mid = Vector2.LerpUnclamped( p0, p1, t );
-			Vector2 b = Vector2.LerpUnclamped( p1, p2, t );
-			Vector2 end = Vector2.LerpUnclamped( mid, b, t );
-			return new BezierQuad2D( p0, mid, end );
-		}
-
 		public override string ToString() => $"({p0}, {p1}, {p2})";
 		/// <summary>Returns a linear blend between two bézier curves</summary>
 		/// <param name="a">The first spline segment</param>
@@ -110,5 +102,19 @@ namespace Freya {
 				Vector2.LerpUnclamped( a.p1, b.p1, t ),
 				Vector2.LerpUnclamped( a.p2, b.p2, t )
 			);
+		/// <summary>Splits this curve at the given t-value, into two curves that together form the exact same shape</summary>
+		/// <param name="t">The t-value to split at</param>
+		public (BezierQuad2D pre, BezierQuad2D post) Split( float t ) {
+			Vector2 a = new Vector2(
+				p0.x + ( p1.x - p0.x ) * t,
+				p0.y + ( p1.y - p0.y ) * t );
+			Vector2 b = new Vector2(
+				p1.x + ( p2.x - p1.x ) * t,
+				p1.y + ( p2.y - p1.y ) * t );
+			Vector2 p = new Vector2(
+				a.x + ( b.x - a.x ) * t,
+				a.y + ( b.y - a.y ) * t );
+			return ( new BezierQuad2D( p0, a, p ), new BezierQuad2D( p, b, p2 ) );
+		}
 	}
 }
