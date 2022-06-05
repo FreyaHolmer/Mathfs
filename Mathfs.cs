@@ -601,6 +601,14 @@ namespace Freya {
 			return 1f - Abs( 2 * ( x - Floor( x ) ) - 1 );
 		}
 
+		/// <summary>Returns the greatest common divisor of the two numbers</summary>
+		public static int Gcd( int a, int b ) {
+			( a, b ) = ( Mathf.Abs( a ), Mathf.Abs( b ) );
+			while( a != 0 && b != 0 )
+				_ = a > b ? a %= b : b %= a;
+			return a | b;
+		}
+
 		#endregion
 
 		#region Smoothing & Easing Curves
