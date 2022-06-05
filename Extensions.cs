@@ -1,8 +1,8 @@
 ﻿// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
+using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
-
 
 namespace Freya {
 
@@ -224,6 +224,35 @@ namespace Freya {
 
 		/// <inheritdoc cref="Mathfs.Pow(float, float)"/>
 		[MethodImpl( INLINE )] public static float Pow( this float value, float exponent ) => Mathfs.Pow( value, exponent );
+
+		/// <summary>Calculates exact positive integer powers</summary>
+		/// <param name="value"></param>
+		/// <param name="pow">A positive integer power</param>
+		[MethodImpl( INLINE )] public static int Pow( this int value, int pow ) {
+			if( pow < 0 )
+				throw new ArithmeticException( "int.Pow(int) doesn't support negative powers" );
+			checked {
+				switch( pow ) {
+					case 0: return 1;
+					case 1: return value;
+					case 2: return value * value;
+					case 3: return value * value * value;
+					default:
+						if( value == 2 )
+							return 1 << pow;
+						// from: https://stackoverflow.com/questions/383587/how-do-you-do-integer-exponentiation-in-c
+						int ret = 1;
+						while( pow != 0 ) {
+							if( ( pow & 1 ) == 1 )
+								ret *= value;
+							value *= value;
+							pow >>= 1;
+						}
+
+						return ret;
+				}
+			}
+		}
 
 		#endregion
 
