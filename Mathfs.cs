@@ -603,6 +603,16 @@ namespace Freya {
 
 		/// <summary>Returns the greatest common divisor of the two numbers</summary>
 		public static int Gcd( int a, int b ) {
+			// special case bc we can't negate int.MinValue
+			if( a == int.MinValue || b == int.MinValue ) {
+				if( a == int.MinValue && b == int.MinValue )
+					return int.MinValue; // the only negative return value, bc we can't negate this number
+				int v = Mathf.Max( a, b ).Abs();
+				return v & -v;
+			}
+
+			if( a == b )
+				return a.Abs();
 			( a, b ) = ( Mathf.Abs( a ), Mathf.Abs( b ) );
 			while( a != 0 && b != 0 )
 				_ = a > b ? a %= b : b %= a;
