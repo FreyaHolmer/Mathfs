@@ -22,10 +22,14 @@ namespace Freya {
 		/// <param name="num">The numerator of this number</param>
 		/// <param name="den">The denominator of this number</param>
 		public Rational( int num, int den ) {
-			int sign = Mathfs.Sign( den ); // used to ensure only the numerator carries the sign
-			int gcd = Mathfs.Gcd( num, den ); // used to simplify the expression
-			n = sign * num / gcd;
-			d = sign * den / gcd;
+			// ensure only the numerator carries the sign
+			int sign = Mathfs.Sign( den );
+			n = sign * num;
+			d = sign * den;
+			// simplify the expression
+			int gcd = Mathfs.Gcd( num, den );
+			n /= gcd;
+			d /= gcd;
 		}
 
 		/// <summary>Returns the reciprocal of this number</summary>
