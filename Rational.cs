@@ -35,6 +35,9 @@ namespace Freya {
 		/// <summary>Returns the reciprocal of this number</summary>
 		public Rational Reciprocal => new(d, n);
 
+		/// <summary>Returns the absolute value of this number</summary>
+		public Rational Abs() => new(n.Abs(), d);
+
 		/// <summary>Returns this number to the power of another integer <c>pow</c></summary>
 		/// <param name="pow">The power to raise this number by</param>
 		public Rational Pow( int pow ) =>
@@ -47,6 +50,12 @@ namespace Freya {
 			};
 
 		public override string ToString() => d == 1 ? n.ToString() : $"{n}/{d}";
+		
+		// statics
+		public static Rational Min( Rational a, Rational b ) => a < b ? a : b;
+		public static Rational Max( Rational a, Rational b ) => a > b ? a : b;
+		public static Rational Lerp( Rational a, Rational b, Rational t ) => a + t * ( b - a );
+		public static Rational InverseLerp( Rational a, Rational b, Rational v ) => ( v - a ) / ( b - a );
 
 		// type casting
 		public static implicit operator Rational( int n ) => new(n, 1);
