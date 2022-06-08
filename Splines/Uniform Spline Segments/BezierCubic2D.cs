@@ -109,6 +109,18 @@ namespace Freya {
 		public static explicit operator BezierCubic3D( BezierCubic2D curve2D ) {
 			return new BezierCubic3D( curve2D.p0, curve2D.p1, curve2D.p2, curve2D.p3 );
 		}
+		public static explicit operator HermiteCubic2D( BezierCubic2D bezier ) {
+			Vector2Matrix4x1 p = CharMatrix.GetConversionMatrix( CharMatrix.cubicBezier, CharMatrix.cubicHermite ) * bezier.PointMatrix;
+			return new HermiteCubic2D( p.m0, p.m1, p.m2, p.m3 );
+		}
+		public static explicit operator CatRomCubic2D( BezierCubic2D bezier ) {
+			Vector2Matrix4x1 p = CharMatrix.GetConversionMatrix( CharMatrix.cubicBezier, CharMatrix.cubicCatmullRom ) * bezier.PointMatrix;
+			return new CatRomCubic2D( p.m0, p.m1, p.m2, p.m3 );
+		}
+		public static explicit operator UBSCubic2D( BezierCubic2D bezier ) {
+			Vector2Matrix4x1 p = CharMatrix.GetConversionMatrix( CharMatrix.cubicBezier, CharMatrix.cubicUniformBspline ) * bezier.PointMatrix;
+			return new UBSCubic2D( p.m0, p.m1, p.m2, p.m3 );
+		}
 		/// <summary>Returns a linear blend between two bézier curves</summary>
 		/// <param name="a">The first spline segment</param>
 		/// <param name="b">The second spline segment</param>

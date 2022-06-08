@@ -104,6 +104,18 @@ namespace Freya {
 		public override int GetHashCode() => HashCode.Combine( p0, v0, p1, v1 );
 
 		public override string ToString() => $"({p0}, {v0}, {p1}, {v1})";
+		public static explicit operator BezierCubic1D( HermiteCubic1D hermite ) {
+			Matrix4x1 p = CharMatrix.GetConversionMatrix( CharMatrix.cubicHermite, CharMatrix.cubicBezier ) * hermite.PointMatrix;
+			return new BezierCubic1D( p.m0, p.m1, p.m2, p.m3 );
+		}
+		public static explicit operator CatRomCubic1D( HermiteCubic1D hermite ) {
+			Matrix4x1 p = CharMatrix.GetConversionMatrix( CharMatrix.cubicHermite, CharMatrix.cubicCatmullRom ) * hermite.PointMatrix;
+			return new CatRomCubic1D( p.m0, p.m1, p.m2, p.m3 );
+		}
+		public static explicit operator UBSCubic1D( HermiteCubic1D hermite ) {
+			Matrix4x1 p = CharMatrix.GetConversionMatrix( CharMatrix.cubicHermite, CharMatrix.cubicUniformBspline ) * hermite.PointMatrix;
+			return new UBSCubic1D( p.m0, p.m1, p.m2, p.m3 );
+		}
 		/// <summary>Returns a linear blend between two hermite curves</summary>
 		/// <param name="a">The first spline segment</param>
 		/// <param name="b">The second spline segment</param>

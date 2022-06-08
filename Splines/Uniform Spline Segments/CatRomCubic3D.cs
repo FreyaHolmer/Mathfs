@@ -109,6 +109,18 @@ namespace Freya {
 		public static explicit operator CatRomCubic2D( CatRomCubic3D curve3D ) {
 			return new CatRomCubic2D( curve3D.p0, curve3D.p1, curve3D.p2, curve3D.p3 );
 		}
+		public static explicit operator BezierCubic3D( CatRomCubic3D catrom ) {
+			Vector3Matrix4x1 p = CharMatrix.GetConversionMatrix( CharMatrix.cubicCatmullRom, CharMatrix.cubicBezier ) * catrom.PointMatrix;
+			return new BezierCubic3D( p.m0, p.m1, p.m2, p.m3 );
+		}
+		public static explicit operator HermiteCubic3D( CatRomCubic3D catrom ) {
+			Vector3Matrix4x1 p = CharMatrix.GetConversionMatrix( CharMatrix.cubicCatmullRom, CharMatrix.cubicHermite ) * catrom.PointMatrix;
+			return new HermiteCubic3D( p.m0, p.m1, p.m2, p.m3 );
+		}
+		public static explicit operator UBSCubic3D( CatRomCubic3D catrom ) {
+			Vector3Matrix4x1 p = CharMatrix.GetConversionMatrix( CharMatrix.cubicCatmullRom, CharMatrix.cubicUniformBspline ) * catrom.PointMatrix;
+			return new UBSCubic3D( p.m0, p.m1, p.m2, p.m3 );
+		}
 		/// <summary>Returns a linear blend between two catmull-rom curves</summary>
 		/// <param name="a">The first spline segment</param>
 		/// <param name="b">The second spline segment</param>
