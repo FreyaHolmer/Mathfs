@@ -95,11 +95,15 @@ namespace Freya {
 		public static Rational operator *( Rational a, Rational b ) => checked( new(a.n * b.n, a.d * b.d) );
 		public static Rational operator *( Rational a, int b ) => checked( new(a.n * b, a.d) );
 		public static Rational operator *( int a, Rational b ) => checked( new(b.n * a, b.d) );
+		public static float operator *( Rational a, float b ) => ( a.n * b ) / a.d;
+		public static float operator *( float a, Rational b ) => ( b.n * a ) / b.d;
 
 		// division
 		public static Rational operator /( Rational a, Rational b ) => checked( new(a.n * b.d, a.d * b.n) );
 		public static Rational operator /( Rational a, int b ) => checked( new(a.n, a.d * b) );
 		public static Rational operator /( int a, Rational b ) => checked( new(a * b.d, b.n) );
+		public static float operator /( Rational a, float b ) => a.n / ( a.d * b );
+		public static float operator /( float a, Rational b ) => ( a * b.d ) / b.n;
 
 		// comparison operators
 		public static bool operator ==( Rational a, Rational b ) => a.CompareTo( b ) == 0;
