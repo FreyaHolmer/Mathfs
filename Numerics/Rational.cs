@@ -31,6 +31,11 @@ namespace Freya {
 					( n, d ) = ( num, den );
 					break;
 				default:
+					if( num == 0 ) {
+						( n, d ) = ( 0, 1 );
+						break;
+					}
+					
 					// ensure only the numerator carries the sign
 					int sign = Mathfs.Sign( den );
 					n = sign * num;
