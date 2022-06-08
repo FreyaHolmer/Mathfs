@@ -50,6 +50,8 @@ namespace Freya {
 		/// <summary>Returns the reciprocal of this number</summary>
 		public Rational Reciprocal => new(d, n);
 
+		public bool IsInteger => d == 1;
+
 		/// <summary>Returns the absolute value of this number</summary>
 		public Rational Abs() => new(n.Abs(), d);
 
@@ -65,7 +67,7 @@ namespace Freya {
 			};
 
 		public override string ToString() => d == 1 ? n.ToString() : $"{n}/{d}";
-		
+
 		// statics
 		public static Rational Min( Rational a, Rational b ) => a < b ? a : b;
 		public static Rational Max( Rational a, Rational b ) => a > b ? a : b;
