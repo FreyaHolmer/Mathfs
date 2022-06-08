@@ -17,8 +17,9 @@ namespace Freya {
 			public string[] paramNames;
 			public string[] paramDescs;
 			public string matrixName;
+			public RationalMatrix4x4 charMatrix;
 
-			public SplineType( int degree, string className, string prettyName, string matrixName, string[] paramNames, string[] paramDescs, string[] paramDescsQuad = null ) {
+			public SplineType( int degree, string className, string prettyName, string matrixName, RationalMatrix4x4 charMatrix, string[] paramNames, string[] paramDescs, string[] paramDescsQuad = null ) {
 				this.degree = degree;
 				this.className = className;
 				this.prettyName = prettyName;
@@ -26,6 +27,7 @@ namespace Freya {
 				this.paramDescs = paramDescs;
 				this.matrixName = matrixName;
 				this.paramNames = paramNames;
+				this.charMatrix = charMatrix;
 			}
 
 			public void AppendParamStrings( CodeGenerator gen, int degree, int i ) {
@@ -35,7 +37,7 @@ namespace Freya {
 
 		#region Type Definitions
 
-		static SplineType typeBezier = new SplineType( 3, "Bezier", "Bézier", "cubicBezier",
+		static SplineType typeBezier = new SplineType( 3, "Bezier", "Bézier", "cubicBezier", CharMatrix.cubicBezier,
 			new[] { "p0", "p1", "p2", "p3" },
 			new[] {
 				"The starting point of the curve",
@@ -45,7 +47,7 @@ namespace Freya {
 			}
 		);
 
-		static SplineType typeBezierQuad = new SplineType( 2, "Bezier", "Bézier", "quadraticBezier",
+		static SplineType typeBezierQuad = new SplineType( 2, "Bezier", "Bézier", "quadraticBezier", default,
 			new[] { "p0", "p1", "p2" },
 			new[] {
 				"The starting point of the curve",
@@ -54,7 +56,7 @@ namespace Freya {
 			}
 		);
 
-		static SplineType typeHermite = new SplineType( 3, "Hermite", "Hermite", "cubicHermite",
+		static SplineType typeHermite = new SplineType( 3, "Hermite", "Hermite", "cubicHermite", CharMatrix.cubicHermite,
 			new[] { "p0", "v0", "p1", "v1" },
 			new[] {
 				"The starting point of the curve",
@@ -64,7 +66,7 @@ namespace Freya {
 			}
 		);
 
-		static SplineType typeBspline = new SplineType( 3, "UBS", "B-Spline", "cubicUniformBspline",
+		static SplineType typeBspline = new SplineType( 3, "UBS", "B-Spline", "cubicUniformBspline", CharMatrix.cubicUniformBspline,
 			new[] { "p0", "p1", "p2", "p3" },
 			new[] {
 				"The first point of the B-spline hull",
@@ -74,7 +76,7 @@ namespace Freya {
 			}
 		);
 
-		static SplineType typeCatRom = new SplineType( 3, "CatRom", "Catmull-Rom", "cubicCatmullRom",
+		static SplineType typeCatRom = new SplineType( 3, "CatRom", "Catmull-Rom", "cubicCatmullRom", CharMatrix.cubicCatmullRom,
 			new[] { "p0", "p1", "p2", "p3" },
 			new[] {
 				"The first control point of the catmull-rom curve. Note that this point is not included in the curve itself, and only helps to shape it",
@@ -209,6 +211,14 @@ namespace Freya {
 						using( code.Scope( "if( validCoefficients )" ) )
 							code.Append( "return; // no need to update" );
 						code.Append( "validCoefficients = true;" );
+
+
+						// string line = "curve = ";
+						// for( int i = 0; i < dim; i++ ) {
+						// 	
+						// }
+						// code.Append( line );
+
 						// todo: unroll matrix multiply for performance
 						code.Append( $"curve = new {polynomType}( CharMatrix.{type.matrixName} * PointMatrix );" );
 					}
@@ -229,9 +239,7 @@ namespace Freya {
 							string structName3D = $"{type.className}{degShortCapital}3D";
 							code.Summary( "Returns this spline segment in 3D, where z = 0" );
 							code.Param( "curve2D", "The 2D curve to cast to 3D" );
-							using( code.BracketScope( $"public static explicit operator {structName3D}( {structName} curve2D )" ) ) {
-								code.Append( $"return new {structName3D}( {string.Join( ", ", points.Select( p => $"curve2D.{p}" ) )} );" );
-							}
+							code.Append( $"public static explicit operator {structName3D}( {structName} curve2D ) => new {structName3D}( {string.Join( ", ", points.Select( p => $"curve2D.{p}" ) )} );" );
 						}
 
 						if( dim == 3 ) {
@@ -239,9 +247,7 @@ namespace Freya {
 							string structName2D = $"{type.className}{degShortCapital}2D";
 							code.Summary( "Returns this curve flattened to 2D. Effectively setting z = 0" );
 							code.Param( "curve3D", "The 3D curve to flatten to the Z plane" );
-							using( code.BracketScope( $"public static explicit operator {structName2D}( {structName} curve3D )" ) ) {
-								code.Append( $"return new {structName2D}( {string.Join( ", ", points.Select( p => $"curve3D.{p}" ) )} );" );
-							}
+							code.Append( $"public static explicit operator {structName2D}( {structName} curve3D ) => new {structName2D}( {string.Join( ", ", points.Select( p => $"curve3D.{p}" ) )} );" );
 						}
 					}
 
@@ -253,11 +259,11 @@ namespace Freya {
 							nameof(CatRomCubic1D).Replace( "1D", $"{dim}D" ),
 							nameof(UBSCubic1D).Replace( "1D", $"{dim}D" )
 						};
-						string[] typeMatrices = {
-							nameof(CharMatrix.cubicBezier),
-							nameof(CharMatrix.cubicHermite),
-							nameof(CharMatrix.cubicCatmullRom),
-							nameof(CharMatrix.cubicUniformBspline)
+						RationalMatrix4x4[] typeMatrices = {
+							CharMatrix.cubicBezier,
+							CharMatrix.cubicHermite,
+							CharMatrix.cubicCatmullRom,
+							CharMatrix.cubicUniformBspline
 						};
 
 						// Conversion to other cubic splines
@@ -265,11 +271,45 @@ namespace Freya {
 							string targetType = cubicSplineTypeNames[i];
 							if( targetType == structName )
 								continue; // don't convert to self
-							string v = type.className.ToLowerInvariant(); // var name
-							using( code.BracketScope( $"public static explicit operator {targetType}( {structName} {v} )" ) ) {
-								code.Append( $"{pointMatrixType} p = CharMatrix.GetConversionMatrix( CharMatrix.{type.matrixName}, CharMatrix.{typeMatrices[i]} ) * {v}.PointMatrix;" );
-								int[] range4 = { 0, 1, 2, 3 };
-								code.Append( $"return new {targetType}( {string.Join( ", ", range4.Select( j => $"p.m{j}" ) )} );" );
+							RationalMatrix4x4 C = CharMatrix.GetConversionMatrix( type.charMatrix, typeMatrices[i] );
+
+							using( code.Scope( $"public static explicit operator {targetType}( {structName} s ) =>" ) ) {
+								using( code.Scope( $"new {targetType}(" ) ) {
+									for( int oPt = 0; oPt < 4; oPt++ ) {
+										string line = "";
+										int entries = 0;
+										for( int iPt = 0; iPt < 4; iPt++ ) {
+											Rational value = C[oPt, iPt];
+											if( value == 0 )
+												continue;
+
+											string FormatStr( Rational v ) => v.IsInteger ? $"{v.n}*" : $"({v}f)*";
+
+											string sign = entries > 0 && value >= 0 ? "+" : "";
+											string valueStr;
+											if( value == Rational.One )
+												valueStr = "";
+											else if( value == -Rational.One )
+												valueStr = "-";
+											else if( value > 0 )
+												valueStr = FormatStr( value );
+											else { // value < 0
+												valueStr = FormatStr( -value );
+												sign = "-";
+											}
+
+											line += $"{sign}{valueStr}s.{type.paramNames[iPt]}";
+											entries++;
+										}
+
+										code.Append( $"{line}{( oPt < 3 ? "," : "" )}" );
+									}
+								}
+
+								code.Append( ");" );
+								// code.Append( $"{pointMatrixType} p = CharMatrix.GetConversionMatrix( CharMatrix.{type.matrixName}, CharMatrix.{typeMatrices[i]} ) * {v}.PointMatrix;" );
+								// int[] range4 = { 0, 1, 2, 3 };
+								// code.Append( $"return new {targetType}( {string.Join( ", ", range4.Select( j => $"p.m{j}" ) )} );" );
 							}
 						}
 					}

@@ -103,43 +103,31 @@ namespace Freya {
 		public override bool Equals( object obj ) => obj is UBSCubic3D other && Equals( other );
 		public override int GetHashCode() => HashCode.Combine( p0, p1, p2, p3 );
 
-		/// <inheritdoc cref="UBSCubic2D.ToBezier"/>
-		public BezierCubic3D ToBezier() {
-			const float _13 = 1f / 3f;
-			const float _23 = 2f / 3f;
-			float ax = p0.x + _23 * ( p1.x - p0.x );
-			float bx = p1.x + _13 * ( p2.x - p1.x );
-			float cx = p1.x + _23 * ( p2.x - p1.x );
-			float dx = p2.x + _13 * ( p3.x - p2.x );
-			float ay = p0.y + _23 * ( p1.y - p0.y );
-			float by = p1.y + _13 * ( p2.y - p1.y );
-			float cy = p1.y + _23 * ( p2.y - p1.y );
-			float dy = p2.y + _13 * ( p3.y - p2.y );
-			return new BezierCubic3D(
-				new Vector3( 0.5f * ( ax + bx ), 0.5f * ( ay + by ) ),
-				new Vector3( bx, by ),
-				new Vector3( cx, cy ),
-				new Vector3( 0.5f * ( cx + dx ), 0.5f * ( cy + dy ) )
-			);
-		}
 		public override string ToString() => $"({p0}, {p1}, {p2}, {p3})";
 		/// <summary>Returns this curve flattened to 2D. Effectively setting z = 0</summary>
 		/// <param name="curve3D">The 3D curve to flatten to the Z plane</param>
-		public static explicit operator UBSCubic2D( UBSCubic3D curve3D ) {
-			return new UBSCubic2D( curve3D.p0, curve3D.p1, curve3D.p2, curve3D.p3 );
-		}
-		public static explicit operator BezierCubic3D( UBSCubic3D ubs ) {
-			Vector3Matrix4x1 p = CharMatrix.GetConversionMatrix( CharMatrix.cubicUniformBspline, CharMatrix.cubicBezier ) * ubs.PointMatrix;
-			return new BezierCubic3D( p.m0, p.m1, p.m2, p.m3 );
-		}
-		public static explicit operator HermiteCubic3D( UBSCubic3D ubs ) {
-			Vector3Matrix4x1 p = CharMatrix.GetConversionMatrix( CharMatrix.cubicUniformBspline, CharMatrix.cubicHermite ) * ubs.PointMatrix;
-			return new HermiteCubic3D( p.m0, p.m1, p.m2, p.m3 );
-		}
-		public static explicit operator CatRomCubic3D( UBSCubic3D ubs ) {
-			Vector3Matrix4x1 p = CharMatrix.GetConversionMatrix( CharMatrix.cubicUniformBspline, CharMatrix.cubicCatmullRom ) * ubs.PointMatrix;
-			return new CatRomCubic3D( p.m0, p.m1, p.m2, p.m3 );
-		}
+		public static explicit operator UBSCubic2D( UBSCubic3D curve3D ) => new UBSCubic2D( curve3D.p0, curve3D.p1, curve3D.p2, curve3D.p3 );
+		public static explicit operator BezierCubic3D( UBSCubic3D s ) =>
+			new BezierCubic3D(
+				(1/6f)*s.p0+(2/3f)*s.p1+(1/6f)*s.p2,
+				(2/3f)*s.p1+(1/3f)*s.p2,
+				(1/3f)*s.p1+(2/3f)*s.p2,
+				(1/6f)*s.p1+(2/3f)*s.p2+(1/6f)*s.p3
+			);
+		public static explicit operator HermiteCubic3D( UBSCubic3D s ) =>
+			new HermiteCubic3D(
+				(1/6f)*s.p0+(2/3f)*s.p1+(1/6f)*s.p2,
+				-(1/2f)*s.p0+(1/2f)*s.p2,
+				(1/6f)*s.p1+(2/3f)*s.p2+(1/6f)*s.p3,
+				-(1/2f)*s.p1+(1/2f)*s.p3
+			);
+		public static explicit operator CatRomCubic3D( UBSCubic3D s ) =>
+			new CatRomCubic3D(
+				s.p0+(1/6f)*s.p1-(1/3f)*s.p2+(1/6f)*s.p3,
+				(1/6f)*s.p0+(2/3f)*s.p1+(1/6f)*s.p2,
+				(1/6f)*s.p1+(2/3f)*s.p2+(1/6f)*s.p3,
+				(1/6f)*s.p0-(1/3f)*s.p1+(1/6f)*s.p2+s.p3
+			);
 		/// <summary>Returns a linear blend between two b-spline curves</summary>
 		/// <param name="a">The first spline segment</param>
 		/// <param name="b">The second spline segment</param>

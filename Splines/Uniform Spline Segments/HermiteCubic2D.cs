@@ -97,8 +97,6 @@ namespace Freya {
 			validCoefficients = true;
 			curve = new Polynomial2D( CharMatrix.cubicHermite * PointMatrix );
 		}
-
-		public BezierCubic2D ToBezier() => new BezierCubic2D( p0, p0 + v0 / 3, p1 - v1 / 3, p1 );
 		public static bool operator ==( HermiteCubic2D a, HermiteCubic2D b ) => a.P0 == b.P0 && a.V0 == b.V0 && a.P1 == b.P1 && a.V1 == b.V1;
 		public static bool operator !=( HermiteCubic2D a, HermiteCubic2D b ) => !( a == b );
 		public bool Equals( HermiteCubic2D other ) => P0.Equals( other.P0 ) && V0.Equals( other.V0 ) && P1.Equals( other.P1 ) && V1.Equals( other.V1 );
@@ -108,21 +106,28 @@ namespace Freya {
 		public override string ToString() => $"({p0}, {v0}, {p1}, {v1})";
 		/// <summary>Returns this spline segment in 3D, where z = 0</summary>
 		/// <param name="curve2D">The 2D curve to cast to 3D</param>
-		public static explicit operator HermiteCubic3D( HermiteCubic2D curve2D ) {
-			return new HermiteCubic3D( curve2D.p0, curve2D.v0, curve2D.p1, curve2D.v1 );
-		}
-		public static explicit operator BezierCubic2D( HermiteCubic2D hermite ) {
-			Vector2Matrix4x1 p = CharMatrix.GetConversionMatrix( CharMatrix.cubicHermite, CharMatrix.cubicBezier ) * hermite.PointMatrix;
-			return new BezierCubic2D( p.m0, p.m1, p.m2, p.m3 );
-		}
-		public static explicit operator CatRomCubic2D( HermiteCubic2D hermite ) {
-			Vector2Matrix4x1 p = CharMatrix.GetConversionMatrix( CharMatrix.cubicHermite, CharMatrix.cubicCatmullRom ) * hermite.PointMatrix;
-			return new CatRomCubic2D( p.m0, p.m1, p.m2, p.m3 );
-		}
-		public static explicit operator UBSCubic2D( HermiteCubic2D hermite ) {
-			Vector2Matrix4x1 p = CharMatrix.GetConversionMatrix( CharMatrix.cubicHermite, CharMatrix.cubicUniformBspline ) * hermite.PointMatrix;
-			return new UBSCubic2D( p.m0, p.m1, p.m2, p.m3 );
-		}
+		public static explicit operator HermiteCubic3D( HermiteCubic2D curve2D ) => new HermiteCubic3D( curve2D.p0, curve2D.v0, curve2D.p1, curve2D.v1 );
+		public static explicit operator BezierCubic2D( HermiteCubic2D s ) =>
+			new BezierCubic2D(
+				s.p0,
+				s.p0+(1/3f)*s.v0,
+				s.p1-(1/3f)*s.v1,
+				s.p1
+			);
+		public static explicit operator CatRomCubic2D( HermiteCubic2D s ) =>
+			new CatRomCubic2D(
+				-2*s.v0+s.p1,
+				s.p0,
+				s.p1,
+				s.p0+2*s.v1
+			);
+		public static explicit operator UBSCubic2D( HermiteCubic2D s ) =>
+			new UBSCubic2D(
+				-s.p0-(7/3f)*s.v0+2*s.p1-(2/3f)*s.v1,
+				2*s.p0+(2/3f)*s.v0-s.p1+(1/3f)*s.v1,
+				-s.p0-(1/3f)*s.v0+2*s.p1-(2/3f)*s.v1,
+				2*s.p0+(2/3f)*s.v0-s.p1+(7/3f)*s.v1
+			);
 		/// <summary>Returns a linear blend between two hermite curves</summary>
 		/// <param name="a">The first spline segment</param>
 		/// <param name="b">The second spline segment</param>

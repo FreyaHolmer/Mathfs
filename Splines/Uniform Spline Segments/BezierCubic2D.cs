@@ -106,21 +106,28 @@ namespace Freya {
 		public override string ToString() => $"({p0}, {p1}, {p2}, {p3})";
 		/// <summary>Returns this spline segment in 3D, where z = 0</summary>
 		/// <param name="curve2D">The 2D curve to cast to 3D</param>
-		public static explicit operator BezierCubic3D( BezierCubic2D curve2D ) {
-			return new BezierCubic3D( curve2D.p0, curve2D.p1, curve2D.p2, curve2D.p3 );
-		}
-		public static explicit operator HermiteCubic2D( BezierCubic2D bezier ) {
-			Vector2Matrix4x1 p = CharMatrix.GetConversionMatrix( CharMatrix.cubicBezier, CharMatrix.cubicHermite ) * bezier.PointMatrix;
-			return new HermiteCubic2D( p.m0, p.m1, p.m2, p.m3 );
-		}
-		public static explicit operator CatRomCubic2D( BezierCubic2D bezier ) {
-			Vector2Matrix4x1 p = CharMatrix.GetConversionMatrix( CharMatrix.cubicBezier, CharMatrix.cubicCatmullRom ) * bezier.PointMatrix;
-			return new CatRomCubic2D( p.m0, p.m1, p.m2, p.m3 );
-		}
-		public static explicit operator UBSCubic2D( BezierCubic2D bezier ) {
-			Vector2Matrix4x1 p = CharMatrix.GetConversionMatrix( CharMatrix.cubicBezier, CharMatrix.cubicUniformBspline ) * bezier.PointMatrix;
-			return new UBSCubic2D( p.m0, p.m1, p.m2, p.m3 );
-		}
+		public static explicit operator BezierCubic3D( BezierCubic2D curve2D ) => new BezierCubic3D( curve2D.p0, curve2D.p1, curve2D.p2, curve2D.p3 );
+		public static explicit operator HermiteCubic2D( BezierCubic2D s ) =>
+			new HermiteCubic2D(
+				s.p0,
+				-3*s.p0+3*s.p1,
+				s.p3,
+				-3*s.p2+3*s.p3
+			);
+		public static explicit operator CatRomCubic2D( BezierCubic2D s ) =>
+			new CatRomCubic2D(
+				6*s.p0-6*s.p1+s.p3,
+				s.p0,
+				s.p3,
+				s.p0-6*s.p2+6*s.p3
+			);
+		public static explicit operator UBSCubic2D( BezierCubic2D s ) =>
+			new UBSCubic2D(
+				6*s.p0-7*s.p1+2*s.p2,
+				2*s.p1-s.p2,
+				-s.p1+2*s.p2,
+				2*s.p1-7*s.p2+6*s.p3
+			);
 		/// <summary>Returns a linear blend between two bézier curves</summary>
 		/// <param name="a">The first spline segment</param>
 		/// <param name="b">The second spline segment</param>
@@ -169,29 +176,6 @@ namespace Freya {
 				d.x + ( e.x - d.x ) * t,
 				d.y + ( e.y - d.y ) * t );
 			return ( new BezierCubic2D( p0, a, d, p ), new BezierCubic2D( p, e, c, p3 ) );
-		}
-
-		public UBSCubic2D ToUniformCubicBSpline() {
-			// todo: channel split for performance
-			return new UBSCubic2D(
-				6 * p0 - 7 * p1 + 2 * p2,
-				2 * p1 - p2,
-				-p1 + 2 * p2,
-				2 * p1 - 7 * p2 + 6 * p3 );
-		}
-
-		public CatRomCubic2D ToUniformCubicCatRom() {
-			// todo: channel split for performance
-			return new CatRomCubic2D(
-				6 * p0 - 6 * p1 + p3,
-				p0,
-				p3,
-				p0 - 6 * p2 + 6 * p3 );
-		}
-
-		public HermiteCubic2D ToHermite() {
-			// todo: channel split for performance
-			return new HermiteCubic2D( p0, ( p1 - p0 ) * 3, p3, ( p3 - p2 ) * 3 );
 		}
 	}
 }

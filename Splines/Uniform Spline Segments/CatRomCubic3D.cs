@@ -106,21 +106,28 @@ namespace Freya {
 		public override string ToString() => $"({p0}, {p1}, {p2}, {p3})";
 		/// <summary>Returns this curve flattened to 2D. Effectively setting z = 0</summary>
 		/// <param name="curve3D">The 3D curve to flatten to the Z plane</param>
-		public static explicit operator CatRomCubic2D( CatRomCubic3D curve3D ) {
-			return new CatRomCubic2D( curve3D.p0, curve3D.p1, curve3D.p2, curve3D.p3 );
-		}
-		public static explicit operator BezierCubic3D( CatRomCubic3D catrom ) {
-			Vector3Matrix4x1 p = CharMatrix.GetConversionMatrix( CharMatrix.cubicCatmullRom, CharMatrix.cubicBezier ) * catrom.PointMatrix;
-			return new BezierCubic3D( p.m0, p.m1, p.m2, p.m3 );
-		}
-		public static explicit operator HermiteCubic3D( CatRomCubic3D catrom ) {
-			Vector3Matrix4x1 p = CharMatrix.GetConversionMatrix( CharMatrix.cubicCatmullRom, CharMatrix.cubicHermite ) * catrom.PointMatrix;
-			return new HermiteCubic3D( p.m0, p.m1, p.m2, p.m3 );
-		}
-		public static explicit operator UBSCubic3D( CatRomCubic3D catrom ) {
-			Vector3Matrix4x1 p = CharMatrix.GetConversionMatrix( CharMatrix.cubicCatmullRom, CharMatrix.cubicUniformBspline ) * catrom.PointMatrix;
-			return new UBSCubic3D( p.m0, p.m1, p.m2, p.m3 );
-		}
+		public static explicit operator CatRomCubic2D( CatRomCubic3D curve3D ) => new CatRomCubic2D( curve3D.p0, curve3D.p1, curve3D.p2, curve3D.p3 );
+		public static explicit operator BezierCubic3D( CatRomCubic3D s ) =>
+			new BezierCubic3D(
+				s.p1,
+				-(1/6f)*s.p0+s.p1+(1/6f)*s.p2,
+				(1/6f)*s.p1+s.p2-(1/6f)*s.p3,
+				s.p2
+			);
+		public static explicit operator HermiteCubic3D( CatRomCubic3D s ) =>
+			new HermiteCubic3D(
+				s.p1,
+				-(1/2f)*s.p0+(1/2f)*s.p2,
+				s.p2,
+				-(1/2f)*s.p1+(1/2f)*s.p3
+			);
+		public static explicit operator UBSCubic3D( CatRomCubic3D s ) =>
+			new UBSCubic3D(
+				(7/6f)*s.p0-(2/3f)*s.p1+(5/6f)*s.p2-(1/3f)*s.p3,
+				-(1/3f)*s.p0+(11/6f)*s.p1-(2/3f)*s.p2+(1/6f)*s.p3,
+				(1/6f)*s.p0-(2/3f)*s.p1+(11/6f)*s.p2-(1/3f)*s.p3,
+				-(1/3f)*s.p0+(5/6f)*s.p1-(2/3f)*s.p2+(7/6f)*s.p3
+			);
 		/// <summary>Returns a linear blend between two catmull-rom curves</summary>
 		/// <param name="a">The first spline segment</param>
 		/// <param name="b">The second spline segment</param>
@@ -132,33 +139,5 @@ namespace Freya {
 				Vector3.LerpUnclamped( a.p2, b.p2, t ),
 				Vector3.LerpUnclamped( a.p3, b.p3, t )
 			);
-
-		/// <inheritdoc cref="CatRomCubic2D.ToBezier()"/>
-		public BezierCubic3D ToBezier() =>
-			new BezierCubic3D(
-				p1,
-				p1 + ( p2 - p0 ) / 6f,
-				p2 + ( p1 - p3 ) / 6f,
-				p2
-			);
-
-		/// <inheritdoc cref="CatRomCubic2D.ToHermite()"/>
-		public HermiteCubic3D ToHermite() =>
-			new HermiteCubic3D(
-				p1,
-				( p2 - p0 ) / 2f,
-				p2,
-				( p3 - p1 ) / 2f
-			);
-
-		/// <inheritdoc cref="CatRomCubic2D.ToBSpline()"/>
-		public UBSCubic3D ToBSpline() =>
-			new UBSCubic3D(
-				( 7 * p0 - 4 * p1 + 5 * p2 - 2 * p3 ) / 6,
-				( -2 * p0 + 11 * p1 - 4 * p2 + p3 ) / 6,
-				( p0 - 4 * p1 + 11 * p2 - 2 * p3 ) / 6,
-				( -2 * p0 + 5 * p1 - 4 * p2 + 7 * p3 ) / 6
-			);
-
 	}
 }
