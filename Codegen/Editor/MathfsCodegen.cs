@@ -118,7 +118,7 @@ namespace Freya {
 			string[] points = type.paramNames;
 			string[] pointDescs = type.paramDescs;
 			string lerpName = GetLerpName( dim );
-			string curveFunc = dim == 1 ? "GetEvalPolynomial" : "GetCurve";
+			string pointMatrixType = $"{( dim == 1 ? "" : dataType )}Matrix{ptCount}x1";
 
 			CodeGenerator code = new CodeGenerator();
 			code.Comment( "by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)" );
@@ -163,7 +163,7 @@ namespace Freya {
 					// control point properties
 					using( code.ScopeRegion( "Control Points" ) ) {
 						code.Append( $"[SerializeField] {dataType} {string.Join( ", ", points )};" );
-						code.Append( $"public {( dim == 1 ? "" : dataType )}Matrix{ptCount}x1 PointMatrix => new({string.Join( ", ", points )});" );
+						code.Append( $"public {pointMatrixType} PointMatrix => new({string.Join( ", ", points )});" );
 						code.LineBreak();
 						for( int i = 0; i < ptCount; i++ ) {
 							code.Summary( pointDescs[i] );
@@ -242,8 +242,35 @@ namespace Freya {
 							using( code.BracketScope( $"public static explicit operator {structName2D}( {structName} curve3D )" ) ) {
 								code.Append( $"return new {structName2D}( {string.Join( ", ", points.Select( p => $"curve3D.{p}" ) )} );" );
 							}
+						}
+					}
 
-							// todo: conversion to other cubic splines
+					// converting between spline types
+					if( degree == 3 ) {
+						string[] cubicSplineTypeNames = {
+							nameof(BezierCubic1D).Replace( "1D", $"{dim}D" ),
+							nameof(HermiteCubic1D).Replace( "1D", $"{dim}D" ),
+							nameof(CatRomCubic1D).Replace( "1D", $"{dim}D" ),
+							nameof(UBSCubic1D).Replace( "1D", $"{dim}D" )
+						};
+						string[] typeMatrices = {
+							nameof(CharMatrix.cubicBezier),
+							nameof(CharMatrix.cubicHermite),
+							nameof(CharMatrix.cubicCatmullRom),
+							nameof(CharMatrix.cubicUniformBspline)
+						};
+
+						// Conversion to other cubic splines
+						for( int i = 0; i < 4; i++ ) {
+							string targetType = cubicSplineTypeNames[i];
+							if( targetType == structName )
+								continue; // don't convert to self
+							string v = type.className.ToLowerInvariant(); // var name
+							using( code.BracketScope( $"public static explicit operator {targetType}( {structName} {v} )" ) ) {
+								code.Append( $"{pointMatrixType} p = CharMatrix.GetConversionMatrix( CharMatrix.{type.matrixName}, CharMatrix.{typeMatrices[i]} ) * {v}.PointMatrix;" );
+								int[] range4 = { 0, 1, 2, 3 };
+								code.Append( $"return new {targetType}( {string.Join( ", ", range4.Select( j => $"p.m{j}" ) )} );" );
+							}
 						}
 					}
 
