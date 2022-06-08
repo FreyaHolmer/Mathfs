@@ -145,6 +145,16 @@ namespace Freya {
 				GetEvalPolynomial( p0.y, p1.y, p2.y ),
 				GetEvalPolynomial( p0.z, p1.z, p2.z )
 			);
+		/// <summary>Multiplies this characteristic matrix C by a column matrix: C*[p0,p1,p2]^T</summary>
+		/// <param name="p0">The first entry of the column matrix</param>
+		/// <param name="p1">The second entry of the column matrix</param>
+		/// <param name="p2">The third entry of the column matrix</param>
+		public (float, float, float) MultiplyColumnVec( float p0, float p1, float p2 ) =>
+		(
+			p0 * m00 + p1 * m01 + p2 * m02,
+			p0 * m10 + p1 * m11 + p2 * m12,
+			p0 * m20 + p1 * m21 + p2 * m22
+		);
 
 		/// <inheritdoc cref="RationalMatrix4x4.GetBasisFunction(int)"/>
 		public Polynomial GetBasisFunction( int i ) {

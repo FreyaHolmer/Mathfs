@@ -70,7 +70,7 @@ namespace Freya {
 				new Vector4( m03, m13, m23, m33 )
 			);
 
-		/// <summary>Returns the polynomial representing the cubic curve of a given characteristic matrix of a spline, given 4 control points</summary>
+		/// <summary>Returns the polynomial representing the curve of a given characteristic matrix of a spline, given 4 control points</summary>
 		/// <param name="c">The characteristic matrix to use</param>
 		/// <param name="p0">The value of the first control point</param>
 		/// <param name="p1">The value of the second control point</param>
@@ -92,6 +92,25 @@ namespace Freya {
 				GetSplinePolynomial( c, p0.y, p1.y, p2.y, p3.y ),
 				GetSplinePolynomial( c, p0.z, p1.z, p2.z, p3.z )
 			);
+
+		/// <inheritdoc cref="GetSplinePolynomial(RationalMatrix4x4,float,float,float,float)"/>
+		public static Polynomial GetSplinePolynomial( RationalMatrix3x3 c, float p0, float p1, float p2 ) => new Polynomial( c.MultiplyColumnVec( p0, p1, p2 ) );
+
+		/// <inheritdoc cref="GetSplinePolynomial(RationalMatrix4x4,float,float,float,float)"/>
+		public static Polynomial2D GetSplinePolynomial( RationalMatrix3x3 c, Vector2 p0, Vector2 p1, Vector2 p2 ) =>
+			new(
+				GetSplinePolynomial( c, p0.x, p1.x, p2.x ),
+				GetSplinePolynomial( c, p0.y, p1.y, p2.y )
+			);
+
+		/// <inheritdoc cref="GetSplinePolynomial(RationalMatrix4x4,float,float,float,float)"/>
+		public static Polynomial3D GetSplinePolynomial( RationalMatrix3x3 c, Vector3 p0, Vector3 p1, Vector3 p2 ) =>
+			new(
+				GetSplinePolynomial( c, p0.x, p1.x, p2.x ),
+				GetSplinePolynomial( c, p0.y, p1.y, p2.y ),
+				GetSplinePolynomial( c, p0.z, p1.z, p2.z )
+			);
+
 
 	}
 

@@ -67,6 +67,10 @@ namespace Freya {
 		/// <param name="coefficients">The coefficients to use (c0 = constant, c1 = linear, c2 = quadratic, c3 = cubic)</param>
 		public Polynomial( (float c0, float c1, float c2, float c3) coefficients ) => ( c0, c1, c2, c3 ) = coefficients;
 
+		/// <summary>Creates a polynomial up to a quadratic</summary>
+		/// <param name="coefficients">The coefficients to use (c0 = constant, c1 = linear, c2 = quadratic)</param>
+		public Polynomial( (float c0, float c1, float c2) coefficients ) => _ = ( ( c0, c1, c2 ) = coefficients, c3 = 0 );
+
 		/// <summary>Evaluates the polynomial at the given value <c>t</c></summary>
 		/// <param name="t">The value to sample at</param>
 		public float Eval( float t ) => c3 * ( t * t * t ) + c2 * ( t * t ) + c1 * t + c0;

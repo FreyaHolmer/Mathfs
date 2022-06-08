@@ -83,7 +83,7 @@ namespace Freya {
 			if( validCoefficients )
 				return; // no need to update
 			validCoefficients = true;
-			curve = CharMatrix.quadraticBezier.GetCurve( p0, p1, p2 );
+			curve = CharMatrix.GetSplinePolynomial( CharMatrix.quadraticBezier, p0, p1, p2 );
 		}
 		public static bool operator ==( BezierQuad3D a, BezierQuad3D b ) => a.P0 == b.P0 && a.P1 == b.P1 && a.P2 == b.P2;
 		public static bool operator !=( BezierQuad3D a, BezierQuad3D b ) => !( a == b );
