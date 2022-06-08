@@ -59,6 +59,14 @@ namespace Freya {
 		/// <param name="c3">The cubic coefficient</param>
 		public Polynomial( float c0, float c1, float c2, float c3 ) => ( this.c0, this.c1, this.c2, this.c3 ) = ( c0, c1, c2, c3 );
 
+		/// <summary>Creates a polynomial up to a cubic</summary>
+		/// <param name="coefficients">The coefficients to use (x = constant, y = linear, z = quadratic, w = cubic)</param>
+		public Polynomial( Vector4 coefficients ) => ( c0, c1, c2, c3 ) = ( coefficients.x, coefficients.y, coefficients.z, coefficients.w );
+
+		/// <summary>Creates a polynomial up to a cubic</summary>
+		/// <param name="coefficients">The coefficients to use (c0 = constant, c1 = linear, c2 = quadratic, c3 = cubic)</param>
+		public Polynomial( (float c0, float c1, float c2, float c3) coefficients ) => ( c0, c1, c2, c3 ) = coefficients;
+
 		/// <summary>Evaluates the polynomial at the given value <c>t</c></summary>
 		/// <param name="t">The value to sample at</param>
 		public float Eval( float t ) => c3 * ( t * t * t ) + c2 * ( t * t ) + c1 * t + c0;

@@ -209,7 +209,7 @@ namespace Freya {
 							code.Append( "return; // no need to update" );
 						code.Append( "validCoefficients = true;" );
 						// todo: unroll matrix multiply for performance
-						code.Append( $"curve = CharMatrix.{type.matrixName}.{curveFunc}( {string.Join( ", ", points )} );" );
+						code.Append( $"curve = CharMatrix.GetSplinePolynomial( CharMatrix.{type.matrixName}, {string.Join( ", ", points )} );" );
 					}
 
 					// equality checks

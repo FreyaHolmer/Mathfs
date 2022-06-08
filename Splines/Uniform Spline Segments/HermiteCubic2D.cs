@@ -94,7 +94,7 @@ namespace Freya {
 			if( validCoefficients )
 				return; // no need to update
 			validCoefficients = true;
-			curve = CharMatrix.cubicHermite.GetCurve( p0, v0, p1, v1 );
+			curve = CharMatrix.GetSplinePolynomial( CharMatrix.cubicHermite, p0, v0, p1, v1 );
 		}
 
 		public BezierCubic2D ToBezier() => new BezierCubic2D( p0, p0 + v0 / 3, p1 - v1 / 3, p1 );

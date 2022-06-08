@@ -94,7 +94,7 @@ namespace Freya {
 			if( validCoefficients )
 				return; // no need to update
 			validCoefficients = true;
-			curve = CharMatrix.cubicCatmullRom.GetEvalPolynomial( p0, p1, p2, p3 );
+			curve = CharMatrix.GetSplinePolynomial( CharMatrix.cubicCatmullRom, p0, p1, p2, p3 );
 		}
 		public static bool operator ==( CatRomCubic1D a, CatRomCubic1D b ) => a.P0 == b.P0 && a.P1 == b.P1 && a.P2 == b.P2 && a.P3 == b.P3;
 		public static bool operator !=( CatRomCubic1D a, CatRomCubic1D b ) => !( a == b );

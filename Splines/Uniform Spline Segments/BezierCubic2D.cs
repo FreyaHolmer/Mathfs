@@ -94,7 +94,7 @@ namespace Freya {
 			if( validCoefficients )
 				return; // no need to update
 			validCoefficients = true;
-			curve = CharMatrix.cubicBezier.GetCurve( p0, p1, p2, p3 );
+			curve = CharMatrix.GetSplinePolynomial( CharMatrix.cubicBezier, p0, p1, p2, p3 );
 		}
 		public static bool operator ==( BezierCubic2D a, BezierCubic2D b ) => a.P0 == b.P0 && a.P1 == b.P1 && a.P2 == b.P2 && a.P3 == b.P3;
 		public static bool operator !=( BezierCubic2D a, BezierCubic2D b ) => !( a == b );
@@ -155,6 +155,7 @@ namespace Freya {
 			Vector2 p = new Vector2(
 				d.x + ( e.x - d.x ) * t,
 				d.y + ( e.y - d.y ) * t );
+			return ( new BezierCubic2D( p0, a, d, p ), new BezierCubic2D( p, e, c, p3 ) );
 		}
 
 		public UBSCubic2D ToUniformCubicBSpline() {
@@ -178,7 +179,6 @@ namespace Freya {
 		public HermiteCubic2D ToHermite() {
 			// todo: channel split for performance
 			return new HermiteCubic2D( p0, ( p1 - p0 ) * 3, p3, ( p3 - p2 ) * 3 );
-			return ( new BezierCubic2D( p0, a, d, p ), new BezierCubic2D( p, e, c, p3 ) );
 		}
 	}
 }

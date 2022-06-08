@@ -74,7 +74,7 @@ namespace Freya {
 			return ( k0, k1, k2, k3 );
 		}
 
-		static CharMatrix4x4 GetNUCatRomCharMatrix( float k0, float k1, float k2, float k3 ) {
+		static Matrix4x4 GetNUCatRomCharMatrix( float k0, float k1, float k2, float k3 ) {
 			if( k1 == 0f && k2 == 1f )
 				return GetNUCatRomCharMatrixUnitInterval( k0, k3 );
 			float k1k1 = k1 * k1;
@@ -133,7 +133,7 @@ namespace Freya {
 			float p1sc = 1f / ( i01 * i12sq * i13 );
 			float p2sc = 1f / ( i02 * i12sq * i23 );
 			float p3sc = 1f / ( i12 * i13 * i23 );
-			return new CharMatrix4x4(
+			return CharMatrix.Create(
 				p0sc * p0u0, p1sc * p1u0, p2sc * p2u0, p3sc * p3u0,
 				p0sc * p0u1, p1sc * p1u1, p2sc * p2u1, p3sc * p3u1,
 				p0sc * p0u2, p1sc * p1u2, p2sc * p2u2, p3sc * p3u2,
@@ -141,7 +141,7 @@ namespace Freya {
 			);
 		}
 
-		static CharMatrix4x4 GetNUCatRomCharMatrixUnitInterval( float k0, float k3 ) {
+		static Matrix4x4 GetNUCatRomCharMatrixUnitInterval( float k0, float k3 ) {
 			float k0mk3 = k0 - k3;
 			float k0m2k3 = k0mk3 - k3;
 			float k0k3 = k0 * k3;
@@ -162,7 +162,7 @@ namespace Freya {
 			float p2sc = 1f / ( i02 * i23 );
 			float p3sc = 1f / ( k3 * i23 );
 
-			return new CharMatrix4x4(
+			return CharMatrix.Create(
 				0, 1, 0, 0,
 				p0sc, p1sc * p1u1, p2sc * p2u1, 0,
 				p0sc * -2, p1sc * p1u2, p2sc * p2u2, p3sc,
@@ -171,11 +171,20 @@ namespace Freya {
 		}
 
 		internal static Polynomial2D CalculateCatRomCurve( Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3, float k0, float k1, float k2, float k3 ) {
-			return GetNUCatRomCharMatrix( k0, k1, k2, k3 ).GetCurve( p0, p1, p2, p3 );
+			Matrix4x4 m = GetNUCatRomCharMatrix( k0, k1, k2, k3 );
+			return new Polynomial2D(
+				new Polynomial( m.MultiplyColumnVector( new Vector4( p0.x, p1.x, p2.x, p3.x ) ) ),
+				new Polynomial( m.MultiplyColumnVector( new Vector4( p0.y, p1.y, p2.y, p3.y ) ) )
+			);
 		}
 
 		internal static Polynomial3D CalculateCatRomCurve( Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float k0, float k1, float k2, float k3 ) {
-			return GetNUCatRomCharMatrix( k0, k1, k2, k3 ).GetCurve( p0, p1, p2, p3 );
+			Matrix4x4 m = GetNUCatRomCharMatrix( k0, k1, k2, k3 );
+			return new Polynomial3D(
+				new Polynomial( m.MultiplyColumnVector( new Vector4( p0.x, p1.x, p2.x, p3.x ) ) ),
+				new Polynomial( m.MultiplyColumnVector( new Vector4( p0.y, p1.y, p2.y, p3.y ) ) ),
+				new Polynomial( m.MultiplyColumnVector( new Vector4( p0.z, p1.z, p2.z, p3.z ) ) )
+			);
 		}
 
 	}

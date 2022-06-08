@@ -94,7 +94,7 @@ namespace Freya {
 			if( validCoefficients )
 				return; // no need to update
 			validCoefficients = true;
-			curve = CharMatrix.cubicUniformBspline.GetCurve( p0, p1, p2, p3 );
+			curve = CharMatrix.GetSplinePolynomial( CharMatrix.cubicUniformBspline, p0, p1, p2, p3 );
 		}
 
 		/// <summary>Returns the exact cubic bézier representation of this segment</summary>
