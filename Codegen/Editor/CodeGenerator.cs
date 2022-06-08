@@ -10,10 +10,7 @@ namespace Freya {
 		int scope = 0;
 		public List<string> content = new List<string>();
 
-		public void Append( string s ) {
-			content.Add( $"{new string( '\t', scope )}{s}" );
-		}
-
+		public void Append( string s ) => content.Add( $"{new string( '\t', scope )}{s}" );
 		public void Comment( string s ) => Append( $"// {s}" );
 		public void Using( string s ) => Append( $"using {s};" );
 		public void Summary( string s ) => Append( $"/// <summary>{s}</summary>" );
