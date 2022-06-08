@@ -33,6 +33,7 @@ namespace Freya {
 		#region Control Points
 
 		[SerializeField] Vector3 p0, p1, p2, p3;
+		public Vector3Matrix4x1 PointMatrix => new(p0, p1, p2, p3);
 
 		/// <summary>The first control point of the catmull-rom curve. Note that this point is not included in the curve itself, and only helps to shape it</summary>
 		public Vector3 P0 {
@@ -94,7 +95,7 @@ namespace Freya {
 			if( validCoefficients )
 				return; // no need to update
 			validCoefficients = true;
-			curve = CharMatrix.GetSplinePolynomial( CharMatrix.cubicCatmullRom, p0, p1, p2, p3 );
+			curve = new Polynomial3D( CharMatrix.cubicCatmullRom * PointMatrix );
 		}
 		public static bool operator ==( CatRomCubic3D a, CatRomCubic3D b ) => a.P0 == b.P0 && a.P1 == b.P1 && a.P2 == b.P2 && a.P3 == b.P3;
 		public static bool operator !=( CatRomCubic3D a, CatRomCubic3D b ) => !( a == b );

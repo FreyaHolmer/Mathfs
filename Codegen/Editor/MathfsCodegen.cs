@@ -163,6 +163,7 @@ namespace Freya {
 					// control point properties
 					using( code.ScopeRegion( "Control Points" ) ) {
 						code.Append( $"[SerializeField] {dataType} {string.Join( ", ", points )};" );
+						code.Append( $"public {( dim == 1 ? "" : dataType )}Matrix{ptCount}x1 PointMatrix => new({string.Join( ", ", points )});" );
 						code.LineBreak();
 						for( int i = 0; i < ptCount; i++ ) {
 							code.Summary( pointDescs[i] );
@@ -209,7 +210,7 @@ namespace Freya {
 							code.Append( "return; // no need to update" );
 						code.Append( "validCoefficients = true;" );
 						// todo: unroll matrix multiply for performance
-						code.Append( $"curve = CharMatrix.GetSplinePolynomial( CharMatrix.{type.matrixName}, {string.Join( ", ", points )} );" );
+						code.Append( $"curve = new {polynomType}( CharMatrix.{type.matrixName} * PointMatrix );" );
 					}
 
 					// equality checks

@@ -33,6 +33,7 @@ namespace Freya {
 		#region Control Points
 
 		[SerializeField] Vector2 p0, p1, p2, p3;
+		public Vector2Matrix4x1 PointMatrix => new(p0, p1, p2, p3);
 
 		/// <summary>The first point of the B-spline hull</summary>
 		public Vector2 P0 {
@@ -94,7 +95,7 @@ namespace Freya {
 			if( validCoefficients )
 				return; // no need to update
 			validCoefficients = true;
-			curve = CharMatrix.GetSplinePolynomial( CharMatrix.cubicUniformBspline, p0, p1, p2, p3 );
+			curve = new Polynomial2D( CharMatrix.cubicUniformBspline * PointMatrix );
 		}
 
 		/// <summary>Returns the exact cubic bézier representation of this segment</summary>

@@ -33,6 +33,7 @@ namespace Freya {
 		#region Control Points
 
 		[SerializeField] Vector3 p0, v0, p1, v1;
+		public Vector3Matrix4x1 PointMatrix => new(p0, v0, p1, v1);
 
 		/// <summary>The starting point of the curve</summary>
 		public Vector3 P0 {
@@ -94,7 +95,7 @@ namespace Freya {
 			if( validCoefficients )
 				return; // no need to update
 			validCoefficients = true;
-			curve = CharMatrix.GetSplinePolynomial( CharMatrix.cubicHermite, p0, v0, p1, v1 );
+			curve = new Polynomial3D( CharMatrix.cubicHermite * PointMatrix );
 		}
 		public static bool operator ==( HermiteCubic3D a, HermiteCubic3D b ) => a.P0 == b.P0 && a.V0 == b.V0 && a.P1 == b.P1 && a.V1 == b.V1;
 		public static bool operator !=( HermiteCubic3D a, HermiteCubic3D b ) => !( a == b );

@@ -1,5 +1,6 @@
 // by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
+using System;
 using UnityEngine;
 
 namespace Freya {
@@ -70,46 +71,19 @@ namespace Freya {
 				new Vector4( m03, m13, m23, m33 )
 			);
 
-		/// <summary>Returns the polynomial representing the curve of a given characteristic matrix of a spline, given 4 control points</summary>
-		/// <param name="c">The characteristic matrix to use</param>
-		/// <param name="p0">The value of the first control point</param>
-		/// <param name="p1">The value of the second control point</param>
-		/// <param name="p2">The value of the third control point</param>
-		/// <param name="p3">The value of the fourth control point</param>
-		public static Polynomial GetSplinePolynomial( RationalMatrix4x4 c, float p0, float p1, float p2, float p3 ) => new Polynomial( c.MultiplyColumnVec( p0, p1, p2, p3 ) );
-
-		/// <inheritdoc cref="GetSplinePolynomial(RationalMatrix4x4,float,float,float,float)"/>
-		public static Polynomial2D GetSplinePolynomial( RationalMatrix4x4 c, Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3 ) =>
-			new(
-				GetSplinePolynomial( c, p0.x, p1.x, p2.x, p3.x ),
-				GetSplinePolynomial( c, p0.y, p1.y, p2.y, p3.y )
-			);
-
-		/// <inheritdoc cref="GetSplinePolynomial(RationalMatrix4x4,float,float,float,float)"/>
-		public static Polynomial3D GetSplinePolynomial( RationalMatrix4x4 c, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3 ) =>
-			new(
-				GetSplinePolynomial( c, p0.x, p1.x, p2.x, p3.x ),
-				GetSplinePolynomial( c, p0.y, p1.y, p2.y, p3.y ),
-				GetSplinePolynomial( c, p0.z, p1.z, p2.z, p3.z )
-			);
-
-		/// <inheritdoc cref="GetSplinePolynomial(RationalMatrix4x4,float,float,float,float)"/>
-		public static Polynomial GetSplinePolynomial( RationalMatrix3x3 c, float p0, float p1, float p2 ) => new Polynomial( c.MultiplyColumnVec( p0, p1, p2 ) );
-
-		/// <inheritdoc cref="GetSplinePolynomial(RationalMatrix4x4,float,float,float,float)"/>
-		public static Polynomial2D GetSplinePolynomial( RationalMatrix3x3 c, Vector2 p0, Vector2 p1, Vector2 p2 ) =>
-			new(
-				GetSplinePolynomial( c, p0.x, p1.x, p2.x ),
-				GetSplinePolynomial( c, p0.y, p1.y, p2.y )
-			);
-
-		/// <inheritdoc cref="GetSplinePolynomial(RationalMatrix4x4,float,float,float,float)"/>
-		public static Polynomial3D GetSplinePolynomial( RationalMatrix3x3 c, Vector3 p0, Vector3 p1, Vector3 p2 ) =>
-			new(
-				GetSplinePolynomial( c, p0.x, p1.x, p2.x ),
-				GetSplinePolynomial( c, p0.y, p1.y, p2.y ),
-				GetSplinePolynomial( c, p0.z, p1.z, p2.z )
-			);
+		/// <summary>Returns the basis function (weight) for the given spline points by index <c>i</c>,
+		/// equal to the t-matrix multiplied by the characteristic matrix</summary>
+		/// <param name="c">The characteristic matrix to get the basis functions of</param>
+		/// <param name="i">The point index to get the basis function of</param>
+		public static Polynomial GetBasisFunction( RationalMatrix4x4 c, int i ) {
+			return i switch {
+				0 => new Polynomial( (float)c.m00, (float)c.m10, (float)c.m20, (float)c.m30 ),
+				1 => new Polynomial( (float)c.m01, (float)c.m11, (float)c.m21, (float)c.m31 ),
+				2 => new Polynomial( (float)c.m02, (float)c.m12, (float)c.m22, (float)c.m32 ),
+				3 => new Polynomial( (float)c.m03, (float)c.m13, (float)c.m23, (float)c.m33 ),
+				_ => throw new IndexOutOfRangeException( "Basis index needs to be between 0 and 3" )
+			};
+		}
 
 
 	}

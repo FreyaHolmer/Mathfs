@@ -37,6 +37,12 @@ namespace Freya {
 			this.y = new Polynomial( c0.y, c1.y, c2.y, c3.y );
 		}
 
+		/// <inheritdoc cref="Polynomial(Matrix4x1)"/>
+		public Polynomial2D( Vector2Matrix4x1 coefficients ) => ( x, y ) = ( new Polynomial( coefficients.X ), new Polynomial( coefficients.Y ) );
+
+		/// <inheritdoc cref="Polynomial(Matrix4x1)"/>
+		public Polynomial2D( Vector2Matrix3x1 coefficients ) => ( x, y ) = ( new Polynomial( coefficients.X ), new Polynomial( coefficients.Y ) );
+
 		/// <inheritdoc cref="Polynomial.Eval(float)"/>
 		public Vector2 Eval( float t ) => new(x.Eval( t ), y.Eval( t ));
 
@@ -60,26 +66,26 @@ namespace Freya {
 
 		/// <summary>Returns the cubic bezier control points for the unit interval of this curve</summary>
 		public BezierCubic2D ToBezier() {
-			( Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3 ) = CharMatrix.cubicBezierInverse.MultiplyColumnVec( C0, C1, C2, C3 );
-			return new BezierCubic2D( p0, p1, p2, p3 );
+			Vector2Matrix4x1 p = CharMatrix.cubicBezierInverse * new Vector2Matrix4x1( C0, C1, C2, C3 );
+			return new BezierCubic2D( p.m0, p.m1, p.m2, p.m3 );
 		}
 
 		/// <summary>Returns the cubic catmull-rom control points for the unit interval of this curve</summary>
 		public CatRomCubic2D ToCatmullRom() {
-			( Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3 ) = CharMatrix.cubicCatmullRomInverse.MultiplyColumnVec( C0, C1, C2, C3 );
-			return new CatRomCubic2D( p0, p1, p2, p3 );
+			Vector2Matrix4x1 p = CharMatrix.cubicCatmullRomInverse * new Vector2Matrix4x1( C0, C1, C2, C3 );
+			return new CatRomCubic2D( p.m0, p.m1, p.m2, p.m3 );
 		}
 
 		/// <summary>Returns the cubic hermite control points for the unit interval of this curve</summary>
 		public HermiteCubic2D ToHermite() {
-			( Vector2 p0, Vector2 v0, Vector2 p1, Vector2 v1 ) = CharMatrix.cubicHermiteInverse.MultiplyColumnVec( C0, C1, C2, C3 );
-			return new HermiteCubic2D( p0, v0, p1, v1 );
+			Vector2Matrix4x1 p = CharMatrix.cubicHermiteInverse * new Vector2Matrix4x1( C0, C1, C2, C3 );
+			return new HermiteCubic2D( p.m0, p.m1, p.m2, p.m3 );
 		}
 
 		/// <summary>Returns the cubic b-spline control points for the unit interval of this curve</summary>
 		public UBSCubic2D ToBSpline() {
-			( Vector2 p0, Vector2 v0, Vector2 p1, Vector2 v1 ) = CharMatrix.cubicUniformBsplineInverse.MultiplyColumnVec( C0, C1, C2, C3 );
-			return new UBSCubic2D( p0, v0, p1, v1 );
+			Vector2Matrix4x1 p = CharMatrix.cubicUniformBsplineInverse * new Vector2Matrix4x1( C0, C1, C2, C3 );
+			return new UBSCubic2D( p.m0, p.m1, p.m2, p.m3 );
 		}
 
 		#endregion

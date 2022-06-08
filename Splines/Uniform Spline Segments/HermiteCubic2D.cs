@@ -33,6 +33,7 @@ namespace Freya {
 		#region Control Points
 
 		[SerializeField] Vector2 p0, v0, p1, v1;
+		public Vector2Matrix4x1 PointMatrix => new(p0, v0, p1, v1);
 
 		/// <summary>The starting point of the curve</summary>
 		public Vector2 P0 {
@@ -94,7 +95,7 @@ namespace Freya {
 			if( validCoefficients )
 				return; // no need to update
 			validCoefficients = true;
-			curve = CharMatrix.GetSplinePolynomial( CharMatrix.cubicHermite, p0, v0, p1, v1 );
+			curve = new Polynomial2D( CharMatrix.cubicHermite * PointMatrix );
 		}
 
 		public BezierCubic2D ToBezier() => new BezierCubic2D( p0, p0 + v0 / 3, p1 - v1 / 3, p1 );

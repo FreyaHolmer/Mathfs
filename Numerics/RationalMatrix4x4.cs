@@ -6,12 +6,12 @@ using UnityEngine;
 namespace Freya {
 
 	/// <summary>A 4x4 matrix using exact rational number representation</summary>
-	public struct RationalMatrix4x4 {
+	public readonly struct RationalMatrix4x4 {
 
-		public Rational m00, m01, m02, m03;
-		public Rational m10, m11, m12, m13;
-		public Rational m20, m21, m22, m23;
-		public Rational m30, m31, m32, m33;
+		public readonly Rational m00, m01, m02, m03;
+		public readonly Rational m10, m11, m12, m13;
+		public readonly Rational m20, m21, m22, m23;
+		public readonly Rational m30, m31, m32, m33;
 
 		public RationalMatrix4x4( Rational m00, Rational m01, Rational m02, Rational m03, Rational m10, Rational m11, Rational m12, Rational m13, Rational m20, Rational m21, Rational m22, Rational m23, Rational m30, Rational m31, Rational m32, Rational m33 ) {
 			( this.m00, this.m01, this.m02, this.m03 ) = ( m00, m01, m02, m03 );
@@ -41,59 +41,6 @@ namespace Freya {
 					(3, 3) => m33,
 					_      => throw new IndexOutOfRangeException( $"Matrix row/column indices have to be from 0 to 3, got: ({row},{column})" )
 				};
-			}
-			set {
-				switch( ( row, column ) ) {
-					case (0, 0):
-						m00 = value;
-						break;
-					case (0, 1):
-						m01 = value;
-						break;
-					case (0, 2):
-						m02 = value;
-						break;
-					case (0, 3):
-						m03 = value;
-						break;
-					case (1, 0):
-						m10 = value;
-						break;
-					case (1, 1):
-						m11 = value;
-						break;
-					case (1, 2):
-						m12 = value;
-						break;
-					case (1, 3):
-						m13 = value;
-						break;
-					case (2, 0):
-						m20 = value;
-						break;
-					case (2, 1):
-						m21 = value;
-						break;
-					case (2, 2):
-						m22 = value;
-						break;
-					case (2, 3):
-						m23 = value;
-						break;
-					case (3, 0):
-						m30 = value;
-						break;
-					case (3, 1):
-						m31 = value;
-						break;
-					case (3, 2):
-						m32 = value;
-						break;
-					case (3, 3):
-						m33 = value;
-						break;
-					default: throw new IndexOutOfRangeException( $"Matrix row/column indices have to be from 0 to 3, got: ({row},{column})" );
-				}
 			}
 		}
 
@@ -185,56 +132,20 @@ namespace Freya {
 			);
 		}
 
-		/// <summary>Multiplies this characteristic matrix C by a column matrix: C*[p0,p1,p2,p3]^T</summary>
-		/// <param name="p0">The first entry of the column matrix</param>
-		/// <param name="p1">The second entry of the column matrix</param>
-		/// <param name="p2">The third entry of the column matrix</param>
-		/// <param name="p3">The fourth entry of the column matrix</param>
-		public (float, float, float, float) MultiplyColumnVec( float p0, float p1, float p2, float p3 ) =>
-		(
-			p0 * m00 + p1 * m01 + p2 * m02 + p3 * m03,
-			p0 * m10 + p1 * m11 + p2 * m12 + p3 * m13,
-			p0 * m20 + p1 * m21 + p2 * m22 + p3 * m23,
-			p0 * m30 + p1 * m31 + p2 * m32 + p3 * m33
-		);
+		/// <summary>Multiplies this matrix C by a column matrix M</summary>
+		/// <param name="c">The left hand side 4x4 matrix</param>
+		/// <param name="m">The right hand side 4x1 matrix</param>
+		public static Matrix4x1 operator *( RationalMatrix4x4 c, Matrix4x1 m ) =>
+			new(m.m0 * c.m00 + m.m1 * c.m01 + m.m2 * c.m02 + m.m3 * c.m03,
+				m.m0 * c.m10 + m.m1 * c.m11 + m.m2 * c.m12 + m.m3 * c.m13,
+				m.m0 * c.m20 + m.m1 * c.m21 + m.m2 * c.m22 + m.m3 * c.m23,
+				m.m0 * c.m30 + m.m1 * c.m31 + m.m2 * c.m32 + m.m3 * c.m33);
 
-		/// <inheritdoc cref="MultiplyColumnVec(float,float,float,float)"/>
-		public (Vector2, Vector2, Vector2, Vector2) MultiplyColumnVec( Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3 ) {
-			( float x0, float x1, float x2, float x3 ) = MultiplyColumnVec( p0.x, p1.x, p2.x, p3.x );
-			( float y0, float y1, float y2, float y3 ) = MultiplyColumnVec( p0.y, p1.y, p2.y, p3.y );
-			return (
-				new Vector2( x0, y0 ),
-				new Vector2( x1, y1 ),
-				new Vector2( x2, y2 ),
-				new Vector2( x3, y3 )
-			);
-		}
+		/// <inheritdoc cref="operator*(RationalMatrix4x4,Matrix4x1)"/>
+		public static Vector2Matrix4x1 operator *( RationalMatrix4x4 c, Vector2Matrix4x1 m ) => new(c * m.X, c * m.Y);
 
-		/// <inheritdoc cref="MultiplyColumnVec(float,float,float,float)"/>
-		public (Vector3, Vector3, Vector3, Vector3) MultiplyColumnVec( Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3 ) {
-			( float x0, float x1, float x2, float x3 ) = MultiplyColumnVec( p0.x, p1.x, p2.x, p3.x );
-			( float y0, float y1, float y2, float y3 ) = MultiplyColumnVec( p0.y, p1.y, p2.y, p3.y );
-			( float z0, float z1, float z2, float z3 ) = MultiplyColumnVec( p0.z, p1.z, p2.z, p3.z );
-			return (
-				new Vector3( x0, y0, z0 ),
-				new Vector3( x1, y1, z1 ),
-				new Vector3( x2, y2, z2 ),
-				new Vector3( x3, y3, z3 )
-			);
-		}
-
-		/// <summary>Returns the basis function (weight) for the given point by index <c>i</c>,
-		/// equal to the t-matrix multiplied by the characteristic matrix</summary>
-		/// <param name="i">The point index to get the basis function of</param>
-		public Polynomial GetBasisFunction( int i ) {
-			return i switch {
-				0 => new Polynomial( (float)m00, (float)m10, (float)m20, (float)m30 ),
-				1 => new Polynomial( (float)m01, (float)m11, (float)m21, (float)m31 ),
-				2 => new Polynomial( (float)m02, (float)m12, (float)m22, (float)m32 ),
-				3 => new Polynomial( (float)m03, (float)m13, (float)m23, (float)m33 ),
-				_ => throw new IndexOutOfRangeException( "Basis index needs to be between 0 and 3" )
-			};
-		}
+		/// <inheritdoc cref="operator*(RationalMatrix4x4,Matrix4x1)"/>
+		public static Vector3Matrix4x1 operator *( RationalMatrix4x4 c, Vector3Matrix4x1 m ) => new(c * m.X, c * m.Y, c * m.Z);
 
 	}
 

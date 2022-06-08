@@ -33,6 +33,12 @@ namespace Freya {
 
 		public Polynomial3D( Polynomial x, Polynomial y, Polynomial z ) => ( this.x, this.y, this.z ) = ( x, y, z );
 
+		/// <inheritdoc cref="Polynomial(Matrix4x1)"/>
+		public Polynomial3D( Vector3Matrix4x1 coefficients ) => ( x, y, z ) = ( new Polynomial( coefficients.X ), new Polynomial( coefficients.Y ), new Polynomial( coefficients.Z ) );
+
+		/// <inheritdoc cref="Polynomial(Matrix4x1)"/>
+		public Polynomial3D( Vector3Matrix3x1 coefficients ) => ( x, y, z ) = ( new Polynomial( coefficients.X ), new Polynomial( coefficients.Y ), new Polynomial( coefficients.Z ) );
+
 		/// <inheritdoc cref="Polynomial.Eval(float)"/>
 		public Vector3 Eval( float t ) => new(x.Eval( t ), y.Eval( t ), z.Eval( t ));
 
@@ -57,26 +63,26 @@ namespace Freya {
 
 		/// <inheritdoc cref="Polynomial2D.ToBezier"/>
 		public BezierCubic3D ToBezier() {
-			( Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3 ) = CharMatrix.cubicBezierInverse.MultiplyColumnVec( C0, C1, C2, C3 );
-			return new BezierCubic3D( p0, p1, p2, p3 );
+			Vector3Matrix4x1 p = CharMatrix.cubicBezierInverse * new Vector3Matrix4x1( C0, C1, C2, C3 );
+			return new BezierCubic3D( p.m0, p.m1, p.m2, p.m3 );
 		}
 
 		/// <inheritdoc cref="Polynomial2D.ToCatmullRom"/>
 		public CatRomCubic3D ToCatmullRom() {
-			( Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3 ) = CharMatrix.cubicCatmullRomInverse.MultiplyColumnVec( C0, C1, C2, C3 );
-			return new CatRomCubic3D( p0, p1, p2, p3 );
+			Vector3Matrix4x1 p = CharMatrix.cubicCatmullRomInverse * new Vector3Matrix4x1( C0, C1, C2, C3 );
+			return new CatRomCubic3D( p.m0, p.m1, p.m2, p.m3 );
 		}
 
 		/// <inheritdoc cref="Polynomial2D.ToHermite"/>
 		public HermiteCubic3D ToHermite() {
-			( Vector3 p0, Vector3 v0, Vector3 p1, Vector3 v1 ) = CharMatrix.cubicHermiteInverse.MultiplyColumnVec( C0, C1, C2, C3 );
-			return new HermiteCubic3D( p0, v0, p1, v1 );
+			Vector3Matrix4x1 p = CharMatrix.cubicHermiteInverse * new Vector3Matrix4x1( C0, C1, C2, C3 );
+			return new HermiteCubic3D( p.m0, p.m1, p.m2, p.m3 );
 		}
 
 		/// <inheritdoc cref="Polynomial2D.ToBSpline"/>
 		public UBSCubic3D ToBSpline() {
-			( Vector3 p0, Vector3 v0, Vector3 p1, Vector3 v1 ) = CharMatrix.cubicUniformBsplineInverse.MultiplyColumnVec( C0, C1, C2, C3 );
-			return new UBSCubic3D( p0, v0, p1, v1 );
+			Vector3Matrix4x1 p = CharMatrix.cubicUniformBsplineInverse * new Vector3Matrix4x1( C0, C1, C2, C3 );
+			return new UBSCubic3D( p.m0, p.m1, p.m2, p.m3 );
 		}
 
 		#endregion

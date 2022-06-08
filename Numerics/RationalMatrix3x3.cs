@@ -6,11 +6,11 @@ using UnityEngine;
 namespace Freya {
 
 	/// <summary>A 4x4 matrix using exact rational number representation</summary>
-	public struct RationalMatrix3x3 {
+	public readonly struct RationalMatrix3x3 {
 
-		public Rational m00, m01, m02;
-		public Rational m10, m11, m12;
-		public Rational m20, m21, m22;
+		public readonly Rational m00, m01, m02;
+		public readonly Rational m10, m11, m12;
+		public readonly Rational m20, m21, m22;
 
 		public RationalMatrix3x3( Rational m00, Rational m01, Rational m02, Rational m10, Rational m11, Rational m12, Rational m20, Rational m21, Rational m22 ) {
 			( this.m00, this.m01, this.m02 ) = ( m00, m01, m02 );
@@ -32,38 +32,6 @@ namespace Freya {
 					(2, 2) => m22,
 					_      => throw new IndexOutOfRangeException( $"Matrix row/column indices have to be from 0 to 3, got: ({row},{column})" )
 				};
-			}
-			set {
-				switch( ( row, column ) ) {
-					case (0, 0):
-						m00 = value;
-						break;
-					case (0, 1):
-						m01 = value;
-						break;
-					case (0, 2):
-						m02 = value;
-						break;
-					case (1, 0):
-						m10 = value;
-						break;
-					case (1, 1):
-						m11 = value;
-						break;
-					case (1, 2):
-						m12 = value;
-						break;
-					case (2, 0):
-						m20 = value;
-						break;
-					case (2, 1):
-						m21 = value;
-						break;
-					case (2, 2):
-						m22 = value;
-						break;
-					default: throw new IndexOutOfRangeException( $"Matrix row/column indices have to be from 0 to 3, got: ({row},{column})" );
-				}
 			}
 		}
 
@@ -123,48 +91,18 @@ namespace Freya {
 			);
 		}
 
-		/// <inheritdoc cref="CharMatrix4x4.GetEvalPolynomial(float,float,float,float)"/>
-		public Polynomial GetEvalPolynomial( float p0, float p1, float p2 ) =>
-			Polynomial.Quadratic(
-				p0 * m00 + p1 * m01 + p2 * m02,
-				p0 * m10 + p1 * m11 + p2 * m12,
-				p0 * m20 + p1 * m21 + p2 * m22
-			);
+		/// <inheritdoc cref="RationalMatrix4x4.operator*(RationalMatrix4x4,Matrix4x1)"/>
+		public static Matrix3x1 operator *( RationalMatrix3x3 c, Matrix3x1 m ) =>
+			new(m.m0 * c.m00 + m.m1 * c.m01 + m.m2 * c.m02,
+				m.m0 * c.m10 + m.m1 * c.m11 + m.m2 * c.m12,
+				m.m0 * c.m20 + m.m1 * c.m21 + m.m2 * c.m22);
 
-		/// <inheritdoc cref="CharMatrix4x4.GetCurve(Vector2,Vector2,Vector2,Vector2)"/>
-		public Polynomial2D GetCurve( Vector2 p0, Vector2 p1, Vector2 p2 ) =>
-			new(
-				GetEvalPolynomial( p0.x, p1.x, p2.x ),
-				GetEvalPolynomial( p0.y, p1.y, p2.y )
-			);
+		/// <inheritdoc cref="RationalMatrix4x4.operator*(RationalMatrix4x4,Matrix4x1)"/>
+		public static Vector2Matrix3x1 operator *( RationalMatrix3x3 c, Vector2Matrix3x1 m ) => new(c * m.X, c * m.Y);
 
-		/// <inheritdoc cref="CharMatrix4x4.GetCurve(Vector2,Vector2,Vector2,Vector2)"/>
-		public Polynomial3D GetCurve( Vector3 p0, Vector3 p1, Vector3 p2 ) =>
-			new(
-				GetEvalPolynomial( p0.x, p1.x, p2.x ),
-				GetEvalPolynomial( p0.y, p1.y, p2.y ),
-				GetEvalPolynomial( p0.z, p1.z, p2.z )
-			);
-		/// <summary>Multiplies this characteristic matrix C by a column matrix: C*[p0,p1,p2]^T</summary>
-		/// <param name="p0">The first entry of the column matrix</param>
-		/// <param name="p1">The second entry of the column matrix</param>
-		/// <param name="p2">The third entry of the column matrix</param>
-		public (float, float, float) MultiplyColumnVec( float p0, float p1, float p2 ) =>
-		(
-			p0 * m00 + p1 * m01 + p2 * m02,
-			p0 * m10 + p1 * m11 + p2 * m12,
-			p0 * m20 + p1 * m21 + p2 * m22
-		);
-
-		/// <inheritdoc cref="RationalMatrix4x4.GetBasisFunction(int)"/>
-		public Polynomial GetBasisFunction( int i ) {
-			return i switch {
-				0 => Polynomial.Quadratic( (float)m00, (float)m10, (float)m20 ),
-				1 => Polynomial.Quadratic( (float)m01, (float)m11, (float)m21 ),
-				2 => Polynomial.Quadratic( (float)m02, (float)m12, (float)m22 ),
-				_ => throw new IndexOutOfRangeException( "Basis index needs to be between 0 and 2" )
-			};
-		}
+		/// <inheritdoc cref="RationalMatrix4x4.operator*(RationalMatrix4x4,Matrix4x1)"/>
+		public static Vector3Matrix3x1 operator *( RationalMatrix3x3 c, Vector3Matrix3x1 m ) => new(c * m.X, c * m.Y, c * m.Z);
+		
 	}
 
 }

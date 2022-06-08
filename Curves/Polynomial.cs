@@ -64,12 +64,20 @@ namespace Freya {
 		public Polynomial( Vector4 coefficients ) => ( c0, c1, c2, c3 ) = ( coefficients.x, coefficients.y, coefficients.z, coefficients.w );
 
 		/// <summary>Creates a polynomial up to a cubic</summary>
+		/// <param name="coefficients">The coefficients to use</param>
+		public Polynomial( Matrix4x1 coefficients ) => ( c0, c1, c2, c3 ) = ( coefficients.m0, coefficients.m1, coefficients.m2, coefficients.m3 );
+
+		/// <summary>Creates a polynomial up to a quadratic</summary>
+		/// <param name="coefficients">The coefficients to use</param>
+		public Polynomial( Matrix3x1 coefficients ) => ( c0, c1, c2, c3 ) = ( coefficients.m0, coefficients.m1, coefficients.m2, 0 );
+
+		/// <summary>Creates a polynomial up to a cubic</summary>
 		/// <param name="coefficients">The coefficients to use (c0 = constant, c1 = linear, c2 = quadratic, c3 = cubic)</param>
 		public Polynomial( (float c0, float c1, float c2, float c3) coefficients ) => ( c0, c1, c2, c3 ) = coefficients;
 
 		/// <summary>Creates a polynomial up to a quadratic</summary>
 		/// <param name="coefficients">The coefficients to use (c0 = constant, c1 = linear, c2 = quadratic)</param>
-		public Polynomial( (float c0, float c1, float c2) coefficients ) => _ = ( ( c0, c1, c2 ) = coefficients, c3 = 0 );
+		public Polynomial( (float c0, float c1, float c2) coefficients ) => ( c0, c1, c2, c3 ) = ( coefficients.c0, coefficients.c1, coefficients.c2, 0 );
 
 		/// <summary>Evaluates the polynomial at the given value <c>t</c></summary>
 		/// <param name="t">The value to sample at</param>
