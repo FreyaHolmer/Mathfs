@@ -48,7 +48,7 @@ namespace Freya {
 			}
 		);
 
-		static SplineType typeBezierQuad = new SplineType( 2, "Bezier", "Bézier", "quadraticBezier", default,
+		static SplineType typeBezierQuad = new SplineType( 2, "Bezier", "Bézier", "quadraticBezier", (RationalMatrix4x4)CharMatrix.quadraticBezier,
 			new[] { "p0", "p1", "p2" },
 			new[] {
 				"The starting point of the curve",
@@ -214,14 +214,19 @@ namespace Freya {
 						code.Append( "validCoefficients = true;" );
 
 
-						// string line = "curve = ";
-						// for( int i = 0; i < dim; i++ ) {
-						// 	
-						// }
-						// code.Append( line );
+						using( code.Scope( $"curve = new {polynomType}(" ) ) {
+							for( int icRow = 0; icRow < ptCount; icRow++ ) {
+								MathSum sum = new MathSum();
+								for( int ip = 0; ip < ptCount; ip++ )
+									sum.AddTerm( type.charMatrix[icRow, ip], $"{type.paramNames[ip]}" );
+								code.Append( $"{sum}{( icRow < ptCount - 1 ? "," : "" )}" );
+							}
+						}
+
+						code.Append( ");" );
 
 						// todo: unroll matrix multiply for performance
-						code.Append( $"curve = new {polynomType}( CharMatrix.{type.matrixName} * PointMatrix );" );
+						// code.Append( $"curve = new {polynomType}( CharMatrix.{type.matrixName} * PointMatrix );" );
 					}
 
 					// equality checks
@@ -345,6 +350,8 @@ namespace Freya {
 		}
 
 		class MathSum {
+
+			Rational globalScale = Rational.One;
 			List<(Rational coeff, string var)> terms = new List<(Rational coeff, string var)>();
 
 			public void AddTerm( Rational coeff, string var ) {
@@ -352,36 +359,64 @@ namespace Freya {
 					terms.Add( ( coeff, var ) );
 			}
 
+			void TryOptimize() {
+				if( terms.Count < 2 )
+					return; // can't optimize 0 or 1 terms
+
+				Rational coeff0 = terms[0].coeff.Abs();
+				if( terms.TrueForAll( t => t.coeff.Abs() == coeff0 ) ) {
+					globalScale = coeff0;
+					for( int i = 0; i < terms.Count; i++ )
+						terms[i] = ( terms[i].coeff / coeff0, terms[i].var );
+				}
+			}
+
 			public override string ToString() {
 				if( terms.Count == 0 )
 					return "0";
 
+				TryOptimize();
+
 				string line = "";
-				string FormatStr( Rational v ) => v.IsInteger ? $"{v.n}" : $"({v}f)";
+				for( int i = 0; i < terms.Count; i++ )
+					line += FormatTerm( i );
 
-				for( int i = 0; i < terms.Count; i++ ) {
-					Rational value = terms[i].coeff;
-					string sign = i > 0 && value >= 0 ? "+" : "";
-					string valueStr;
-					string op = "";
-					if( value == Rational.One )
-						valueStr = "";
-					else if( value == -Rational.One )
-						valueStr = "-";
-					else if( value > 0 ) {
-						valueStr = FormatStr( value );
-						op = "*";
-					} else { // value < 0
-						valueStr = FormatStr( -value );
-						sign = "-";
-						op = "*";
+				if( globalScale != 1 ) {
+
+					if( globalScale.n == 1 ) {
+						line = $"({line})/{globalScale.d}";
+					} else {
+						line = $"{FormatRational( globalScale )}*({line})";
 					}
-
-					line += $"{sign}{valueStr}{op}{terms[i].var}";
+					
 				}
 
 				return line;
 			}
+
+			string FormatRational( Rational v ) => v.IsInteger ? $"{v.n}" : $"({v}f)";
+
+			string FormatTerm( int i ) {
+				Rational value = terms[i].coeff;
+				string sign = i > 0 && value >= 0 ? "+" : "";
+				string valueStr;
+				string op = "";
+				if( value == Rational.One )
+					valueStr = "";
+				else if( value == -Rational.One )
+					valueStr = "-";
+				else if( value > 0 ) {
+					valueStr = FormatRational( value );
+					op = "*";
+				} else { // value < 0
+					valueStr = FormatRational( -value );
+					sign = "-";
+					op = "*";
+				}
+
+				return $"{sign}{valueStr}{op}{terms[i].var}";
+			}
+
 		}
 
 		public static string GetDegreeName( int d, bool shortName ) {

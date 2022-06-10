@@ -28,10 +28,23 @@ namespace Freya {
 			set => ( x.c3, y.c3, z.c3 ) = ( value.x, value.y, value.z );
 		}
 
-
 		public Polynomial this[ int i ] => i switch { 0 => x, 1 => y, 2 => z, _ => throw new IndexOutOfRangeException( "Polynomial3D component index has to be either 0, 1, or 2" ) };
 
 		public Polynomial3D( Polynomial x, Polynomial y, Polynomial z ) => ( this.x, this.y, this.z ) = ( x, y, z );
+
+		/// <inheritdoc cref="Polynomial(float,float,float,float)"/>
+		public Polynomial3D( Vector3 c0, Vector3 c1, Vector3 c2, Vector3 c3 ) {
+			this.x = new Polynomial( c0.x, c1.x, c2.x, c3.x );
+			this.y = new Polynomial( c0.y, c1.y, c2.y, c3.y );
+			this.z = new Polynomial( c0.z, c1.z, c2.z, c3.z );
+		}
+
+		/// <inheritdoc cref="Polynomial(float,float,float)"/>
+		public Polynomial3D( Vector3 c0, Vector3 c1, Vector3 c2 ) {
+			this.x = new Polynomial( c0.x, c1.x, c2.x, 0 );
+			this.y = new Polynomial( c0.y, c1.y, c2.y, 0 );
+			this.z = new Polynomial( c0.z, c1.z, c2.z, 0 );
+		}
 
 		/// <inheritdoc cref="Polynomial(Matrix4x1)"/>
 		public Polynomial3D( Vector3Matrix4x1 coefficients ) => ( x, y, z ) = ( new Polynomial( coefficients.X ), new Polynomial( coefficients.Y ), new Polynomial( coefficients.Z ) );

@@ -32,9 +32,16 @@ namespace Freya {
 
 		public Polynomial2D( Polynomial x, Polynomial y ) => ( this.x, this.y ) = ( x, y );
 
+		/// <inheritdoc cref="Polynomial(float,float,float,float)"/>
 		public Polynomial2D( Vector2 c0, Vector2 c1, Vector2 c2, Vector2 c3 ) {
 			this.x = new Polynomial( c0.x, c1.x, c2.x, c3.x );
 			this.y = new Polynomial( c0.y, c1.y, c2.y, c3.y );
+		}
+
+		/// <inheritdoc cref="Polynomial(float,float,float)"/>
+		public Polynomial2D( Vector2 c0, Vector2 c1, Vector2 c2 ) {
+			this.x = new Polynomial( c0.x, c1.x, c2.x );
+			this.y = new Polynomial( c0.y, c1.y, c2.y );
 		}
 
 		/// <inheritdoc cref="Polynomial(Matrix4x1)"/>

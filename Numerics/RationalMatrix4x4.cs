@@ -118,6 +118,12 @@ namespace Freya {
 				c.m20 * v, c.m21 * v, c.m22 * v, c.m23 * v,
 				c.m30 * v, c.m31 * v, c.m32 * v, c.m33 * v);
 
+		public static explicit operator RationalMatrix4x4( RationalMatrix3x3 c ) =>
+			new(c.m00, c.m01, c.m02, 0,
+				c.m10, c.m11, c.m12, 0,
+				c.m20, c.m21, c.m22, 0,
+				0, 0, 0, 1);
+
 
 		public static RationalMatrix4x4 operator /( RationalMatrix4x4 c, Rational v ) => c * v.Reciprocal;
 

@@ -95,7 +95,12 @@ namespace Freya {
 			if( validCoefficients )
 				return; // no need to update
 			validCoefficients = true;
-			curve = new Polynomial3D( CharMatrix.cubicCatmullRom * PointMatrix );
+			curve = new Polynomial3D(
+				p1,
+				(-p0+p2)/2,
+				p0-(5/2f)*p1+2*p2-(1/2f)*p3,
+				-(1/2f)*p0+(3/2f)*p1-(3/2f)*p2+(1/2f)*p3
+			);
 		}
 		public static bool operator ==( CatRomCubic3D a, CatRomCubic3D b ) => a.P0 == b.P0 && a.P1 == b.P1 && a.P2 == b.P2 && a.P3 == b.P3;
 		public static bool operator !=( CatRomCubic3D a, CatRomCubic3D b ) => !( a == b );
@@ -117,9 +122,9 @@ namespace Freya {
 		public static explicit operator HermiteCubic3D( CatRomCubic3D s ) =>
 			new HermiteCubic3D(
 				s.p1,
-				-(1/2f)*s.p0+(1/2f)*s.p2,
+				(-s.p0+s.p2)/2,
 				s.p2,
-				-(1/2f)*s.p1+(1/2f)*s.p3
+				(-s.p1+s.p3)/2
 			);
 		public static explicit operator UBSCubic3D( CatRomCubic3D s ) =>
 			new UBSCubic3D(

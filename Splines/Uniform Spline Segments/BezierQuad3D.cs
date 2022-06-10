@@ -84,7 +84,11 @@ namespace Freya {
 			if( validCoefficients )
 				return; // no need to update
 			validCoefficients = true;
-			curve = new Polynomial3D( CharMatrix.quadraticBezier * PointMatrix );
+			curve = new Polynomial3D(
+				p0,
+				2*(-p0+p1),
+				p0-2*p1+p2
+			);
 		}
 		public static bool operator ==( BezierQuad3D a, BezierQuad3D b ) => a.P0 == b.P0 && a.P1 == b.P1 && a.P2 == b.P2;
 		public static bool operator !=( BezierQuad3D a, BezierQuad3D b ) => !( a == b );

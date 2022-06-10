@@ -95,7 +95,12 @@ namespace Freya {
 			if( validCoefficients )
 				return; // no need to update
 			validCoefficients = true;
-			curve = new Polynomial3D( CharMatrix.cubicHermite * PointMatrix );
+			curve = new Polynomial3D(
+				p0,
+				v0,
+				-3*p0-2*v0+3*p1-v1,
+				2*p0+v0-2*p1+v1
+			);
 		}
 		public static bool operator ==( HermiteCubic3D a, HermiteCubic3D b ) => a.P0 == b.P0 && a.V0 == b.V0 && a.P1 == b.P1 && a.V1 == b.V1;
 		public static bool operator !=( HermiteCubic3D a, HermiteCubic3D b ) => !( a == b );
