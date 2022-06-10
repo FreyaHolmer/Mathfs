@@ -1,6 +1,7 @@
 // by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
@@ -276,40 +277,14 @@ namespace Freya {
 							using( code.Scope( $"public static explicit operator {targetType}( {structName} s ) =>" ) ) {
 								using( code.Scope( $"new {targetType}(" ) ) {
 									for( int oPt = 0; oPt < 4; oPt++ ) {
-										string line = "";
-										int entries = 0;
-										for( int iPt = 0; iPt < 4; iPt++ ) {
-											Rational value = C[oPt, iPt];
-											if( value == 0 )
-												continue;
-
-											string FormatStr( Rational v ) => v.IsInteger ? $"{v.n}*" : $"({v}f)*";
-
-											string sign = entries > 0 && value >= 0 ? "+" : "";
-											string valueStr;
-											if( value == Rational.One )
-												valueStr = "";
-											else if( value == -Rational.One )
-												valueStr = "-";
-											else if( value > 0 )
-												valueStr = FormatStr( value );
-											else { // value < 0
-												valueStr = FormatStr( -value );
-												sign = "-";
-											}
-
-											line += $"{sign}{valueStr}s.{type.paramNames[iPt]}";
-											entries++;
-										}
-
-										code.Append( $"{line}{( oPt < 3 ? "," : "" )}" );
+										MathSum sum = new();
+										for( int iPt = 0; iPt < 4; iPt++ )
+											sum.AddTerm( C[oPt, iPt], $"s.{type.paramNames[iPt]}" );
+										code.Append( $"{sum}{( oPt < 3 ? "," : "" )}" );
 									}
 								}
 
 								code.Append( ");" );
-								// code.Append( $"{pointMatrixType} p = CharMatrix.GetConversionMatrix( CharMatrix.{type.matrixName}, CharMatrix.{typeMatrices[i]} ) * {v}.PointMatrix;" );
-								// int[] range4 = { 0, 1, 2, 3 };
-								// code.Append( $"return new {targetType}( {string.Join( ", ", range4.Select( j => $"p.m{j}" ) )} );" );
 							}
 						}
 					}
@@ -367,6 +342,46 @@ namespace Freya {
 
 			string path = $"Assets/Mathfs/Splines/Uniform Spline Segments/{structName}.cs";
 			File.WriteAllLines( path, code.content );
+		}
+
+		class MathSum {
+			List<(Rational coeff, string var)> terms = new List<(Rational coeff, string var)>();
+
+			public void AddTerm( Rational coeff, string var ) {
+				if( coeff != 0 )
+					terms.Add( ( coeff, var ) );
+			}
+
+			public override string ToString() {
+				if( terms.Count == 0 )
+					return "0";
+
+				string line = "";
+				string FormatStr( Rational v ) => v.IsInteger ? $"{v.n}" : $"({v}f)";
+
+				for( int i = 0; i < terms.Count; i++ ) {
+					Rational value = terms[i].coeff;
+					string sign = i > 0 && value >= 0 ? "+" : "";
+					string valueStr;
+					string op = "";
+					if( value == Rational.One )
+						valueStr = "";
+					else if( value == -Rational.One )
+						valueStr = "-";
+					else if( value > 0 ) {
+						valueStr = FormatStr( value );
+						op = "*";
+					} else { // value < 0
+						valueStr = FormatStr( -value );
+						sign = "-";
+						op = "*";
+					}
+
+					line += $"{sign}{valueStr}{op}{terms[i].var}";
+				}
+
+				return line;
+			}
 		}
 
 		public static string GetDegreeName( int d, bool shortName ) {
