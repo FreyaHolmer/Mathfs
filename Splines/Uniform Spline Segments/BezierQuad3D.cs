@@ -17,7 +17,7 @@ namespace Freya {
 		/// <param name="p1">The middle control point of the curve, sometimes called a tangent point</param>
 		/// <param name="p2">The end point of the curve</param>
 		public BezierQuad3D( Vector3 p0, Vector3 p1, Vector3 p2 ) {
-			( this.p0, this.p1, this.p2 ) = ( p0, p1, p2 );
+			pointMatrix = new Vector3Matrix3x1( p0, p1, p2 );
 			validCoefficients = false;
 			curve = default;
 		}
@@ -31,25 +31,25 @@ namespace Freya {
 		}
 		#region Control Points
 
-		[SerializeField] Vector3 p0, p1, p2;
-		public Vector3Matrix3x1 PointMatrix => new(p0, p1, p2);
+		[SerializeField] Vector3Matrix3x1 pointMatrix;
+		public Vector3Matrix3x1 PointMatrix => pointMatrix;
 
 		/// <summary>The starting point of the curve</summary>
 		public Vector3 P0 {
-			[MethodImpl( INLINE )] get => p0;
-			[MethodImpl( INLINE )] set => _ = ( p0 = value, validCoefficients = false );
+			[MethodImpl( INLINE )] get => pointMatrix.m0;
+			[MethodImpl( INLINE )] set => _ = ( pointMatrix.m0 = value, validCoefficients = false );
 		}
 
 		/// <summary>The middle control point of the curve, sometimes called a tangent point</summary>
 		public Vector3 P1 {
-			[MethodImpl( INLINE )] get => p1;
-			[MethodImpl( INLINE )] set => _ = ( p1 = value, validCoefficients = false );
+			[MethodImpl( INLINE )] get => pointMatrix.m1;
+			[MethodImpl( INLINE )] set => _ = ( pointMatrix.m1 = value, validCoefficients = false );
 		}
 
 		/// <summary>The end point of the curve</summary>
 		public Vector3 P2 {
-			[MethodImpl( INLINE )] get => p2;
-			[MethodImpl( INLINE )] set => _ = ( p2 = value, validCoefficients = false );
+			[MethodImpl( INLINE )] get => pointMatrix.m2;
+			[MethodImpl( INLINE )] set => _ = ( pointMatrix.m2 = value, validCoefficients = false );
 		}
 
 		/// <summary>Get or set a control point position by index. Valid indices from 0 to 2</summary>
@@ -85,44 +85,44 @@ namespace Freya {
 				return; // no need to update
 			validCoefficients = true;
 			curve = new Polynomial3D(
-				p0,
-				2*(-p0+p1),
-				p0-2*p1+p2
+				P0,
+				2*(-P0+P1),
+				P0-2*P1+P2
 			);
 		}
-		public static bool operator ==( BezierQuad3D a, BezierQuad3D b ) => a.P0 == b.P0 && a.P1 == b.P1 && a.P2 == b.P2;
+		public static bool operator ==( BezierQuad3D a, BezierQuad3D b ) => a.pointMatrix == b.pointMatrix;
 		public static bool operator !=( BezierQuad3D a, BezierQuad3D b ) => !( a == b );
 		public bool Equals( BezierQuad3D other ) => P0.Equals( other.P0 ) && P1.Equals( other.P1 ) && P2.Equals( other.P2 );
-		public override bool Equals( object obj ) => obj is BezierQuad3D other && Equals( other );
-		public override int GetHashCode() => HashCode.Combine( p0, p1, p2 );
+		public override bool Equals( object obj ) => obj is BezierQuad3D other && pointMatrix.Equals( other.pointMatrix );
+		public override int GetHashCode() => pointMatrix.GetHashCode();
+		public override string ToString() => $"({pointMatrix.m0}, {pointMatrix.m1}, {pointMatrix.m2})";
 
-		public override string ToString() => $"({p0}, {p1}, {p2})";
 		/// <summary>Returns a linear blend between two bézier curves</summary>
 		/// <param name="a">The first spline segment</param>
 		/// <param name="b">The second spline segment</param>
 		/// <param name="t">A value from 0 to 1 to blend between <c>a</c> and <c>b</c></param>
 		public static BezierQuad3D Lerp( BezierQuad3D a, BezierQuad3D b, float t ) =>
 			new(
-				Vector3.LerpUnclamped( a.p0, b.p0, t ),
-				Vector3.LerpUnclamped( a.p1, b.p1, t ),
-				Vector3.LerpUnclamped( a.p2, b.p2, t )
+				Vector3.LerpUnclamped( a.P0, b.P0, t ),
+				Vector3.LerpUnclamped( a.P1, b.P1, t ),
+				Vector3.LerpUnclamped( a.P2, b.P2, t )
 			);
 		/// <summary>Splits this curve at the given t-value, into two curves that together form the exact same shape</summary>
 		/// <param name="t">The t-value to split at</param>
 		public (BezierQuad3D pre, BezierQuad3D post) Split( float t ) {
 			Vector3 a = new Vector3(
-				p0.x + ( p1.x - p0.x ) * t,
-				p0.y + ( p1.y - p0.y ) * t,
-				p0.z + ( p1.z - p0.z ) * t );
+				P0.x + ( P1.x - P0.x ) * t,
+				P0.y + ( P1.y - P0.y ) * t,
+				P0.z + ( P1.z - P0.z ) * t );
 			Vector3 b = new Vector3(
-				p1.x + ( p2.x - p1.x ) * t,
-				p1.y + ( p2.y - p1.y ) * t,
-				p1.z + ( p2.z - p1.z ) * t );
+				P1.x + ( P2.x - P1.x ) * t,
+				P1.y + ( P2.y - P1.y ) * t,
+				P1.z + ( P2.z - P1.z ) * t );
 			Vector3 p = new Vector3(
 				a.x + ( b.x - a.x ) * t,
 				a.y + ( b.y - a.y ) * t,
 				a.z + ( b.z - a.z ) * t );
-			return ( new BezierQuad3D( p0, a, p ), new BezierQuad3D( p, b, p2 ) );
+			return ( new BezierQuad3D( P0, a, p ), new BezierQuad3D( p, b, P2 ) );
 		}
 	}
 }

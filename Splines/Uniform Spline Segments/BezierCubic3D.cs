@@ -18,7 +18,7 @@ namespace Freya {
 		/// <param name="p2">The third control point of the curve, sometimes called the end tangent point</param>
 		/// <param name="p3">The end point of the curve</param>
 		public BezierCubic3D( Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3 ) {
-			( this.p0, this.p1, this.p2, this.p3 ) = ( p0, p1, p2, p3 );
+			pointMatrix = new Vector3Matrix4x1( p0, p1, p2, p3 );
 			validCoefficients = false;
 			curve = default;
 		}
@@ -32,31 +32,31 @@ namespace Freya {
 		}
 		#region Control Points
 
-		[SerializeField] Vector3 p0, p1, p2, p3;
-		public Vector3Matrix4x1 PointMatrix => new(p0, p1, p2, p3);
+		[SerializeField] Vector3Matrix4x1 pointMatrix;
+		public Vector3Matrix4x1 PointMatrix => pointMatrix;
 
 		/// <summary>The starting point of the curve</summary>
 		public Vector3 P0 {
-			[MethodImpl( INLINE )] get => p0;
-			[MethodImpl( INLINE )] set => _ = ( p0 = value, validCoefficients = false );
+			[MethodImpl( INLINE )] get => pointMatrix.m0;
+			[MethodImpl( INLINE )] set => _ = ( pointMatrix.m0 = value, validCoefficients = false );
 		}
 
 		/// <summary>The second control point of the curve, sometimes called the start tangent point</summary>
 		public Vector3 P1 {
-			[MethodImpl( INLINE )] get => p1;
-			[MethodImpl( INLINE )] set => _ = ( p1 = value, validCoefficients = false );
+			[MethodImpl( INLINE )] get => pointMatrix.m1;
+			[MethodImpl( INLINE )] set => _ = ( pointMatrix.m1 = value, validCoefficients = false );
 		}
 
 		/// <summary>The third control point of the curve, sometimes called the end tangent point</summary>
 		public Vector3 P2 {
-			[MethodImpl( INLINE )] get => p2;
-			[MethodImpl( INLINE )] set => _ = ( p2 = value, validCoefficients = false );
+			[MethodImpl( INLINE )] get => pointMatrix.m2;
+			[MethodImpl( INLINE )] set => _ = ( pointMatrix.m2 = value, validCoefficients = false );
 		}
 
 		/// <summary>The end point of the curve</summary>
 		public Vector3 P3 {
-			[MethodImpl( INLINE )] get => p3;
-			[MethodImpl( INLINE )] set => _ = ( p3 = value, validCoefficients = false );
+			[MethodImpl( INLINE )] get => pointMatrix.m3;
+			[MethodImpl( INLINE )] set => _ = ( pointMatrix.m3 = value, validCoefficients = false );
 		}
 
 		/// <summary>Get or set a control point position by index. Valid indices from 0 to 3</summary>
@@ -96,42 +96,42 @@ namespace Freya {
 				return; // no need to update
 			validCoefficients = true;
 			curve = new Polynomial3D(
-				p0,
-				3*(-p0+p1),
-				3*p0-6*p1+3*p2,
-				-p0+3*p1-3*p2+p3
+				P0,
+				3*(-P0+P1),
+				3*P0-6*P1+3*P2,
+				-P0+3*P1-3*P2+P3
 			);
 		}
-		public static bool operator ==( BezierCubic3D a, BezierCubic3D b ) => a.P0 == b.P0 && a.P1 == b.P1 && a.P2 == b.P2 && a.P3 == b.P3;
+		public static bool operator ==( BezierCubic3D a, BezierCubic3D b ) => a.pointMatrix == b.pointMatrix;
 		public static bool operator !=( BezierCubic3D a, BezierCubic3D b ) => !( a == b );
 		public bool Equals( BezierCubic3D other ) => P0.Equals( other.P0 ) && P1.Equals( other.P1 ) && P2.Equals( other.P2 ) && P3.Equals( other.P3 );
-		public override bool Equals( object obj ) => obj is BezierCubic3D other && Equals( other );
-		public override int GetHashCode() => HashCode.Combine( p0, p1, p2, p3 );
+		public override bool Equals( object obj ) => obj is BezierCubic3D other && pointMatrix.Equals( other.pointMatrix );
+		public override int GetHashCode() => pointMatrix.GetHashCode();
+		public override string ToString() => $"({pointMatrix.m0}, {pointMatrix.m1}, {pointMatrix.m2}, {pointMatrix.m3})";
 
-		public override string ToString() => $"({p0}, {p1}, {p2}, {p3})";
 		/// <summary>Returns this curve flattened to 2D. Effectively setting z = 0</summary>
 		/// <param name="curve3D">The 3D curve to flatten to the Z plane</param>
-		public static explicit operator BezierCubic2D( BezierCubic3D curve3D ) => new BezierCubic2D( curve3D.p0, curve3D.p1, curve3D.p2, curve3D.p3 );
+		public static explicit operator BezierCubic2D( BezierCubic3D curve3D ) => new BezierCubic2D( curve3D.P0, curve3D.P1, curve3D.P2, curve3D.P3 );
 		public static explicit operator HermiteCubic3D( BezierCubic3D s ) =>
 			new HermiteCubic3D(
-				s.p0,
-				3*(-s.p0+s.p1),
-				s.p3,
-				3*(-s.p2+s.p3)
+				s.P0,
+				3*(-s.P0+s.P1),
+				s.P3,
+				3*(-s.P2+s.P3)
 			);
 		public static explicit operator CatRomCubic3D( BezierCubic3D s ) =>
 			new CatRomCubic3D(
-				6*s.p0-6*s.p1+s.p3,
-				s.p0,
-				s.p3,
-				s.p0-6*s.p2+6*s.p3
+				6*s.P0-6*s.P1+s.P3,
+				s.P0,
+				s.P3,
+				s.P0-6*s.P2+6*s.P3
 			);
 		public static explicit operator UBSCubic3D( BezierCubic3D s ) =>
 			new UBSCubic3D(
-				6*s.p0-7*s.p1+2*s.p2,
-				2*s.p1-s.p2,
-				-s.p1+2*s.p2,
-				2*s.p1-7*s.p2+6*s.p3
+				6*s.P0-7*s.P1+2*s.P2,
+				2*s.P1-s.P2,
+				-s.P1+2*s.P2,
+				2*s.P1-7*s.P2+6*s.P3
 			);
 		/// <summary>Returns a linear blend between two bézier curves</summary>
 		/// <param name="a">The first spline segment</param>
@@ -139,10 +139,10 @@ namespace Freya {
 		/// <param name="t">A value from 0 to 1 to blend between <c>a</c> and <c>b</c></param>
 		public static BezierCubic3D Lerp( BezierCubic3D a, BezierCubic3D b, float t ) =>
 			new(
-				Vector3.LerpUnclamped( a.p0, b.p0, t ),
-				Vector3.LerpUnclamped( a.p1, b.p1, t ),
-				Vector3.LerpUnclamped( a.p2, b.p2, t ),
-				Vector3.LerpUnclamped( a.p3, b.p3, t )
+				Vector3.LerpUnclamped( a.P0, b.P0, t ),
+				Vector3.LerpUnclamped( a.P1, b.P1, t ),
+				Vector3.LerpUnclamped( a.P2, b.P2, t ),
+				Vector3.LerpUnclamped( a.P3, b.P3, t )
 			);
 
 		/// <summary>Returns a linear blend between two bézier curves, where the tangent directions are spherically interpolated</summary>
@@ -150,30 +150,30 @@ namespace Freya {
 		/// <param name="b">The second spline segment</param>
 		/// <param name="t">A value from 0 to 1 to blend between <c>a</c> and <c>b</c></param>
 		public static BezierCubic3D Slerp( BezierCubic3D a, BezierCubic3D b, float t ) {
-			Vector3 p0 = Vector3.LerpUnclamped( a.p0, b.p0, t );
-			Vector3 p3 = Vector3.LerpUnclamped( a.p3, b.p3, t );
+			Vector3 P0 = Vector3.LerpUnclamped( a.P0, b.P0, t );
+			Vector3 P3 = Vector3.LerpUnclamped( a.P3, b.P3, t );
 			return new BezierCubic3D(
-				p0,
-				p0 + Vector3.SlerpUnclamped( a.p1 - a.p0, b.p1 - b.p0, t ),
-				p3 + Vector3.SlerpUnclamped( a.p2 - a.p3, b.p2 - b.p3, t ),
-				p3
+				P0,
+				P0 + Vector3.SlerpUnclamped( a.P1 - a.P0, b.P1 - b.P0, t ),
+				P3 + Vector3.SlerpUnclamped( a.P2 - a.P3, b.P2 - b.P3, t ),
+				P3
 			);
 		}
 		/// <summary>Splits this curve at the given t-value, into two curves that together form the exact same shape</summary>
 		/// <param name="t">The t-value to split at</param>
 		public (BezierCubic3D pre, BezierCubic3D post) Split( float t ) {
 			Vector3 a = new Vector3(
-				p0.x + ( p1.x - p0.x ) * t,
-				p0.y + ( p1.y - p0.y ) * t,
-				p0.z + ( p1.z - p0.z ) * t );
+				P0.x + ( P1.x - P0.x ) * t,
+				P0.y + ( P1.y - P0.y ) * t,
+				P0.z + ( P1.z - P0.z ) * t );
 			Vector3 b = new Vector3(
-				p1.x + ( p2.x - p1.x ) * t,
-				p1.y + ( p2.y - p1.y ) * t,
-				p1.z + ( p2.z - p1.z ) * t );
+				P1.x + ( P2.x - P1.x ) * t,
+				P1.y + ( P2.y - P1.y ) * t,
+				P1.z + ( P2.z - P1.z ) * t );
 			Vector3 c = new Vector3(
-				p2.x + ( p3.x - p2.x ) * t,
-				p2.y + ( p3.y - p2.y ) * t,
-				p2.z + ( p3.z - p2.z ) * t );
+				P2.x + ( P3.x - P2.x ) * t,
+				P2.y + ( P3.y - P2.y ) * t,
+				P2.z + ( P3.z - P2.z ) * t );
 			Vector3 d = new Vector3(
 				a.x + ( b.x - a.x ) * t,
 				a.y + ( b.y - a.y ) * t,
@@ -186,7 +186,7 @@ namespace Freya {
 				d.x + ( e.x - d.x ) * t,
 				d.y + ( e.y - d.y ) * t,
 				d.z + ( e.z - d.z ) * t );
-			return ( new BezierCubic3D( p0, a, d, p ), new BezierCubic3D( p, e, c, p3 ) );
+			return ( new BezierCubic3D( P0, a, d, p ), new BezierCubic3D( p, e, c, P3 ) );
 		}
 	}
 }

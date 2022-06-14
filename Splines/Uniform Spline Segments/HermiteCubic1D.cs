@@ -18,7 +18,7 @@ namespace Freya {
 		/// <param name="p1">The end point of the curve</param>
 		/// <param name="v1">The rate of change (velocity) at the end of the curve</param>
 		public HermiteCubic1D( float p0, float v0, float p1, float v1 ) {
-			( this.p0, this.v0, this.p1, this.v1 ) = ( p0, v0, p1, v1 );
+			pointMatrix = new Matrix4x1( p0, v0, p1, v1 );
 			validCoefficients = false;
 			curve = default;
 		}
@@ -32,31 +32,31 @@ namespace Freya {
 		}
 		#region Control Points
 
-		[SerializeField] float p0, v0, p1, v1;
-		public Matrix4x1 PointMatrix => new(p0, v0, p1, v1);
+		[SerializeField] Matrix4x1 pointMatrix;
+		public Matrix4x1 PointMatrix => pointMatrix;
 
 		/// <summary>The starting point of the curve</summary>
 		public float P0 {
-			[MethodImpl( INLINE )] get => p0;
-			[MethodImpl( INLINE )] set => _ = ( p0 = value, validCoefficients = false );
+			[MethodImpl( INLINE )] get => pointMatrix.m0;
+			[MethodImpl( INLINE )] set => _ = ( pointMatrix.m0 = value, validCoefficients = false );
 		}
 
 		/// <summary>The rate of change (velocity) at the start of the curve</summary>
 		public float V0 {
-			[MethodImpl( INLINE )] get => v0;
-			[MethodImpl( INLINE )] set => _ = ( v0 = value, validCoefficients = false );
+			[MethodImpl( INLINE )] get => pointMatrix.m1;
+			[MethodImpl( INLINE )] set => _ = ( pointMatrix.m1 = value, validCoefficients = false );
 		}
 
 		/// <summary>The end point of the curve</summary>
 		public float P1 {
-			[MethodImpl( INLINE )] get => p1;
-			[MethodImpl( INLINE )] set => _ = ( p1 = value, validCoefficients = false );
+			[MethodImpl( INLINE )] get => pointMatrix.m2;
+			[MethodImpl( INLINE )] set => _ = ( pointMatrix.m2 = value, validCoefficients = false );
 		}
 
 		/// <summary>The rate of change (velocity) at the end of the curve</summary>
 		public float V1 {
-			[MethodImpl( INLINE )] get => v1;
-			[MethodImpl( INLINE )] set => _ = ( v1 = value, validCoefficients = false );
+			[MethodImpl( INLINE )] get => pointMatrix.m3;
+			[MethodImpl( INLINE )] set => _ = ( pointMatrix.m3 = value, validCoefficients = false );
 		}
 
 		/// <summary>Get or set a control point position by index. Valid indices from 0 to 3</summary>
@@ -96,39 +96,39 @@ namespace Freya {
 				return; // no need to update
 			validCoefficients = true;
 			curve = new Polynomial(
-				p0,
-				v0,
-				-3*p0-2*v0+3*p1-v1,
-				2*p0+v0-2*p1+v1
+				P0,
+				V0,
+				-3*P0-2*V0+3*P1-V1,
+				2*P0+V0-2*P1+V1
 			);
 		}
-		public static bool operator ==( HermiteCubic1D a, HermiteCubic1D b ) => a.P0 == b.P0 && a.V0 == b.V0 && a.P1 == b.P1 && a.V1 == b.V1;
+		public static bool operator ==( HermiteCubic1D a, HermiteCubic1D b ) => a.pointMatrix == b.pointMatrix;
 		public static bool operator !=( HermiteCubic1D a, HermiteCubic1D b ) => !( a == b );
 		public bool Equals( HermiteCubic1D other ) => P0.Equals( other.P0 ) && V0.Equals( other.V0 ) && P1.Equals( other.P1 ) && V1.Equals( other.V1 );
-		public override bool Equals( object obj ) => obj is HermiteCubic1D other && Equals( other );
-		public override int GetHashCode() => HashCode.Combine( p0, v0, p1, v1 );
+		public override bool Equals( object obj ) => obj is HermiteCubic1D other && pointMatrix.Equals( other.pointMatrix );
+		public override int GetHashCode() => pointMatrix.GetHashCode();
+		public override string ToString() => $"({pointMatrix.m0}, {pointMatrix.m1}, {pointMatrix.m2}, {pointMatrix.m3})";
 
-		public override string ToString() => $"({p0}, {v0}, {p1}, {v1})";
 		public static explicit operator BezierCubic1D( HermiteCubic1D s ) =>
 			new BezierCubic1D(
-				s.p0,
-				s.p0+(1/3f)*s.v0,
-				s.p1-(1/3f)*s.v1,
-				s.p1
+				s.P0,
+				s.P0+(1/3f)*s.V0,
+				s.P1-(1/3f)*s.V1,
+				s.P1
 			);
 		public static explicit operator CatRomCubic1D( HermiteCubic1D s ) =>
 			new CatRomCubic1D(
-				-2*s.v0+s.p1,
-				s.p0,
-				s.p1,
-				s.p0+2*s.v1
+				-2*s.V0+s.P1,
+				s.P0,
+				s.P1,
+				s.P0+2*s.V1
 			);
 		public static explicit operator UBSCubic1D( HermiteCubic1D s ) =>
 			new UBSCubic1D(
-				-s.p0-(7/3f)*s.v0+2*s.p1-(2/3f)*s.v1,
-				2*s.p0+(2/3f)*s.v0-s.p1+(1/3f)*s.v1,
-				-s.p0-(1/3f)*s.v0+2*s.p1-(2/3f)*s.v1,
-				2*s.p0+(2/3f)*s.v0-s.p1+(7/3f)*s.v1
+				-s.P0-(7/3f)*s.V0+2*s.P1-(2/3f)*s.V1,
+				2*s.P0+(2/3f)*s.V0-s.P1+(1/3f)*s.V1,
+				-s.P0-(1/3f)*s.V0+2*s.P1-(2/3f)*s.V1,
+				2*s.P0+(2/3f)*s.V0-s.P1+(7/3f)*s.V1
 			);
 		/// <summary>Returns a linear blend between two hermite curves</summary>
 		/// <param name="a">The first spline segment</param>
@@ -136,10 +136,10 @@ namespace Freya {
 		/// <param name="t">A value from 0 to 1 to blend between <c>a</c> and <c>b</c></param>
 		public static HermiteCubic1D Lerp( HermiteCubic1D a, HermiteCubic1D b, float t ) =>
 			new(
-				Mathfs.Lerp( a.p0, b.p0, t ),
-				Mathfs.Lerp( a.v0, b.v0, t ),
-				Mathfs.Lerp( a.p1, b.p1, t ),
-				Mathfs.Lerp( a.v1, b.v1, t )
+				Mathfs.Lerp( a.P0, b.P0, t ),
+				Mathfs.Lerp( a.V0, b.V0, t ),
+				Mathfs.Lerp( a.P1, b.P1, t ),
+				Mathfs.Lerp( a.V1, b.V1, t )
 			);
 	}
 }
