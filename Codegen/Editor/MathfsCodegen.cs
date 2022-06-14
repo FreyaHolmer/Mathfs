@@ -260,11 +260,16 @@ namespace Freya {
 			string degShortCapital = GetDegreeName( degree, true );
 			string structName = $"{type.className}{degShortCapital}{dim}D";
 			string[] points = type.paramNames;
-			int[] ptRange = ptCount == 3 ? new[] { 0, 1, 2 } : new[] { 0, 1, 2, 3 };
+			int[] ptRange = Enumerable.Range( 0, ptCount ).ToArray();
 			string[] pointDescs = type.paramDescs;
 			string lerpName = GetLerpName( dim );
 			string pointMatrixType = $"{( dim == 1 ? "" : dataType )}Matrix{ptCount}x1";
 
+			string JoinRange( string separator, Func<int, string> elem ) => string.Join( separator, ptRange.Select( elem ) );
+			string JoinRangeStr( string separator, Func<string, string> elem ) => string.Join( separator, points.Select( elem ) );
+
+			string ctorParams = JoinRange( ", ", i => $"{dataType} {type.paramNames[i]}" );
+			string csPoints = JoinRange( ", ", i => $"{type.paramNames[i]}" );
 			CodeGenerator code = new CodeGenerator();
 			code.AppendHeader();
 			code.Using( "System" );
@@ -286,8 +291,8 @@ namespace Freya {
 					code.Summary( $"Creates a uniform {dim}D {degFullLower} {type.prettyNameLower} segment, from {ptCount} control points" );
 					for( int i = 0; i < ptCount; i++ )
 						type.AppendParamStrings( code, degree, i );
-					using( code.BracketScope( $"public {structName}( {string.Join( ", ", points.Select( p => $"{dataType} {p}" ) )} )" ) ) {
-						code.Append( $"pointMatrix = new {pointMatrixType}( {string.Join( ", ", points )} );" );
+					using( code.BracketScope( $"public {structName}( {ctorParams} )" ) ) {
+						code.Append( $"pointMatrix = new {pointMatrixType}( {csPoints} );" );
 						code.Append( "validCoefficients = false;" );
 						code.Append( "curve = default;" );
 					}
@@ -370,12 +375,14 @@ namespace Freya {
 					}
 
 					// equality checks
+					string compEquals = JoinRangeStr( " && ", p => $"{p.ToUpperInvariant()}.Equals( other.{p.ToUpperInvariant()} )" );
+					string toStringParams = JoinRange( ", ", i => $"{{pointMatrix.m{i}}}" );
 					code.Append( $"public static bool operator ==( {structName} a, {structName} b ) => a.pointMatrix == b.pointMatrix;" );
 					code.Append( $"public static bool operator !=( {structName} a, {structName} b ) => !( a == b );" );
-					code.Append( $"public bool Equals( {structName} other ) => {string.Join( " && ", points.Select( p => $"{p.ToUpperInvariant()}.Equals( other.{p.ToUpperInvariant()} )" ) )};" );
+					code.Append( $"public bool Equals( {structName} other ) => {compEquals};" );
 					code.Append( $"public override bool Equals( object obj ) => obj is {structName} other && pointMatrix.Equals( other.pointMatrix );" );
 					code.Append( $"public override int GetHashCode() => pointMatrix.GetHashCode();" );
-					code.Append( $"public override string ToString() => $\"({string.Join( ", ", ptRange.Select( i => $"{{pointMatrix.m{i}}}" ) )})\";" );
+					code.Append( $"public override string ToString() => $\"({toStringParams})\";" );
 					code.LineBreak();
 
 					// typecasting
@@ -385,7 +392,8 @@ namespace Freya {
 							string structName3D = $"{type.className}{degShortCapital}3D";
 							code.Summary( "Returns this spline segment in 3D, where z = 0" );
 							code.Param( "curve2D", "The 2D curve to cast to 3D" );
-							code.Append( $"public static explicit operator {structName3D}( {structName} curve2D ) => new {structName3D}( {string.Join( ", ", points.Select( p => $"curve2D.{p.ToUpperInvariant()}" ) )} );" );
+							string inParams = JoinRangeStr( ", ", p => $"curve2D.{p.ToUpperInvariant()}" );
+							code.Append( $"public static explicit operator {structName3D}( {structName} curve2D ) => new {structName3D}( {inParams} );" );
 						}
 
 						if( dim == 3 ) {
@@ -393,7 +401,8 @@ namespace Freya {
 							string structName2D = $"{type.className}{degShortCapital}2D";
 							code.Summary( "Returns this curve flattened to 2D. Effectively setting z = 0" );
 							code.Param( "curve3D", "The 3D curve to flatten to the Z plane" );
-							code.Append( $"public static explicit operator {structName2D}( {structName} curve3D ) => new {structName2D}( {string.Join( ", ", points.Select( p => $"curve3D.{p.ToUpperInvariant()}" ) )} );" );
+							string inParams = JoinRangeStr( ", ", p => $"curve3D.{p.ToUpperInvariant()}" );
+							code.Append( $"public static explicit operator {structName2D}( {structName} curve3D ) => new {structName2D}( {inParams} );" );
 						}
 					}
 
