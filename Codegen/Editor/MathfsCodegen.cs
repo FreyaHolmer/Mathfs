@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using Debug = UnityEngine.Debug;
 
 namespace Freya {
 
@@ -87,7 +90,66 @@ namespace Freya {
 			}
 		);
 
+		static SplineType[] allSplineTypes = { typeBezier, typeBezierQuad, typeHermite, typeBspline, typeCatRom };
+
 		#endregion
+
+		// [MenuItem( "Assets/Port Spline Data" )]
+		public static void PortSplineData() {
+			string replacements = "";
+			int replacementCount = 0;
+			GameObject[] gos = SceneManager.GetActiveScene().GetRootGameObjects();
+			foreach( GameObject go in gos ) {
+				foreach( Component c in go.GetComponentsInChildren<Component>( true ) ) {
+					SerializedObject so = new SerializedObject( c ); // can actually find null components??
+					so.Update();
+					bool madeChanges = false;
+					SerializedProperty prop = so.GetIterator();
+					while( prop.Next( true ) ) {
+						if( prop.isArray == false && IsSplineType( prop.type, out SplineType type, out int dim ) ) {
+							SerializedProperty ptMtx = prop.FindPropertyRelative( "pointMatrix" );
+							try {
+								if( dim == 1 )
+									for( int i = 0; i < type.paramNames.Length; i++ )
+										ptMtx.FindPropertyRelative( $"m{i}" ).floatValue = prop.FindPropertyRelative( type.paramNames[i] ).floatValue;
+								else if( dim == 2 )
+									for( int i = 0; i < type.paramNames.Length; i++ )
+										ptMtx.FindPropertyRelative( $"m{i}" ).vector2Value = prop.FindPropertyRelative( type.paramNames[i] ).vector2Value;
+								else if( dim == 3 )
+									for( int i = 0; i < type.paramNames.Length; i++ )
+										ptMtx.FindPropertyRelative( $"m{i}" ).vector3Value = prop.FindPropertyRelative( type.paramNames[i] ).vector3Value;
+							} catch {
+								Debug.LogError( $"Null thing in {go.name}/{c.GetType().Name}/{prop.propertyPath} of type {type.className} mtx: {type.matrixName}" );
+							}
+
+							madeChanges = true;
+							replacements += $"Replaced: {go.name}/{c.GetType().Name}: {prop.displayName}\n";
+							replacementCount++;
+						}
+					}
+
+					if( madeChanges )
+						so.ApplyModifiedProperties();
+				}
+			}
+
+			Debug.Log( $"{replacementCount} replacements:\n{replacements}" );
+		}
+
+		static bool IsSplineType( string name, out SplineType type, out int dim ) {
+			foreach( SplineType spline in allSplineTypes ) {
+				for( int d = 1; d <= 3; d++ ) {
+					if( name == $"{spline.className}{GetDegreeName( spline.degree, true )}{d}D" ) {
+						dim = d;
+						type = spline;
+						return true;
+					}
+				}
+			}
+
+			( type, dim ) = ( default, default );
+			return false;
+		}
 
 		[MenuItem( "Assets/Run Mathfs Codegen" )]
 		public static void Regenerate() {
