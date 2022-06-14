@@ -2,18 +2,36 @@
 
 using System;
 
-/// <summary>A 3x1 column matrix with float values</summary>
-public readonly struct Matrix3x1 {
+namespace Freya {
 
-	public readonly float m0, m1, m2;
+	/// <summary>A 3x1 column matrix with float values</summary>
+	[Serializable] public struct Matrix3x1 {
 
-	public Matrix3x1( float m0, float m1, float m2 ) => ( this.m0, this.m1, this.m2 ) = ( m0, m1, m2 );
+		public float m0, m1, m2;
 
-	public float this[ int column ] =>
-		column switch {
-			0 => m0, 1 => m1, 2 => m2,
-			_ => throw new IndexOutOfRangeException( $"Matrix column index has to be from 0 to 3, got: {column}" )
-		};
+		public Matrix3x1( float m0, float m1, float m2 ) => ( this.m0, this.m1, this.m2 ) = ( m0, m1, m2 );
+
+		public float this[ int column ] {
+			get =>
+				column switch {
+					0 => m0, 1 => m1, 2 => m2,
+					_ => throw new IndexOutOfRangeException( $"Matrix column index has to be from 0 to 2, got: {column}" )
+				};
+			set {
+				switch( column ) {
+					case 0:
+						m0 = value;
+						break;
+					case 1:
+						m1 = value;
+						break;
+					case 2:
+						m2 = value;
+						break;
+					default: throw new IndexOutOfRangeException( $"Matrix column index has to be from 0 to 2, got: {column}" );
+				}
+			}
+		}
 
 		public static bool operator ==( Matrix3x1 a, Matrix3x1 b ) => a.m0 == b.m0 && a.m1 == b.m1 && a.m2 == b.m2;
 		public static bool operator !=( Matrix3x1 a, Matrix3x1 b ) => !( a == b );

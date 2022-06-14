@@ -6,9 +6,9 @@ using UnityEngine;
 namespace Freya {
 
 	/// <summary>A 4x1 column matrix with Vector3 values</summary>
-	public readonly struct Vector3Matrix4x1 {
+	[Serializable] public struct Vector3Matrix4x1 {
 
-		public readonly Vector3 m0, m1, m2, m3;
+		public Vector3 m0, m1, m2, m3;
 
 		public Vector3Matrix4x1( Vector3 m0, Vector3 m1, Vector3 m2, Vector3 m3 ) => ( this.m0, this.m1, this.m2, this.m3 ) = ( m0, m1, m2, m3 );
 
