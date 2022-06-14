@@ -159,6 +159,8 @@ namespace Freya {
 				GenerateType( typeHermite, dim );
 				GenerateType( typeBspline, dim );
 				GenerateType( typeCatRom, dim );
+				GenerateMatrix( 3, dim );
+				GenerateMatrix( 4, dim ); 
 			}
 		}
 
@@ -170,6 +172,83 @@ namespace Freya {
 				4 => "Vector4.LerpUnclamped",
 				_ => throw new IndexOutOfRangeException()
 			};
+		}
+
+
+		static void GenerateMatrix( int count, int dim ) {
+			const string vCompStr = "xyz";
+			const string vCompStrUp = "XYZ";
+			int[] elemRange = Enumerable.Range( 0, count ).ToArray();
+			int[] compRange = Enumerable.Range( 0, dim ).ToArray();
+			string[] compRangeStr = compRange.Select( c => vCompStr[c].ToString() ).ToArray();
+			string JoinRange( string separator, Func<int, string> elem ) => string.Join( separator, elemRange.Select( elem ) );
+			string typePrefix = dim switch { 2 => "Vector2", 3 => "Vector3", _ => "" };
+			string elemType = dim switch { 1   => "float", 2   => "Vector2", 3 => "Vector3", _ => throw new Exception( "Invalid type" ) };
+
+			string typeName = $"{typePrefix}Matrix{count}x1";
+			string csParams = JoinRange( ", ", i => $"m{i}" );
+			string csParamsThis = JoinRange( ", ", i => $"this.m{i}" );
+			string ctorParams = JoinRange( ", ", i => $"{elemType} m{i}" );
+			string indexerException = $"throw new IndexOutOfRangeException( $\"Matrix row index has to be from 0 to {count - 1}, got: {{row}}\" )";
+			string indexerGetterCases = JoinRange( ", ", i => $"{i} => m{i}" ) + $", _ => {indexerException}";
+			string equalsCompare = JoinRange( " && ", i => $"m{i}.Equals( other.m{i} )" );
+			string equalsOpCompare = JoinRange( " && ", i => $"a.m{i} == b.m{i}" );
+
+
+			// generate content
+			CodeGenerator code = new CodeGenerator();
+			code.AppendHeader();
+			code.Append( "using System;" );
+			if( dim > 1 ) // for Vector2/3
+				code.Append( "using UnityEngine;" );
+
+			using( code.BracketScope( "namespace Freya" ) ) {
+				code.Summary( $"A {count}x1 column matrix with {elemType} values" );
+				using( code.BracketScope( $"[Serializable] public struct {typeName}" ) ) {
+					// fields
+					code.Append( $"public {elemType} {csParams};" );
+
+					// constructors
+					code.Append( $"public {typeName}({ctorParams}) => ({csParamsThis}) = ({csParams});" );
+					if( dim > 1 ) { // compose from float matrices
+						string s = $"public {typeName}({string.Join( ", ", compRangeStr.Select( c => $"Matrix{count}x1 {c}" ) )}) => ";
+						s += $"({csParams}) = ({JoinRange( ", ", i => $"new {elemType}({string.Join( ", ", compRangeStr.Select( c => $"{c}.m{i}" ) )})" )});";
+						code.Append( s );
+					}
+
+					// indexer
+					using( code.BracketScope( $"public {elemType} this[int row]" ) ) {
+						code.Append( $"get => row switch{{{indexerGetterCases}}};" );
+						using( code.BracketScope( "set" ) ) {
+							using( code.BracketScope( "switch(row)" ) ) {
+								code.Append( JoinRange( " ", i => $"case {i}: m{i} = value; break;" ) );
+								code.Append( $"default: {indexerException};" );
+							}
+						}
+					}
+
+					// component extraction for vector-valued matrices
+					if( dim > 1 ) {
+						for( int c = 0; c < dim; c++ ) {
+							int cc = c;
+							string parameters = JoinRange( ", ", i => $"m{i}.{vCompStr[cc]}" );
+							code.Append( $"public Matrix{count}x1 {vCompStrUp[c]} => new({parameters});" );
+						}
+					}
+
+					// comparison/operators
+					code.Append( $"public static bool operator ==( {typeName} a, {typeName} b ) => {equalsOpCompare};" );
+					code.Append( $"public static bool operator !=( {typeName} a, {typeName} b ) => !( a == b );" );
+					code.Append( $"public bool Equals( {typeName} other ) => {equalsCompare};" );
+					code.Append( $"public override bool Equals( object obj ) => obj is {typeName} other && Equals( other );" );
+					code.Append( $"public override int GetHashCode() => HashCode.Combine( {csParams} );" );
+				}
+			}
+
+
+			// save/finalize
+			string path = $"Assets/Mathfs/Numerics/{typeName}.cs";
+			File.WriteAllLines( path, code.content );
 		}
 
 		static void GenerateType( SplineType type, int dim ) {
