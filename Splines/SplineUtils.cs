@@ -36,21 +36,21 @@ namespace Freya {
 
 		static (float, float, float, float) GetUniformKnots( bool unitInterval ) => unitInterval ? ( -1, 0, 1, 2 ) : ( 0, 1, 2, 3 );
 
-		public static (float, float, float, float) CalcCatRomKnots( Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3, float alpha, bool unitInterval ) {
+		public static (float, float, float, float) CalcCatRomKnots( Vector2Matrix4x1 m, float alpha, bool unitInterval ) {
 			if( alpha == 0 ) // uniform catrom
 				return GetUniformKnots( unitInterval );
-			float sqMag01 = Vector2.SqrMagnitude( p0 - p1 );
-			float sqMag12 = Vector2.SqrMagnitude( p1 - p2 );
-			float sqMag23 = Vector2.SqrMagnitude( p2 - p3 );
+			float sqMag01 = Vector2.SqrMagnitude( m.m0 - m.m1 );
+			float sqMag12 = Vector2.SqrMagnitude( m.m1 - m.m2 );
+			float sqMag23 = Vector2.SqrMagnitude( m.m2 - m.m3 );
 			return CalcCatRomKnots( sqMag01, sqMag12, sqMag23, alpha, unitInterval );
 		}
 
-		public static (float, float, float, float) CalcCatRomKnots( Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float alpha, bool unitInterval ) {
+		public static (float, float, float, float) CalcCatRomKnots( Vector3Matrix4x1 m, float alpha, bool unitInterval ) {
 			if( alpha == 0 ) // uniform catrom
 				return GetUniformKnots( unitInterval );
-			float sqMag01 = Vector3.SqrMagnitude( p0 - p1 );
-			float sqMag12 = Vector3.SqrMagnitude( p1 - p2 );
-			float sqMag23 = Vector3.SqrMagnitude( p2 - p3 );
+			float sqMag01 = Vector3.SqrMagnitude( m.m0 - m.m1 );
+			float sqMag12 = Vector3.SqrMagnitude( m.m1 - m.m2 );
+			float sqMag23 = Vector3.SqrMagnitude( m.m2 - m.m3 );
 			return CalcCatRomKnots( sqMag01, sqMag12, sqMag23, alpha, unitInterval );
 		}
 
@@ -170,21 +170,12 @@ namespace Freya {
 			);
 		}
 
-		internal static Polynomial2D CalculateCatRomCurve( Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3, float k0, float k1, float k2, float k3 ) {
-			Matrix4x4 m = GetNUCatRomCharMatrix( k0, k1, k2, k3 );
-			return new Polynomial2D(
-				new Polynomial( m.MultiplyColumnVector( new Vector4( p0.x, p1.x, p2.x, p3.x ) ) ),
-				new Polynomial( m.MultiplyColumnVector( new Vector4( p0.y, p1.y, p2.y, p3.y ) ) )
-			);
+		internal static Polynomial2D CalculateCatRomCurve( Vector2Matrix4x1 m, float k0, float k1, float k2, float k3 ) {
+			return new Polynomial2D( GetNUCatRomCharMatrix( k0, k1, k2, k3 ).MultiplyColumnVector( m ) );
 		}
 
-		internal static Polynomial3D CalculateCatRomCurve( Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float k0, float k1, float k2, float k3 ) {
-			Matrix4x4 m = GetNUCatRomCharMatrix( k0, k1, k2, k3 );
-			return new Polynomial3D(
-				new Polynomial( m.MultiplyColumnVector( new Vector4( p0.x, p1.x, p2.x, p3.x ) ) ),
-				new Polynomial( m.MultiplyColumnVector( new Vector4( p0.y, p1.y, p2.y, p3.y ) ) ),
-				new Polynomial( m.MultiplyColumnVector( new Vector4( p0.z, p1.z, p2.z, p3.z ) ) )
-			);
+		internal static Polynomial3D CalculateCatRomCurve( Vector3Matrix4x1 m, float k0, float k1, float k2, float k3 ) {
+			return new Polynomial3D( GetNUCatRomCharMatrix( k0, k1, k2, k3 ).MultiplyColumnVector( m ) );
 		}
 
 	}

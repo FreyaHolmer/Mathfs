@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Freya {
 
 	/// <summary>A non-uniform cubic catmull-rom 3D curve</summary>
-	[Serializable] public struct NUCatRomCubic3D : IParamCubicSplineSegment3D {
+	[Serializable] public struct NUCatRomCubic3D : IParamSplineSegment<Polynomial3D,Vector3Matrix4x1> {
 
 		public enum KnotCalcMode {
 			Manual,
@@ -21,7 +21,7 @@ namespace Freya {
 
 		/// <inheritdoc cref="NUCatRomCubic2D(Vector2,Vector2,Vector2,Vector2,float,float,float,float)"/>
 		public NUCatRomCubic3D( Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float k0, float k1, float k2, float k3 ) {
-			( this.p0, this.p1, this.p2, this.p3 ) = ( p0, p1, p2, p3 );
+			pointMatrix = new Vector3Matrix4x1( p0, p1, p2, p3 );
 			( this.k0, this.k1, this.k2, this.k3 ) = ( k0, k1, k2, k3 );
 			validCoefficients = false;
 			curve = default;
@@ -40,7 +40,7 @@ namespace Freya {
 
 		/// <inheritdoc cref="NUCatRomCubic2D(Vector2,Vector2,Vector2,Vector2,float,bool)"/>
 		public NUCatRomCubic3D( Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float alpha, bool parameterizeToUnitInterval = true ) {
-			( this.p0, this.p1, this.p2, this.p3 ) = ( p0, p1, p2, p3 );
+			pointMatrix = new Vector3Matrix4x1( p0, p1, p2, p3 );
 			validCoefficients = false;
 			curve = default;
 			k0 = k1 = k2 = k3 = default;
@@ -51,7 +51,11 @@ namespace Freya {
 		#endregion
 
 		// serialized data
-		[SerializeField] Vector3 p0, p1, p2, p3;
+		[SerializeField] Vector3Matrix4x1 pointMatrix;
+		public Vector3Matrix4x1 PointMatrix {
+			get => pointMatrix;
+			set => _ = ( pointMatrix = value, validCoefficients = false );
+		}
 		[SerializeField] float k0, k1, k2, k3; // knot vector
 
 		// knot auto-calculation fields
@@ -70,23 +74,23 @@ namespace Freya {
 
 		/// <inheritdoc cref="NUCatRomCubic2D.P0"/>
 		public Vector3 P0 {
-			[MethodImpl( INLINE )] get => p0;
-			set => _ = ( p0 = value, validCoefficients = false );
+			[MethodImpl( INLINE )] get => pointMatrix.m0;
+			set => _ = ( pointMatrix.m0 = value, validCoefficients = false );
 		}
 		/// <inheritdoc cref="NUCatRomCubic2D.P1"/>
 		public Vector3 P1 {
-			[MethodImpl( INLINE )] get => p1;
-			set => _ = ( p1 = value, validCoefficients = false );
+			[MethodImpl( INLINE )] get => pointMatrix.m1;
+			set => _ = ( pointMatrix.m1 = value, validCoefficients = false );
 		}
 		/// <inheritdoc cref="NUCatRomCubic2D.P2"/>
 		public Vector3 P2 {
-			[MethodImpl( INLINE )] get => p2;
-			set => _ = ( p2 = value, validCoefficients = false );
+			[MethodImpl( INLINE )] get => pointMatrix.m2;
+			set => _ = ( pointMatrix.m2 = value, validCoefficients = false );
 		}
 		/// <inheritdoc cref="NUCatRomCubic2D.P3"/>
 		public Vector3 P3 {
-			[MethodImpl( INLINE )] get => p3;
-			set => _ = ( p3 = value, validCoefficients = false );
+			[MethodImpl( INLINE )] get => pointMatrix.m3;
+			set => _ = ( pointMatrix.m3 = value, validCoefficients = false );
 		}
 
 		/// <inheritdoc cref="NUCatRomCubic2D.K0"/>
@@ -142,8 +146,8 @@ namespace Freya {
 				return; // no need to update
 			validCoefficients = true;
 			if( knotCalcMode != KnotCalcMode.Manual )
-				( k0, k1, k2, k3 ) = SplineUtils.CalcCatRomKnots( p0, p1, p2, p3, alpha, knotCalcMode == KnotCalcMode.AutoUnitInterval );
-			curve = SplineUtils.CalculateCatRomCurve( p0, p1, p2, p3, k0, k1, k2, k3 );
+				( k0, k1, k2, k3 ) = SplineUtils.CalcCatRomKnots( pointMatrix, alpha, knotCalcMode == KnotCalcMode.AutoUnitInterval );
+			curve = SplineUtils.CalculateCatRomCurve( pointMatrix, k0, k1, k2, k3 );
 		}
 
 		/// <inheritdoc cref="NUCatRomCubic2D.GetPointWeightAtKnotValue(int,float)"/>

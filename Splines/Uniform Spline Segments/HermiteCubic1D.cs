@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Freya {
 
 	/// <summary>An optimized uniform 1D Cubic hermite segment, with 4 control points</summary>
-	[Serializable] public struct HermiteCubic1D : IParamCubicSplineSegment1D {
+	[Serializable] public struct HermiteCubic1D : IParamSplineSegment<Polynomial,Matrix4x1> {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 
@@ -33,7 +33,10 @@ namespace Freya {
 		#region Control Points
 
 		[SerializeField] Matrix4x1 pointMatrix;
-		public Matrix4x1 PointMatrix => pointMatrix;
+		public Matrix4x1 PointMatrix {
+			get => pointMatrix;
+			set => _ = ( pointMatrix = value, validCoefficients = false );
+		}
 
 		/// <summary>The starting point of the curve</summary>
 		public float P0 {

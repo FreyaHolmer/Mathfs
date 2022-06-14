@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Freya {
 
 	/// <summary>An optimized uniform 3D Cubic catmull-rom segment, with 4 control points</summary>
-	[Serializable] public struct CatRomCubic3D : IParamCubicSplineSegment3D {
+	[Serializable] public struct CatRomCubic3D : IParamSplineSegment<Polynomial3D,Vector3Matrix4x1> {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 
@@ -33,7 +33,10 @@ namespace Freya {
 		#region Control Points
 
 		[SerializeField] Vector3Matrix4x1 pointMatrix;
-		public Vector3Matrix4x1 PointMatrix => pointMatrix;
+		public Vector3Matrix4x1 PointMatrix {
+			get => pointMatrix;
+			set => _ = ( pointMatrix = value, validCoefficients = false );
+		}
 
 		/// <summary>The first control point of the catmull-rom curve. Note that this point is not included in the curve itself, and only helps to shape it</summary>
 		public Vector3 P0 {

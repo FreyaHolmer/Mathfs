@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Freya {
 
 	/// <summary>An optimized uniform 2D Quadratic bézier segment, with 3 control points</summary>
-	[Serializable] public struct BezierQuad2D : IParamCubicSplineSegment2D {
+	[Serializable] public struct BezierQuad2D : IParamSplineSegment<Polynomial2D,Vector2Matrix3x1> {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 
@@ -32,7 +32,10 @@ namespace Freya {
 		#region Control Points
 
 		[SerializeField] Vector2Matrix3x1 pointMatrix;
-		public Vector2Matrix3x1 PointMatrix => pointMatrix;
+		public Vector2Matrix3x1 PointMatrix {
+			get => pointMatrix;
+			set => _ = ( pointMatrix = value, validCoefficients = false );
+		}
 
 		/// <summary>The starting point of the curve</summary>
 		public Vector2 P0 {
@@ -54,8 +57,27 @@ namespace Freya {
 
 		/// <summary>Get or set a control point position by index. Valid indices from 0 to 2</summary>
 		public Vector2 this[ int i ] {
-			[MethodImpl( INLINE )] get => pointMatrix[i];
-			[MethodImpl( INLINE )] set => _ = ( pointMatrix[i] = value, validCoefficients = false );
+			get =>
+				i switch {
+					0 => P0,
+					1 => P1,
+					2 => P2,
+					_ => throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 2 range, and I think {i} is outside that range you know" )
+				};
+			set {
+				switch( i ) {
+					case 0:
+						P0 = value;
+						break;
+					case 1:
+						P1 = value;
+						break;
+					case 2:
+						P2 = value;
+						break;
+					default: throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 2 range, and I think {i} is outside that range you know" );
+				}
+			}
 		}
 
 		#endregion

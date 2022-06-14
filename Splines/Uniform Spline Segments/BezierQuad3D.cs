@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Freya {
 
 	/// <summary>An optimized uniform 3D Quadratic bézier segment, with 3 control points</summary>
-	[Serializable] public struct BezierQuad3D : IParamCubicSplineSegment3D {
+	[Serializable] public struct BezierQuad3D : IParamSplineSegment<Polynomial3D,Vector3Matrix3x1> {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 
@@ -32,7 +32,10 @@ namespace Freya {
 		#region Control Points
 
 		[SerializeField] Vector3Matrix3x1 pointMatrix;
-		public Vector3Matrix3x1 PointMatrix => pointMatrix;
+		public Vector3Matrix3x1 PointMatrix {
+			get => pointMatrix;
+			set => _ = ( pointMatrix = value, validCoefficients = false );
+		}
 
 		/// <summary>The starting point of the curve</summary>
 		public Vector3 P0 {

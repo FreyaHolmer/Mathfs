@@ -160,7 +160,7 @@ namespace Freya {
 				GenerateType( typeBspline, dim );
 				GenerateType( typeCatRom, dim );
 				GenerateMatrix( 3, dim );
-				GenerateMatrix( 4, dim ); 
+				GenerateMatrix( 4, dim );
 			}
 		}
 
@@ -277,7 +277,7 @@ namespace Freya {
 
 				// type definition
 				code.Summary( $"An optimized uniform {dim}D {degFullLower} {type.prettyNameLower} segment, with {ptCount} control points" );
-				using( code.BracketScope( $"[Serializable] public struct {structName} : IParamCubicSplineSegment{dim}D" ) ) { // intentionally always Cubic right now
+				using( code.BracketScope( $"[Serializable] public struct {structName} : IParamSplineSegment<{polynomType},{pointMatrixType}>" ) ) { // intentionally always Cubic right now
 					code.LineBreak();
 					code.Append( "const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;" );
 					code.LineBreak();
@@ -306,7 +306,11 @@ namespace Freya {
 					// control point properties
 					using( code.ScopeRegion( "Control Points" ) ) {
 						code.Append( $"[SerializeField] {pointMatrixType} pointMatrix;" );
-						code.Append( $"public {pointMatrixType} PointMatrix => pointMatrix;" );
+						using( code.BracketScope( $"public {pointMatrixType} PointMatrix" ) ) {
+							code.Append( "get => pointMatrix;" );
+							code.Append( "set => _ = ( pointMatrix = value, validCoefficients = false );" );
+						}
+
 						code.LineBreak();
 						for( int i = 0; i < ptCount; i++ ) {
 							code.Summary( pointDescs[i] );

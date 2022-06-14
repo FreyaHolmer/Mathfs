@@ -235,13 +235,16 @@ namespace Freya {
 
 		#region Matrix extensions
 
-		public static Vector4 MultiplyColumnVector( this Matrix4x4 m, Vector4 v ) =>
-			new Vector4(
-				Vector4.Dot( m.GetRow( 0 ), v ),
-				Vector4.Dot( m.GetRow( 1 ), v ),
-				Vector4.Dot( m.GetRow( 2 ), v ),
-				Vector4.Dot( m.GetRow( 3 ), v )
+		public static Matrix4x1 MultiplyColumnVector( this Matrix4x4 m, Matrix4x1 v ) =>
+			new Matrix4x1(
+				m.m00 * v.m0 + m.m01 * v.m1 + m.m02 * v.m2 + m.m03 * v.m3,
+				m.m10 * v.m0 + m.m11 * v.m1 + m.m12 * v.m2 + m.m13 * v.m3,
+				m.m20 * v.m0 + m.m21 * v.m1 + m.m22 * v.m2 + m.m23 * v.m3,
+				m.m30 * v.m0 + m.m31 * v.m1 + m.m32 * v.m2 + m.m33 * v.m3
 			);
+
+		public static Vector2Matrix4x1 MultiplyColumnVector( this Matrix4x4 m, Vector2Matrix4x1 v ) => new(m.MultiplyColumnVector( v.X ), m.MultiplyColumnVector( v.Y ));
+		public static Vector3Matrix4x1 MultiplyColumnVector( this Matrix4x4 m, Vector3Matrix4x1 v ) => new(m.MultiplyColumnVector( v.X ), m.MultiplyColumnVector( v.Y ), m.MultiplyColumnVector( v.Z ));
 
 		#endregion
 
