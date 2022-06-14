@@ -15,4 +15,12 @@ public readonly struct Matrix3x1 {
 			_ => throw new IndexOutOfRangeException( $"Matrix column index has to be from 0 to 3, got: {column}" )
 		};
 
+		public static bool operator ==( Matrix3x1 a, Matrix3x1 b ) => a.m0 == b.m0 && a.m1 == b.m1 && a.m2 == b.m2;
+		public static bool operator !=( Matrix3x1 a, Matrix3x1 b ) => !( a == b );
+		public bool Equals( Matrix3x1 other ) => m0.Equals( other.m0 ) && m1.Equals( other.m1 ) && m2.Equals( other.m2 );
+		public override bool Equals( object obj ) => obj is Matrix3x1 other && Equals( other );
+		public override int GetHashCode() => HashCode.Combine( m0, m1, m2 );
+
+	}
+
 }

@@ -27,6 +27,12 @@ namespace Freya {
 
 		public Matrix4x1 X => new(m0.x, m1.x, m2.x, m3.x);
 		public Matrix4x1 Y => new(m0.y, m1.y, m2.y, m3.y);
+		
+		public static bool operator ==( Vector2Matrix4x1 a, Vector2Matrix4x1 b ) => a.m0 == b.m0 && a.m1 == b.m1 && a.m2 == b.m2 && a.m3 == b.m3;
+		public static bool operator !=( Vector2Matrix4x1 a, Vector2Matrix4x1 b ) => !( a == b );
+		public bool Equals( Vector2Matrix4x1 other ) => m0.Equals( other.m0 ) && m1.Equals( other.m1 ) && m2.Equals( other.m2 ) && m3.Equals( other.m3 );
+		public override bool Equals( object obj ) => obj is Vector2Matrix4x1 other && Equals( other );
+		public override int GetHashCode() => HashCode.Combine( m0, m1, m2, m3 );
 
 	}
 
