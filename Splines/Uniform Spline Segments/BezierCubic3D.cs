@@ -12,98 +12,43 @@ namespace Freya {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 
+		[SerializeField] Vector3Matrix4x1 pointMatrix;
+		[NonSerialized] Polynomial3D curve;
+		[NonSerialized] bool validCoefficients;
+
 		/// <summary>Creates a uniform 3D Cubic bézier segment, from 4 control points</summary>
 		/// <param name="p0">The starting point of the curve</param>
 		/// <param name="p1">The second control point of the curve, sometimes called the start tangent point</param>
 		/// <param name="p2">The third control point of the curve, sometimes called the end tangent point</param>
 		/// <param name="p3">The end point of the curve</param>
-		public BezierCubic3D( Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3 ) {
-			pointMatrix = new Vector3Matrix4x1( p0, p1, p2, p3 );
-			validCoefficients = false;
-			curve = default;
-		}
+		public BezierCubic3D( Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3 ) => (pointMatrix,curve,validCoefficients) = (new Vector3Matrix4x1(p0, p1, p2, p3),default,false);
 
-		Polynomial3D curve;
 		public Polynomial3D Curve {
 			get {
-				ReadyCoefficients();
-				return curve;
+				if( validCoefficients )
+					return curve; // no need to update
+				validCoefficients = true;
+				return curve = new Polynomial3D(
+					P0,
+					3*(-P0+P1),
+					3*P0-6*P1+3*P2,
+					-P0+3*P1-3*P2+P3
+				);
 			}
 		}
-		#region Control Points
-
-		[SerializeField] Vector3Matrix4x1 pointMatrix;
-		public Vector3Matrix4x1 PointMatrix {
-			get => pointMatrix;
-			set => _ = ( pointMatrix = value, validCoefficients = false );
-		}
-
+		public Vector3Matrix4x1 PointMatrix {[MethodImpl( INLINE )] get => pointMatrix; [MethodImpl( INLINE )] set => _ = ( pointMatrix = value, validCoefficients = false ); }
 		/// <summary>The starting point of the curve</summary>
-		public Vector3 P0 {
-			[MethodImpl( INLINE )] get => pointMatrix.m0;
-			[MethodImpl( INLINE )] set => _ = ( pointMatrix.m0 = value, validCoefficients = false );
-		}
-
+		public Vector3 P0{ [MethodImpl( INLINE )] get => pointMatrix.m0; [MethodImpl( INLINE )] set => _ = ( pointMatrix.m0 = value, validCoefficients = false ); }
 		/// <summary>The second control point of the curve, sometimes called the start tangent point</summary>
-		public Vector3 P1 {
-			[MethodImpl( INLINE )] get => pointMatrix.m1;
-			[MethodImpl( INLINE )] set => _ = ( pointMatrix.m1 = value, validCoefficients = false );
-		}
-
+		public Vector3 P1{ [MethodImpl( INLINE )] get => pointMatrix.m1; [MethodImpl( INLINE )] set => _ = ( pointMatrix.m1 = value, validCoefficients = false ); }
 		/// <summary>The third control point of the curve, sometimes called the end tangent point</summary>
-		public Vector3 P2 {
-			[MethodImpl( INLINE )] get => pointMatrix.m2;
-			[MethodImpl( INLINE )] set => _ = ( pointMatrix.m2 = value, validCoefficients = false );
-		}
-
+		public Vector3 P2{ [MethodImpl( INLINE )] get => pointMatrix.m2; [MethodImpl( INLINE )] set => _ = ( pointMatrix.m2 = value, validCoefficients = false ); }
 		/// <summary>The end point of the curve</summary>
-		public Vector3 P3 {
-			[MethodImpl( INLINE )] get => pointMatrix.m3;
-			[MethodImpl( INLINE )] set => _ = ( pointMatrix.m3 = value, validCoefficients = false );
-		}
-
+		public Vector3 P3{ [MethodImpl( INLINE )] get => pointMatrix.m3; [MethodImpl( INLINE )] set => _ = ( pointMatrix.m3 = value, validCoefficients = false ); }
 		/// <summary>Get or set a control point position by index. Valid indices from 0 to 3</summary>
 		public Vector3 this[ int i ] {
-			get =>
-				i switch {
-					0 => P0,
-					1 => P1,
-					2 => P2,
-					3 => P3,
-					_ => throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" )
-				};
-			set {
-				switch( i ) {
-					case 0:
-						P0 = value;
-						break;
-					case 1:
-						P1 = value;
-						break;
-					case 2:
-						P2 = value;
-						break;
-					case 3:
-						P3 = value;
-						break;
-					default: throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" );
-				}
-			}
-		}
-
-		#endregion
-		[NonSerialized] bool validCoefficients;
-
-		[MethodImpl( INLINE )] void ReadyCoefficients() {
-			if( validCoefficients )
-				return; // no need to update
-			validCoefficients = true;
-			curve = new Polynomial3D(
-				P0,
-				3*(-P0+P1),
-				3*P0-6*P1+3*P2,
-				-P0+3*P1-3*P2+P3
-			);
+			get => i switch { 0 => P0, 1 => P1, 2 => P2, 3 => P3, _ => throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" ) };
+			set { switch( i ){ case 0: P0 = value; break; case 1: P1 = value; break; case 2: P2 = value; break; case 3: P3 = value; break; default: throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" ); }}
 		}
 		public static bool operator ==( BezierCubic3D a, BezierCubic3D b ) => a.pointMatrix == b.pointMatrix;
 		public static bool operator !=( BezierCubic3D a, BezierCubic3D b ) => !( a == b );

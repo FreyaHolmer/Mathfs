@@ -12,98 +12,43 @@ namespace Freya {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 
+		[SerializeField] Matrix4x1 pointMatrix;
+		[NonSerialized] Polynomial curve;
+		[NonSerialized] bool validCoefficients;
+
 		/// <summary>Creates a uniform 1D Cubic hermite segment, from 4 control points</summary>
 		/// <param name="p0">The starting point of the curve</param>
 		/// <param name="v0">The rate of change (velocity) at the start of the curve</param>
 		/// <param name="p1">The end point of the curve</param>
 		/// <param name="v1">The rate of change (velocity) at the end of the curve</param>
-		public HermiteCubic1D( float p0, float v0, float p1, float v1 ) {
-			pointMatrix = new Matrix4x1( p0, v0, p1, v1 );
-			validCoefficients = false;
-			curve = default;
-		}
+		public HermiteCubic1D( float p0, float v0, float p1, float v1 ) => (pointMatrix,curve,validCoefficients) = (new Matrix4x1(p0, v0, p1, v1),default,false);
 
-		Polynomial curve;
 		public Polynomial Curve {
 			get {
-				ReadyCoefficients();
-				return curve;
+				if( validCoefficients )
+					return curve; // no need to update
+				validCoefficients = true;
+				return curve = new Polynomial(
+					P0,
+					V0,
+					-3*P0-2*V0+3*P1-V1,
+					2*P0+V0-2*P1+V1
+				);
 			}
 		}
-		#region Control Points
-
-		[SerializeField] Matrix4x1 pointMatrix;
-		public Matrix4x1 PointMatrix {
-			get => pointMatrix;
-			set => _ = ( pointMatrix = value, validCoefficients = false );
-		}
-
+		public Matrix4x1 PointMatrix {[MethodImpl( INLINE )] get => pointMatrix; [MethodImpl( INLINE )] set => _ = ( pointMatrix = value, validCoefficients = false ); }
 		/// <summary>The starting point of the curve</summary>
-		public float P0 {
-			[MethodImpl( INLINE )] get => pointMatrix.m0;
-			[MethodImpl( INLINE )] set => _ = ( pointMatrix.m0 = value, validCoefficients = false );
-		}
-
+		public float P0{ [MethodImpl( INLINE )] get => pointMatrix.m0; [MethodImpl( INLINE )] set => _ = ( pointMatrix.m0 = value, validCoefficients = false ); }
 		/// <summary>The rate of change (velocity) at the start of the curve</summary>
-		public float V0 {
-			[MethodImpl( INLINE )] get => pointMatrix.m1;
-			[MethodImpl( INLINE )] set => _ = ( pointMatrix.m1 = value, validCoefficients = false );
-		}
-
+		public float V0{ [MethodImpl( INLINE )] get => pointMatrix.m1; [MethodImpl( INLINE )] set => _ = ( pointMatrix.m1 = value, validCoefficients = false ); }
 		/// <summary>The end point of the curve</summary>
-		public float P1 {
-			[MethodImpl( INLINE )] get => pointMatrix.m2;
-			[MethodImpl( INLINE )] set => _ = ( pointMatrix.m2 = value, validCoefficients = false );
-		}
-
+		public float P1{ [MethodImpl( INLINE )] get => pointMatrix.m2; [MethodImpl( INLINE )] set => _ = ( pointMatrix.m2 = value, validCoefficients = false ); }
 		/// <summary>The rate of change (velocity) at the end of the curve</summary>
-		public float V1 {
-			[MethodImpl( INLINE )] get => pointMatrix.m3;
-			[MethodImpl( INLINE )] set => _ = ( pointMatrix.m3 = value, validCoefficients = false );
-		}
-
+		public float V1{ [MethodImpl( INLINE )] get => pointMatrix.m3; [MethodImpl( INLINE )] set => _ = ( pointMatrix.m3 = value, validCoefficients = false ); }
 		/// <summary>Get or set a control point position by index. Valid indices from 0 to 3</summary>
 		public float this[ int i ] {
-			get =>
-				i switch {
-					0 => P0,
-					1 => V0,
-					2 => P1,
-					3 => V1,
-					_ => throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" )
-				};
-			set {
-				switch( i ) {
-					case 0:
-						P0 = value;
-						break;
-					case 1:
-						V0 = value;
-						break;
-					case 2:
-						P1 = value;
-						break;
-					case 3:
-						V1 = value;
-						break;
-					default: throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" );
-				}
-			}
-		}
-
-		#endregion
-		[NonSerialized] bool validCoefficients;
-
-		[MethodImpl( INLINE )] void ReadyCoefficients() {
-			if( validCoefficients )
-				return; // no need to update
-			validCoefficients = true;
-			curve = new Polynomial(
-				P0,
-				V0,
-				-3*P0-2*V0+3*P1-V1,
-				2*P0+V0-2*P1+V1
-			);
+			get => i switch { 0 => P0, 1 => V0, 2 => P1, 3 => V1, _ => throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" ) };
+			set { switch( i ){ case 0: P0 = value; break; case 1: V0 = value; break; case 2: P1 = value; break; case 3: V1 = value; break; default: throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" ); }}
 		}
 		public static bool operator ==( HermiteCubic1D a, HermiteCubic1D b ) => a.pointMatrix == b.pointMatrix;
 		public static bool operator !=( HermiteCubic1D a, HermiteCubic1D b ) => !( a == b );

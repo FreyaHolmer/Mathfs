@@ -12,98 +12,43 @@ namespace Freya {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 
+		[SerializeField] Vector2Matrix4x1 pointMatrix;
+		[NonSerialized] Polynomial2D curve;
+		[NonSerialized] bool validCoefficients;
+
 		/// <summary>Creates a uniform 2D Cubic b-spline segment, from 4 control points</summary>
 		/// <param name="p0">The first point of the B-spline hull</param>
 		/// <param name="p1">The second point of the B-spline hull</param>
 		/// <param name="p2">The third point of the B-spline hull</param>
 		/// <param name="p3">The fourth point of the B-spline hull</param>
-		public UBSCubic2D( Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3 ) {
-			pointMatrix = new Vector2Matrix4x1( p0, p1, p2, p3 );
-			validCoefficients = false;
-			curve = default;
-		}
+		public UBSCubic2D( Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3 ) => (pointMatrix,curve,validCoefficients) = (new Vector2Matrix4x1(p0, p1, p2, p3),default,false);
 
-		Polynomial2D curve;
 		public Polynomial2D Curve {
 			get {
-				ReadyCoefficients();
-				return curve;
+				if( validCoefficients )
+					return curve; // no need to update
+				validCoefficients = true;
+				return curve = new Polynomial2D(
+					(1/6f)*P0+(2/3f)*P1+(1/6f)*P2,
+					(-P0+P2)/2,
+					(1/2f)*P0-P1+(1/2f)*P2,
+					-(1/6f)*P0+(1/2f)*P1-(1/2f)*P2+(1/6f)*P3
+				);
 			}
 		}
-		#region Control Points
-
-		[SerializeField] Vector2Matrix4x1 pointMatrix;
-		public Vector2Matrix4x1 PointMatrix {
-			get => pointMatrix;
-			set => _ = ( pointMatrix = value, validCoefficients = false );
-		}
-
+		public Vector2Matrix4x1 PointMatrix {[MethodImpl( INLINE )] get => pointMatrix; [MethodImpl( INLINE )] set => _ = ( pointMatrix = value, validCoefficients = false ); }
 		/// <summary>The first point of the B-spline hull</summary>
-		public Vector2 P0 {
-			[MethodImpl( INLINE )] get => pointMatrix.m0;
-			[MethodImpl( INLINE )] set => _ = ( pointMatrix.m0 = value, validCoefficients = false );
-		}
-
+		public Vector2 P0{ [MethodImpl( INLINE )] get => pointMatrix.m0; [MethodImpl( INLINE )] set => _ = ( pointMatrix.m0 = value, validCoefficients = false ); }
 		/// <summary>The second point of the B-spline hull</summary>
-		public Vector2 P1 {
-			[MethodImpl( INLINE )] get => pointMatrix.m1;
-			[MethodImpl( INLINE )] set => _ = ( pointMatrix.m1 = value, validCoefficients = false );
-		}
-
+		public Vector2 P1{ [MethodImpl( INLINE )] get => pointMatrix.m1; [MethodImpl( INLINE )] set => _ = ( pointMatrix.m1 = value, validCoefficients = false ); }
 		/// <summary>The third point of the B-spline hull</summary>
-		public Vector2 P2 {
-			[MethodImpl( INLINE )] get => pointMatrix.m2;
-			[MethodImpl( INLINE )] set => _ = ( pointMatrix.m2 = value, validCoefficients = false );
-		}
-
+		public Vector2 P2{ [MethodImpl( INLINE )] get => pointMatrix.m2; [MethodImpl( INLINE )] set => _ = ( pointMatrix.m2 = value, validCoefficients = false ); }
 		/// <summary>The fourth point of the B-spline hull</summary>
-		public Vector2 P3 {
-			[MethodImpl( INLINE )] get => pointMatrix.m3;
-			[MethodImpl( INLINE )] set => _ = ( pointMatrix.m3 = value, validCoefficients = false );
-		}
-
+		public Vector2 P3{ [MethodImpl( INLINE )] get => pointMatrix.m3; [MethodImpl( INLINE )] set => _ = ( pointMatrix.m3 = value, validCoefficients = false ); }
 		/// <summary>Get or set a control point position by index. Valid indices from 0 to 3</summary>
 		public Vector2 this[ int i ] {
-			get =>
-				i switch {
-					0 => P0,
-					1 => P1,
-					2 => P2,
-					3 => P3,
-					_ => throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" )
-				};
-			set {
-				switch( i ) {
-					case 0:
-						P0 = value;
-						break;
-					case 1:
-						P1 = value;
-						break;
-					case 2:
-						P2 = value;
-						break;
-					case 3:
-						P3 = value;
-						break;
-					default: throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" );
-				}
-			}
-		}
-
-		#endregion
-		[NonSerialized] bool validCoefficients;
-
-		[MethodImpl( INLINE )] void ReadyCoefficients() {
-			if( validCoefficients )
-				return; // no need to update
-			validCoefficients = true;
-			curve = new Polynomial2D(
-				(1/6f)*P0+(2/3f)*P1+(1/6f)*P2,
-				(-P0+P2)/2,
-				(1/2f)*P0-P1+(1/2f)*P2,
-				-(1/6f)*P0+(1/2f)*P1-(1/2f)*P2+(1/6f)*P3
-			);
+			get => i switch { 0 => P0, 1 => P1, 2 => P2, 3 => P3, _ => throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" ) };
+			set { switch( i ){ case 0: P0 = value; break; case 1: P1 = value; break; case 2: P2 = value; break; case 3: P3 = value; break; default: throw new ArgumentOutOfRangeException( nameof(i), $"Index has to be in the 0 to 3 range, and I think {i} is outside that range you know" ); }}
 		}
 		public static bool operator ==( UBSCubic2D a, UBSCubic2D b ) => a.pointMatrix == b.pointMatrix;
 		public static bool operator !=( UBSCubic2D a, UBSCubic2D b ) => !( a == b );

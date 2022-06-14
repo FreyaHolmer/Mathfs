@@ -270,6 +270,7 @@ namespace Freya {
 
 			string ctorParams = JoinRange( ", ", i => $"{dataType} {type.paramNames[i]}" );
 			string csPoints = JoinRange( ", ", i => $"{type.paramNames[i]}" );
+
 			CodeGenerator code = new CodeGenerator();
 			code.AppendHeader();
 			code.Using( "System" );
@@ -287,91 +288,51 @@ namespace Freya {
 					code.Append( "const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;" );
 					code.LineBreak();
 
+					// fields
+					code.Append( $"[SerializeField] {pointMatrixType} pointMatrix;" );
+					code.Append( $"[NonSerialized] {polynomType} curve;" );
+					code.Append( "[NonSerialized] bool validCoefficients;" );
+					code.LineBreak();
+
 					// constructor
 					code.Summary( $"Creates a uniform {dim}D {degFullLower} {type.prettyNameLower} segment, from {ptCount} control points" );
 					for( int i = 0; i < ptCount; i++ )
 						type.AppendParamStrings( code, degree, i );
-					using( code.BracketScope( $"public {structName}( {ctorParams} )" ) ) {
-						code.Append( $"pointMatrix = new {pointMatrixType}( {csPoints} );" );
-						code.Append( "validCoefficients = false;" );
-						code.Append( "curve = default;" );
-					}
+					code.Append( $"public {structName}( {ctorParams} ) => (pointMatrix,curve,validCoefficients) = (new {pointMatrixType}({csPoints}),default,false);" );
 
 					code.LineBreak();
 
-					// Curve
-					code.Append( $"{polynomType} curve;" );
+					// properties
 					using( code.BracketScope( $"public {polynomType} Curve" ) ) {
 						using( code.BracketScope( $"get" ) ) {
-							code.Append( "ReadyCoefficients();" );
-							code.Append( "return curve;" );
-						}
-					}
-
-					// control point properties
-					using( code.ScopeRegion( "Control Points" ) ) {
-						code.Append( $"[SerializeField] {pointMatrixType} pointMatrix;" );
-						using( code.BracketScope( $"public {pointMatrixType} PointMatrix" ) ) {
-							code.Append( "get => pointMatrix;" );
-							code.Append( "set => _ = ( pointMatrix = value, validCoefficients = false );" );
-						}
-
-						code.LineBreak();
-						for( int i = 0; i < ptCount; i++ ) {
-							code.Summary( pointDescs[i] );
-							using( code.BracketScope( $"public {dataType} {points[i].ToUpperInvariant()}" ) ) {
-								code.Append( $"[MethodImpl( INLINE )] get => pointMatrix.m{i};" );
-								code.Append( $"[MethodImpl( INLINE )] set => _ = ( pointMatrix.m{i} = value, validCoefficients = false );" );
-							}
-
-							code.LineBreak();
-						}
-
-						code.Summary( $"Get or set a control point position by index. Valid indices from 0 to {degree}" );
-						using( code.BracketScope( $"public {dataType} this[ int i ]" ) ) {
-							using( code.Scope( "get =>" ) ) {
-								using( code.Scope( "i switch {" ) ) {
-									for( int i = 0; i < ptCount; i++ )
-										code.Append( $"{i} => {points[i].ToUpperInvariant()}," );
-									code.Append( $"_ => throw new ArgumentOutOfRangeException( nameof(i), $\"Index has to be in the 0 to {degree} range, and I think {{i}} is outside that range you know\" )" );
-								}
-
-								code.Append( "};" );
-							}
-
-							using( code.BracketScope( "set" ) ) {
-								using( code.BracketScope( "switch( i )" ) ) {
-									for( int i = 0; i < ptCount; i++ ) {
-										using( code.Scope( $"case {i}:" ) ) {
-											code.Append( $"{points[i].ToUpperInvariant()} = value;" );
-											code.Append( "break;" );
-										}
-									}
-
-									code.Append( $"default: throw new ArgumentOutOfRangeException( nameof(i), $\"Index has to be in the 0 to {degree} range, and I think {{i}} is outside that range you know\" );" );
+							using( code.Scope( "if( validCoefficients )" ) )
+								code.Append( "return curve; // no need to update" );
+							code.Append( "validCoefficients = true;" );
+							using( code.Scope( $"return curve = new {polynomType}(" ) ) {
+								for( int icRow = 0; icRow < ptCount; icRow++ ) {
+									MathSum sum = new MathSum();
+									for( int ip = 0; ip < ptCount; ip++ )
+										sum.AddTerm( type.charMatrix[icRow, ip], $"{type.paramNames[ip].ToUpperInvariant()}" );
+									code.Append( $"{sum}{( icRow < ptCount - 1 ? "," : "" )}" );
 								}
 							}
+
+							code.Append( ");" );
 						}
+						// todo: set would be possible! setting the points based on a curve
 					}
 
-					// Coefficients
-					code.Append( "[NonSerialized] bool validCoefficients;" );
-					code.LineBreak();
-					using( code.BracketScope( "[MethodImpl( INLINE )] void ReadyCoefficients()" ) ) {
-						using( code.Scope( "if( validCoefficients )" ) )
-							code.Append( "return; // no need to update" );
-						code.Append( "validCoefficients = true;" );
+					code.Append( $"public {pointMatrixType} PointMatrix {{[MethodImpl( INLINE )] get => pointMatrix; [MethodImpl( INLINE )] set => _ = ( pointMatrix = value, validCoefficients = false ); }}" );
+					for( int i = 0; i < ptCount; i++ ) {
+						code.Summary( pointDescs[i] );
+						code.Append( $"public {dataType} {points[i].ToUpperInvariant()}{{ [MethodImpl( INLINE )] get => pointMatrix.m{i}; [MethodImpl( INLINE )] set => _ = ( pointMatrix.m{i} = value, validCoefficients = false ); }}" );
+					}
 
-						using( code.Scope( $"curve = new {polynomType}(" ) ) {
-							for( int icRow = 0; icRow < ptCount; icRow++ ) {
-								MathSum sum = new MathSum();
-								for( int ip = 0; ip < ptCount; ip++ )
-									sum.AddTerm( type.charMatrix[icRow, ip], $"{type.paramNames[ip].ToUpperInvariant()}" );
-								code.Append( $"{sum}{( icRow < ptCount - 1 ? "," : "" )}" );
-							}
-						}
-
-						code.Append( ");" );
+					code.Summary( $"Get or set a control point position by index. Valid indices from 0 to {degree}" );
+					using( code.BracketScope( $"public {dataType} this[ int i ]" ) ) {
+						string indexException = $"throw new ArgumentOutOfRangeException( nameof(i), $\"Index has to be in the 0 to {degree} range, and I think {{i}} is outside that range you know\" )";
+						code.Append( $"get => i switch {{ {JoinRange( ", ", i => $"{i} => {points[i].ToUpperInvariant()}" )}, _ => {indexException} }};" );
+						code.Append( $"set {{ switch( i ){{ {JoinRange( " ", i => $"case {i}: {points[i].ToUpperInvariant()} = value; break;" )} default: {indexException}; }}}}" );
 					}
 
 					// equality checks
