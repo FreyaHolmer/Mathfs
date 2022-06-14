@@ -27,6 +27,10 @@ namespace Freya {
 		/// <param name="dir">The direction of the line. It does not have to be normalized, but if it is, the t-value when sampling will correspond to distance along the ray</param>
 		public Line2D( Vector2 origin, Vector2 dir ) => ( this.origin, this.dir ) = ( origin, dir );
 
+		/// <summary>The signed distance from this line to a point. Points to the left of this line are positive</summary>
+		/// <param name="point">The point to check the signed distance to</param>
+		[MethodImpl( INLINE )] public float SignedDistance( Vector2 point ) => Determinant( dir.normalized, point - origin );
+
 		#region Interface stuff for generic line tests
 
 		[MethodImpl( INLINE )] bool ILinear2D.IsValidTValue( float t ) => true; // just always valid uwu
