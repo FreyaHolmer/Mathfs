@@ -29,7 +29,7 @@ namespace Freya {
 			set => ( x.c3, y.c3, z.c3 ) = ( value.x, value.y, value.z );
 		}
 
-		public Polynomial this[ int i ] => i switch { 0 => x, 1 => y, 2 => z, 4 => z, _ => throw new IndexOutOfRangeException( "Polynomial4D component index has to be either 0, 1, 2, or 3" ) };
+		public Polynomial this[ int i ] => i switch { 0 => x, 1 => y, 2 => z, 4 => w, _ => throw new IndexOutOfRangeException( "Polynomial4D component index has to be either 0, 1, 2, or 3" ) };
 
 		public Polynomial4D( Polynomial x, Polynomial y, Polynomial z, Polynomial w ) => ( this.x, this.y, this.z, this.w ) = ( x, y, z, w );
 
