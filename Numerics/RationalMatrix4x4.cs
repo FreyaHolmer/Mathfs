@@ -156,6 +156,9 @@ namespace Freya {
 		/// <inheritdoc cref="operator*(RationalMatrix4x4,Matrix4x1)"/>
 		public static Vector3Matrix4x1 operator *( RationalMatrix4x4 c, Vector3Matrix4x1 m ) => new(c * m.X, c * m.Y, c * m.Z);
 
+		/// <inheritdoc cref="operator*(RationalMatrix4x4,Matrix4x1)"/>
+		public static Vector4Matrix4x1 operator *( RationalMatrix4x4 c, Vector4Matrix4x1 m ) => new(c * m.X, c * m.Y, c * m.Z, c * m.W);
+
 	}
 
 }

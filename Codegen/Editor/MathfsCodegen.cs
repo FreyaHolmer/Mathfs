@@ -118,6 +118,9 @@ namespace Freya {
 								else if( dim == 3 )
 									for( int i = 0; i < type.paramNames.Length; i++ )
 										ptMtx.FindPropertyRelative( $"m{i}" ).vector3Value = prop.FindPropertyRelative( type.paramNames[i] ).vector3Value;
+								else if( dim == 4 )
+									for( int i = 0; i < type.paramNames.Length; i++ )
+										ptMtx.FindPropertyRelative( $"m{i}" ).vector4Value = prop.FindPropertyRelative( type.paramNames[i] ).vector4Value;
 							} catch {
 								Debug.LogError( $"Null thing in {go.name}/{c.GetType().Name}/{prop.propertyPath} of type {type.className} mtx: {type.matrixName}" );
 							}
@@ -153,7 +156,7 @@ namespace Freya {
 
 		[MenuItem( "Assets/Run Mathfs Codegen" )]
 		public static void Regenerate() {
-			for( int dim = 1; dim < 4; dim++ ) { // 1D, 2D, 3D
+			for( int dim = 1; dim < 5; dim++ ) { // 1D, 2D, 3D, 4D
 				GenerateType( typeBezier, dim );
 				GenerateType( typeBezierQuad, dim );
 				GenerateType( typeHermite, dim );
@@ -176,14 +179,14 @@ namespace Freya {
 
 
 		static void GenerateMatrix( int count, int dim ) {
-			const string vCompStr = "xyz";
-			const string vCompStrUp = "XYZ";
+			const string vCompStr = "xyzw";
+			const string vCompStrUp = "XYZW";
 			int[] elemRange = Enumerable.Range( 0, count ).ToArray();
 			int[] compRange = Enumerable.Range( 0, dim ).ToArray();
 			string[] compRangeStr = compRange.Select( c => vCompStr[c].ToString() ).ToArray();
 			string JoinRange( string separator, Func<int, string> elem ) => string.Join( separator, elemRange.Select( elem ) );
-			string typePrefix = dim switch { 2 => "Vector2", 3 => "Vector3", _ => "" };
-			string elemType = dim switch { 1   => "float", 2   => "Vector2", 3 => "Vector3", _ => throw new Exception( "Invalid type" ) };
+			string typePrefix = dim switch { > 1 => $"Vector{dim}", _ => "" };
+			string elemType = dim switch { 1     => "float", > 1      => $"Vector{dim}", _ => throw new Exception( "Invalid type" ) };
 
 			string typeName = $"{typePrefix}Matrix{count}x1";
 			string csParams = JoinRange( ", ", i => $"m{i}" );
@@ -421,7 +424,7 @@ namespace Freya {
 
 
 					// special case slerps for cubic beziers in 2D and 3D
-					if( dim > 1 && degree is 2 or 3 && type == typeBezier ) {
+					if( dim is 2 or 3 && type == typeBezier ) {
 						// todo: hermite slerp
 						string slerpCast = dim == 2 ? "(Vector2)" : "";
 						code.LineBreak();
@@ -538,7 +541,7 @@ namespace Freya {
 			};
 		}
 
-		static readonly string[] comp = { "x", "y", "z" };
+		static readonly string[] comp = { "x", "y", "z", "w" };
 
 		public static void AppendBezierSplit( CodeGenerator code, string structName, string dataType, int degree, int dim ) {
 			string LerpStr( string A, string B, int c ) => $"{A}.{comp[c]} + ( {B}.{comp[c]} - {A}.{comp[c]} ) * t";
