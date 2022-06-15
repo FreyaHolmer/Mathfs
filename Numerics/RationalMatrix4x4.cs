@@ -8,6 +8,9 @@ namespace Freya {
 	/// <summary>A 4x4 matrix using exact rational number representation</summary>
 	public readonly struct RationalMatrix4x4 {
 
+		public static readonly RationalMatrix4x4 Identity = new RationalMatrix4x4( 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 );
+		public static readonly RationalMatrix4x4 Zero = new RationalMatrix4x4( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
+
 		public readonly Rational m00, m01, m02, m03;
 		public readonly Rational m10, m11, m12, m13;
 		public readonly Rational m20, m21, m22, m23;

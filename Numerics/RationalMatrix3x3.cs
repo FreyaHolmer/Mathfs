@@ -8,6 +8,9 @@ namespace Freya {
 	/// <summary>A 4x4 matrix using exact rational number representation</summary>
 	public readonly struct RationalMatrix3x3 {
 
+		public static readonly RationalMatrix3x3 Identity = new RationalMatrix3x3( 1, 0, 0, 0, 1, 0, 0, 0, 1 );
+		public static readonly RationalMatrix3x3 Zero = new RationalMatrix3x3( 0, 0, 0, 0, 0, 0, 0, 0, 0 );
+
 		public readonly Rational m00, m01, m02;
 		public readonly Rational m10, m11, m12;
 		public readonly Rational m20, m21, m22;
@@ -102,7 +105,7 @@ namespace Freya {
 
 		/// <inheritdoc cref="RationalMatrix4x4.operator*(RationalMatrix4x4,Matrix4x1)"/>
 		public static Vector3Matrix3x1 operator *( RationalMatrix3x3 c, Vector3Matrix3x1 m ) => new(c * m.X, c * m.Y, c * m.Z);
-		
+
 	}
 
 }
