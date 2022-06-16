@@ -338,10 +338,22 @@ namespace Freya {
 
 		#endregion
 
+		#region Typecasting & Operators
+
 		public static Polynomial operator /( Polynomial p, float v ) => new(p.c0 / v, p.c1 / v, p.c2 / v, p.c3 / v);
 		public static Polynomial operator /( float v, Polynomial p ) => new(v / p.c0, v / p.c1, v / p.c2, v / p.c3);
 		public static Polynomial operator *( Polynomial p, float v ) => new(p.c0 * v, p.c1 * v, p.c2 * v, p.c3 * v);
 		public static Polynomial operator *( float v, Polynomial p ) => p * v;
+
+		public static explicit operator Matrix3x1( Polynomial poly ) => new(poly.c0, poly.c1, poly.c2);
+		public static explicit operator Matrix4x1( Polynomial poly ) => new(poly.c0, poly.c1, poly.c2, poly.c3);
+		public static explicit operator BezierQuad1D( Polynomial poly ) => poly.Degree < 3 ? new BezierQuad1D( CharMatrix.quadraticBezierInverse * (Matrix3x1)poly ) : throw new InvalidCastException( "Cannot cast a cubic polynomial to a quadratic curve" );
+		public static explicit operator BezierCubic1D( Polynomial poly ) => new(CharMatrix.cubicBezierInverse * (Matrix4x1)poly);
+		public static explicit operator CatRomCubic1D( Polynomial poly ) => new(CharMatrix.cubicCatmullRomInverse * (Matrix4x1)poly);
+		public static explicit operator HermiteCubic1D( Polynomial poly ) => new(CharMatrix.cubicHermiteInverse * (Matrix4x1)poly);
+		public static explicit operator UBSCubic1D( Polynomial poly ) => new(CharMatrix.cubicUniformBsplineInverse * (Matrix4x1)poly);
+
+		#endregion
 
 	}
 

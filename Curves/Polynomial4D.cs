@@ -76,34 +76,6 @@ namespace Freya {
 			return ( new Polynomial4D( xPre, yPre, zPre, wPre ), new Polynomial4D( xPost, yPost, zPost, wPost ) );
 		}
 
-		#region Polynomial to spline converters
-
-		/// <inheritdoc cref="Polynomial2D.ToBezier"/>
-		public BezierCubic4D ToBezier() {
-			Vector4Matrix4x1 p = CharMatrix.cubicBezierInverse * new Vector4Matrix4x1( C0, C1, C2, C3 );
-			return new BezierCubic4D( p.m0, p.m1, p.m2, p.m3 );
-		}
-
-		/// <inheritdoc cref="Polynomial2D.ToCatmullRom"/>
-		public CatRomCubic4D ToCatmullRom() {
-			Vector4Matrix4x1 p = CharMatrix.cubicCatmullRomInverse * new Vector4Matrix4x1( C0, C1, C2, C3 );
-			return new CatRomCubic4D( p.m0, p.m1, p.m2, p.m3 );
-		}
-
-		/// <inheritdoc cref="Polynomial2D.ToHermite"/>
-		public HermiteCubic4D ToHermite() {
-			Vector4Matrix4x1 p = CharMatrix.cubicHermiteInverse * new Vector4Matrix4x1( C0, C1, C2, C3 );
-			return new HermiteCubic4D( p.m0, p.m1, p.m2, p.m3 );
-		}
-
-		/// <inheritdoc cref="Polynomial2D.ToBSpline"/>
-		public UBSCubic4D ToBSpline() {
-			Vector4Matrix4x1 p = CharMatrix.cubicUniformBsplineInverse * new Vector4Matrix4x1( C0, C1, C2, C3 );
-			return new UBSCubic4D( p.m0, p.m1, p.m2, p.m3 );
-		}
-
-		#endregion
-
 		#region IParamCurve3Diff interface implementations
 
 		public int Degree => Mathf.Max( x.Degree, y.Degree, z.Degree, w.Degree );
@@ -191,6 +163,22 @@ namespace Freya {
 			t = tClosest;
 			return ptClosest;
 		}
+
+		#endregion
+
+		#region Typecasting & Operators
+
+		public static Polynomial4D operator /( Polynomial4D p, float v ) => new(p.C0 / v, p.C1 / v, p.C2 / v, p.C3 / v);
+		public static Polynomial4D operator *( Polynomial4D p, float v ) => new(p.C0 * v, p.C1 * v, p.C2 * v, p.C3 * v);
+		public static Polynomial4D operator *( float v, Polynomial4D p ) => p * v;
+
+		public static explicit operator Vector4Matrix3x1( Polynomial4D poly ) => new(poly.C0, poly.C1, poly.C2);
+		public static explicit operator Vector4Matrix4x1( Polynomial4D poly ) => new(poly.C0, poly.C1, poly.C2, poly.C3);
+		public static explicit operator BezierQuad4D( Polynomial4D poly ) => poly.Degree < 3 ? new BezierQuad4D( CharMatrix.quadraticBezierInverse * (Vector4Matrix3x1)poly ) : throw new InvalidCastException( "Cannot cast a cubic polynomial to a quadratic curve" );
+		public static explicit operator BezierCubic4D( Polynomial4D poly ) => new(CharMatrix.cubicBezierInverse * (Vector4Matrix4x1)poly);
+		public static explicit operator CatRomCubic4D( Polynomial4D poly ) => new(CharMatrix.cubicCatmullRomInverse * (Vector4Matrix4x1)poly);
+		public static explicit operator HermiteCubic4D( Polynomial4D poly ) => new(CharMatrix.cubicHermiteInverse * (Vector4Matrix4x1)poly);
+		public static explicit operator UBSCubic4D( Polynomial4D poly ) => new(CharMatrix.cubicUniformBsplineInverse * (Vector4Matrix4x1)poly);
 
 		#endregion
 

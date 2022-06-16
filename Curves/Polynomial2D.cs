@@ -69,34 +69,6 @@ namespace Freya {
 			return ( new Polynomial2D( xPre, yPre ), new Polynomial2D( xPost, yPost ) );
 		}
 
-		#region Polynomial to spline converters
-
-		/// <summary>Returns the cubic bezier control points for the unit interval of this curve</summary>
-		public BezierCubic2D ToBezier() {
-			Vector2Matrix4x1 p = CharMatrix.cubicBezierInverse * new Vector2Matrix4x1( C0, C1, C2, C3 );
-			return new BezierCubic2D( p.m0, p.m1, p.m2, p.m3 );
-		}
-
-		/// <summary>Returns the cubic catmull-rom control points for the unit interval of this curve</summary>
-		public CatRomCubic2D ToCatmullRom() {
-			Vector2Matrix4x1 p = CharMatrix.cubicCatmullRomInverse * new Vector2Matrix4x1( C0, C1, C2, C3 );
-			return new CatRomCubic2D( p.m0, p.m1, p.m2, p.m3 );
-		}
-
-		/// <summary>Returns the cubic hermite control points for the unit interval of this curve</summary>
-		public HermiteCubic2D ToHermite() {
-			Vector2Matrix4x1 p = CharMatrix.cubicHermiteInverse * new Vector2Matrix4x1( C0, C1, C2, C3 );
-			return new HermiteCubic2D( p.m0, p.m1, p.m2, p.m3 );
-		}
-
-		/// <summary>Returns the cubic b-spline control points for the unit interval of this curve</summary>
-		public UBSCubic2D ToBSpline() {
-			Vector2Matrix4x1 p = CharMatrix.cubicUniformBsplineInverse * new Vector2Matrix4x1( C0, C1, C2, C3 );
-			return new UBSCubic2D( p.m0, p.m1, p.m2, p.m3 );
-		}
-
-		#endregion
-
 		#region IParamCurve3Diff interface implementations
 
 		public int Degree => Mathf.Max( (int)x.Degree, (int)y.Degree );
@@ -320,6 +292,23 @@ namespace Freya {
 				poly.C2.Rotate( angle ),
 				poly.C3.Rotate( angle )
 			);
+
+		#region Typecasting & Operators
+
+		public static Polynomial2D operator /( Polynomial2D p, float v ) => new(p.C0 / v, p.C1 / v, p.C2 / v, p.C3 / v);
+		public static Polynomial2D operator *( Polynomial2D p, float v ) => new(p.C0 * v, p.C1 * v, p.C2 * v, p.C3 * v);
+		public static Polynomial2D operator *( float v, Polynomial2D p ) => p * v;
+
+		public static explicit operator Vector2Matrix3x1( Polynomial2D poly ) => new(poly.C0, poly.C1, poly.C2);
+		public static explicit operator Vector2Matrix4x1( Polynomial2D poly ) => new(poly.C0, poly.C1, poly.C2, poly.C3);
+		public static explicit operator BezierQuad2D( Polynomial2D poly ) => poly.Degree < 3 ? new BezierQuad2D( CharMatrix.quadraticBezierInverse * (Vector2Matrix3x1)poly ) : throw new InvalidCastException( "Cannot cast a cubic polynomial to a quadratic curve" );
+		public static explicit operator BezierCubic2D( Polynomial2D poly ) => new(CharMatrix.cubicBezierInverse * (Vector2Matrix4x1)poly);
+		public static explicit operator CatRomCubic2D( Polynomial2D poly ) => new(CharMatrix.cubicCatmullRomInverse * (Vector2Matrix4x1)poly);
+		public static explicit operator HermiteCubic2D( Polynomial2D poly ) => new(CharMatrix.cubicHermiteInverse * (Vector2Matrix4x1)poly);
+		public static explicit operator UBSCubic2D( Polynomial2D poly ) => new(CharMatrix.cubicUniformBsplineInverse * (Vector2Matrix4x1)poly);
+
+		#endregion
+
 	}
 
 }
