@@ -21,7 +21,10 @@ namespace Freya {
 		/// <param name="p1">The second control point, and the start of the catmull-rom curve</param>
 		/// <param name="p2">The third control point, and the end of the catmull-rom curve</param>
 		/// <param name="p3">The last control point of the catmull-rom curve. Note that this point is not included in the curve itself, and only helps to shape it</param>
-		public CatRomCubic3D( Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3 ) => (pointMatrix,curve,validCoefficients) = (new Vector3Matrix4x1(p0, p1, p2, p3),default,false);
+		public CatRomCubic3D( Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3 ) : this(new Vector3Matrix4x1(p0, p1, p2, p3)){}
+		/// <summary>Creates a uniform 3D Cubic catmull-rom segment, from 4 control points</summary>
+		/// <param name="pointMatrix">The matrix containing the control points of this spline</param>
+		public CatRomCubic3D( Vector3Matrix4x1 pointMatrix ) => (this.pointMatrix,curve,validCoefficients) = (pointMatrix,default,false);
 
 		public Polynomial3D Curve {
 			get {

@@ -21,7 +21,10 @@ namespace Freya {
 		/// <param name="v0">The rate of change (velocity) at the start of the curve</param>
 		/// <param name="p1">The end point of the curve</param>
 		/// <param name="v1">The rate of change (velocity) at the end of the curve</param>
-		public HermiteCubic3D( Vector3 p0, Vector3 v0, Vector3 p1, Vector3 v1 ) => (pointMatrix,curve,validCoefficients) = (new Vector3Matrix4x1(p0, v0, p1, v1),default,false);
+		public HermiteCubic3D( Vector3 p0, Vector3 v0, Vector3 p1, Vector3 v1 ) : this(new Vector3Matrix4x1(p0, v0, p1, v1)){}
+		/// <summary>Creates a uniform 3D Cubic hermite segment, from 4 control points</summary>
+		/// <param name="pointMatrix">The matrix containing the control points of this spline</param>
+		public HermiteCubic3D( Vector3Matrix4x1 pointMatrix ) => (this.pointMatrix,curve,validCoefficients) = (pointMatrix,default,false);
 
 		public Polynomial3D Curve {
 			get {

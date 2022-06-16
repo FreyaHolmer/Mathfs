@@ -21,7 +21,10 @@ namespace Freya {
 		/// <param name="p1">The second point of the B-spline hull</param>
 		/// <param name="p2">The third point of the B-spline hull</param>
 		/// <param name="p3">The fourth point of the B-spline hull</param>
-		public UBSCubic1D( float p0, float p1, float p2, float p3 ) => (pointMatrix,curve,validCoefficients) = (new Matrix4x1(p0, p1, p2, p3),default,false);
+		public UBSCubic1D( float p0, float p1, float p2, float p3 ) : this(new Matrix4x1(p0, p1, p2, p3)){}
+		/// <summary>Creates a uniform 1D Cubic b-spline segment, from 4 control points</summary>
+		/// <param name="pointMatrix">The matrix containing the control points of this spline</param>
+		public UBSCubic1D( Matrix4x1 pointMatrix ) => (this.pointMatrix,curve,validCoefficients) = (pointMatrix,default,false);
 
 		public Polynomial Curve {
 			get {

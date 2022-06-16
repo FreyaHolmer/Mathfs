@@ -21,7 +21,10 @@ namespace Freya {
 		/// <param name="p1">The second control point of the curve, sometimes called the start tangent point</param>
 		/// <param name="p2">The third control point of the curve, sometimes called the end tangent point</param>
 		/// <param name="p3">The end point of the curve</param>
-		public BezierCubic4D( Vector4 p0, Vector4 p1, Vector4 p2, Vector4 p3 ) => (pointMatrix,curve,validCoefficients) = (new Vector4Matrix4x1(p0, p1, p2, p3),default,false);
+		public BezierCubic4D( Vector4 p0, Vector4 p1, Vector4 p2, Vector4 p3 ) : this(new Vector4Matrix4x1(p0, p1, p2, p3)){}
+		/// <summary>Creates a uniform 4D Cubic bézier segment, from 4 control points</summary>
+		/// <param name="pointMatrix">The matrix containing the control points of this spline</param>
+		public BezierCubic4D( Vector4Matrix4x1 pointMatrix ) => (this.pointMatrix,curve,validCoefficients) = (pointMatrix,default,false);
 
 		public Polynomial4D Curve {
 			get {
