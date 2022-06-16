@@ -13,20 +13,20 @@ namespace Freya {
 		public Polynomial w;
 
 		public Vector4 C0 {
-			get => new(x.c0, y.c0, z.c0);
-			set => ( x.c0, y.c0, z.c0 ) = ( value.x, value.y, value.z );
+			get => new(x.c0, y.c0, z.c0, w.c0);
+			set => ( x.c0, y.c0, z.c0, w.c0 ) = ( value.x, value.y, value.z, value.w );
 		}
 		public Vector4 C1 {
-			get => new(x.c1, y.c1, z.c1);
-			set => ( x.c1, y.c1, z.c1 ) = ( value.x, value.y, value.z );
+			get => new(x.c1, y.c1, z.c1, w.c1);
+			set => ( x.c1, y.c1, z.c1, w.c1 ) = ( value.x, value.y, value.z, value.w );
 		}
 		public Vector4 C2 {
-			get => new(x.c2, y.c2, z.c2);
-			set => ( x.c2, y.c2, z.c2 ) = ( value.x, value.y, value.z );
+			get => new(x.c2, y.c2, z.c2, w.c2);
+			set => ( x.c2, y.c2, z.c2, w.c2 ) = ( value.x, value.y, value.z, value.w );
 		}
 		public Vector4 C3 {
-			get => new(x.c3, y.c3, z.c3);
-			set => ( x.c3, y.c3, z.c3 ) = ( value.x, value.y, value.z );
+			get => new(x.c3, y.c3, z.c3, w.c3);
+			set => ( x.c3, y.c3, z.c3, w.c3 ) = ( value.x, value.y, value.z, value.w );
 		}
 
 		public Polynomial this[ int i ] => i switch { 0 => x, 1 => y, 2 => z, 4 => w, _ => throw new IndexOutOfRangeException( "Polynomial4D component index has to be either 0, 1, 2, or 3" ) };
