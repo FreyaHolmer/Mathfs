@@ -46,6 +46,9 @@ namespace Freya {
 			-1, 3, -3, 1
 		) / 6;
 
+		/// <summary>The inverse characteristic matrix of a quadratic bézier curve</summary>
+		public static readonly RationalMatrix3x3 quadraticBezierInverse = quadraticBezier.Inverse;
+
 		/// <summary>The inverse characteristic matrix of a cubic bézier curve</summary>
 		public static readonly RationalMatrix4x4 cubicBezierInverse = cubicBezier.Inverse;
 
