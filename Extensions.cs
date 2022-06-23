@@ -604,6 +604,12 @@ namespace Freya {
 		/// <inheritdoc cref="Mathfs.Remap(Bounds,Bounds,Vector3)"/>
 		[MethodImpl( INLINE )] public static Vector3 Remap( this Vector3 iPos, Bounds iBounds, Bounds oBounds ) => Mathfs.Remap( iBounds.min, iBounds.max, oBounds.min, oBounds.max, iPos );
 
+		/// <inheritdoc cref="Mathfs.Eerp(float,float,float)"/>
+		[MethodImpl( INLINE )] public static float Eerp( this float t, float a, float b ) => Mathfs.Eerp( a, b, t );
+
+		/// <inheritdoc cref="Mathfs.InverseEerp(float,float,float)"/>
+		[MethodImpl( INLINE )] public static float InverseEerp( this float v, float a, float b ) => Mathfs.InverseEerp( a, b, v );
+
 		#endregion
 
 		#region Vector Math
