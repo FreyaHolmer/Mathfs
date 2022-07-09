@@ -493,38 +493,38 @@ namespace Freya {
 		/// <inheritdoc cref="Mathfs.CeilToInt(Vector2)"/>
 		[MethodImpl( INLINE )] public static Vector3Int CeilToInt( this Vector3 value ) => Mathfs.CeilToInt( value );
 
-		/// <inheritdoc cref="Mathfs.Round(float)"/>
-		[MethodImpl( INLINE )] public static float Round( this float value ) => Mathfs.Round( value );
+		/// <inheritdoc cref="Mathfs.Round(float,MidpointRounding)"/>
+		[MethodImpl( INLINE )] public static float Round( this float value, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => Mathfs.Round( value, midpointRounding );
 
-		/// <inheritdoc cref="Mathfs.Round(Vector2)"/>
-		[MethodImpl( INLINE )] public static Vector2 Round( this Vector2 value ) => Mathfs.Round( value );
+		/// <inheritdoc cref="Mathfs.Round(Vector2,MidpointRounding)"/>
+		[MethodImpl( INLINE )] public static Vector2 Round( this Vector2 value, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => Mathfs.Round( value, midpointRounding );
 
-		/// <inheritdoc cref="Mathfs.Round(Vector2)"/>
-		[MethodImpl( INLINE )] public static Vector3 Round( this Vector3 value ) => Mathfs.Round( value );
+		/// <inheritdoc cref="Mathfs.Round(Vector2,MidpointRounding)"/>
+		[MethodImpl( INLINE )] public static Vector3 Round( this Vector3 value, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => Mathfs.Round( value, midpointRounding );
 
-		/// <inheritdoc cref="Mathfs.Round(Vector2)"/>
-		[MethodImpl( INLINE )] public static Vector4 Round( this Vector4 value ) => Mathfs.Round( value );
+		/// <inheritdoc cref="Mathfs.Round(Vector2,MidpointRounding)"/>
+		[MethodImpl( INLINE )] public static Vector4 Round( this Vector4 value, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => Mathfs.Round( value, midpointRounding );
 
-		/// <inheritdoc cref="Mathfs.Round(float)"/>
-		[MethodImpl( INLINE )] public static float Round( this float value, float snapInterval ) => Mathfs.Round( value, snapInterval );
+		/// <inheritdoc cref="Mathfs.Round(float,MidpointRounding)"/>
+		[MethodImpl( INLINE )] public static float Round( this float value, float snapInterval, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => Mathfs.Round( value, snapInterval, midpointRounding );
 
-		/// <inheritdoc cref="Mathfs.Round(Vector2)"/>
-		[MethodImpl( INLINE )] public static Vector2 Round( this Vector2 value, float snapInterval ) => Mathfs.Round( value, snapInterval );
+		/// <inheritdoc cref="Mathfs.Round(Vector2,MidpointRounding)"/>
+		[MethodImpl( INLINE )] public static Vector2 Round( this Vector2 value, float snapInterval, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => Mathfs.Round( value, snapInterval, midpointRounding );
 
-		/// <inheritdoc cref="Mathfs.Round(Vector2,float)"/>
-		[MethodImpl( INLINE )] public static Vector3 Round( this Vector3 value, float snapInterval ) => Mathfs.Round( value, snapInterval );
+		/// <inheritdoc cref="Mathfs.Round(Vector2,float,MidpointRounding)"/>
+		[MethodImpl( INLINE )] public static Vector3 Round( this Vector3 value, float snapInterval, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => Mathfs.Round( value, snapInterval, midpointRounding );
 
-		/// <inheritdoc cref="Mathfs.Round(Vector2,float)"/>
-		[MethodImpl( INLINE )] public static Vector4 Round( this Vector4 value, float snapInterval ) => Mathfs.Round( value, snapInterval );
+		/// <inheritdoc cref="Mathfs.Round(Vector2,float,MidpointRounding)"/>
+		[MethodImpl( INLINE )] public static Vector4 Round( this Vector4 value, float snapInterval, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => Mathfs.Round( value, snapInterval, midpointRounding );
 
-		/// <inheritdoc cref="Mathfs.RoundToInt(float)"/>
-		[MethodImpl( INLINE )] public static int RoundToInt( this float value ) => Mathfs.RoundToInt( value );
+		/// <inheritdoc cref="Mathfs.RoundToInt(float,MidpointRounding)"/>
+		[MethodImpl( INLINE )] public static int RoundToInt( this float value, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => Mathfs.RoundToInt( value, midpointRounding );
 
-		/// <inheritdoc cref="Mathfs.RoundToInt(Vector2)"/>
-		[MethodImpl( INLINE )] public static Vector2Int RoundToInt( this Vector2 value ) => Mathfs.RoundToInt( value );
+		/// <inheritdoc cref="Mathfs.RoundToInt(Vector2,MidpointRounding)"/>
+		[MethodImpl( INLINE )] public static Vector2Int RoundToInt( this Vector2 value, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => Mathfs.RoundToInt( value, midpointRounding );
 
-		/// <inheritdoc cref="Mathfs.RoundToInt(Vector2)"/>
-		[MethodImpl( INLINE )] public static Vector3Int RoundToInt( this Vector3 value ) => Mathfs.RoundToInt( value );
+		/// <inheritdoc cref="Mathfs.RoundToInt(Vector2,MidpointRounding)"/>
+		[MethodImpl( INLINE )] public static Vector3Int RoundToInt( this Vector3 value, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => Mathfs.RoundToInt( value, midpointRounding );
 
 		#endregion
 
