@@ -48,7 +48,7 @@ namespace Freya {
 		/// <summary>Returns whether or not this range contains the value <c>v</c></summary>
 		/// <param name="v">The value to see if it's inside</param>
 		public bool Contains( float v ) => v >= Min && v <= Max;
-		
+
 		/// <summary>Returns whether or not this range contains the range <c>r</c></summary>
 		/// <param name="r">The range to see if it's inside</param>
 		public bool Contains( FloatRange r ) => r.Min >= Min && r.Max <= Max;

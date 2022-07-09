@@ -119,27 +119,27 @@ namespace Freya {
 		/// <param name="p">The point to mirror</param>
 		/// <param name="pivot">The point to mirror around</param>
 		[MethodImpl( INLINE )] public static Vector2 MirrorAround( this Vector2 p, Vector2 pivot ) => new(2 * pivot.x - p.x, 2 * pivot.y - p.y);
-		
+
 		/// <summary>Mirrors this vector around an x coordinate</summary>
 		/// <param name="p">The point to mirror</param>
 		/// <param name="xPivot">The x coordinate to mirror around</param>
-		[MethodImpl( INLINE )] public static Vector2 MirrorAroundX( this Vector2 p, float xPivot ) => new(2 * xPivot - p.x, p.y );
-		
+		[MethodImpl( INLINE )] public static Vector2 MirrorAroundX( this Vector2 p, float xPivot ) => new(2 * xPivot - p.x, p.y);
+
 		/// <summary>Mirrors this vector around a y coordinate</summary>
 		/// <param name="p">The point to mirror</param>
 		/// <param name="yPivot">The y coordinate to mirror around</param>
-		[MethodImpl( INLINE )] public static Vector2 MirrorAroundY( this Vector2 p, float yPivot ) => new(p.x, 2 * yPivot - p.y );
-		
+		[MethodImpl( INLINE )] public static Vector2 MirrorAroundY( this Vector2 p, float yPivot ) => new(p.x, 2 * yPivot - p.y);
+
 		/// <inheritdoc cref="MirrorAroundX(Vector2,float)"/>
-		[MethodImpl( INLINE )] public static Vector3 MirrorAroundX( this Vector3 p, float xPivot ) => new(2 * xPivot - p.x, p.y, p.z );
-		
+		[MethodImpl( INLINE )] public static Vector3 MirrorAroundX( this Vector3 p, float xPivot ) => new(2 * xPivot - p.x, p.y, p.z);
+
 		/// <inheritdoc cref="MirrorAroundY(Vector2,float)"/>
-		[MethodImpl( INLINE )] public static Vector3 MirrorAroundY( this Vector3 p, float yPivot ) => new(p.x, 2 * yPivot - p.y, p.z );
-		
+		[MethodImpl( INLINE )] public static Vector3 MirrorAroundY( this Vector3 p, float yPivot ) => new(p.x, 2 * yPivot - p.y, p.z);
+
 		/// <summary>Mirrors this vector around a y coordinate</summary>
 		/// <param name="p">The point to mirror</param>
 		/// <param name="zPivot">The z coordinate to mirror around</param>
-		[MethodImpl( INLINE )] public static Vector3 MirrorAroundZ( this Vector3 p, float zPivot ) => new(p.x, p.y, 2 * zPivot - p.z );
+		[MethodImpl( INLINE )] public static Vector3 MirrorAroundZ( this Vector3 p, float zPivot ) => new(p.x, p.y, 2 * zPivot - p.z);
 
 		/// <inheritdoc cref="MirrorAround(Vector2,Vector2)"/>
 		[MethodImpl( INLINE )] public static Vector3 MirrorAround( this Vector3 p, Vector3 pivot ) => new(2 * pivot.x - p.x, 2 * pivot.y - p.y, 2 * pivot.z - p.z);
