@@ -75,6 +75,10 @@ namespace Freya {
 				_ => ( Mathfs.Min( b, value ), Mathfs.Max( a, value ) ) // reversed - b is min, a is max
 			};
 
+		/// <summary>Returns a version of this range, scaled around its start value</summary>
+		/// <param name="scale">The value to scale the range by</param>
+		public FloatRange ScaleFromStart( float scale ) => new FloatRange( a, a + scale * ( b - a ) );
+
 		/// <summary>Returns the rectangle encapsulating the region defined by a range per axis. Note: The direction of each range is ignored</summary>
 		/// <param name="rangeX">The range of the X axis</param>
 		/// <param name="rangeY">The range of the Y axis</param>
