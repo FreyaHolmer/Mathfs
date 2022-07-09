@@ -540,37 +540,37 @@ namespace Freya {
 		[MethodImpl( INLINE )] public static Vector3Int CeilToInt( Vector3 value ) => new Vector3Int( (int)Math.Ceiling( value.x ), (int)Math.Ceiling( value.y ), (int)Math.Ceiling( value.z ) );
 
 		/// <summary>Rounds the value to the nearest integer</summary>
-		[MethodImpl( INLINE )] public static float Round( float value ) => (float)Math.Round( value );
+		[MethodImpl( INLINE )] public static float Round( float value, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => (float)MathF.Round( value, midpointRounding );
 
 		/// <summary>Rounds the vector components to the nearest integer</summary>
-		[MethodImpl( INLINE )] public static Vector2 Round( Vector2 value ) => new Vector2( (float)Math.Round( value.x ), (float)Math.Round( value.y ) );
+		[MethodImpl( INLINE )] public static Vector2 Round( Vector2 value, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => new Vector2( (float)Math.Round( value.x, midpointRounding ), (float)Math.Round( value.y, midpointRounding ) );
 
-		/// <inheritdoc cref="Mathfs.Round(Vector2)"/>
-		[MethodImpl( INLINE )] public static Vector3 Round( Vector3 value ) => new Vector3( (float)Math.Round( value.x ), (float)Math.Round( value.y ), (float)Math.Round( value.z ) );
+		/// <inheritdoc cref="Mathfs.Round(Vector2,MidpointRounding)"/>
+		[MethodImpl( INLINE )] public static Vector3 Round( Vector3 value, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => new Vector3( (float)Math.Round( value.x, midpointRounding ), (float)Math.Round( value.y, midpointRounding ), (float)Math.Round( value.z, midpointRounding ) );
 
-		/// <inheritdoc cref="Mathfs.Round(Vector2)"/>
-		[MethodImpl( INLINE )] public static Vector4 Round( Vector4 value ) => new Vector4( (float)Math.Round( value.x ), (float)Math.Round( value.y ), (float)Math.Round( value.z ), (float)Math.Round( value.w ) );
+		/// <inheritdoc cref="Mathfs.Round(Vector2,MidpointRounding)"/>
+		[MethodImpl( INLINE )] public static Vector4 Round( Vector4 value, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => new Vector4( (float)Math.Round( value.x, midpointRounding ), (float)Math.Round( value.y, midpointRounding ), (float)Math.Round( value.z, midpointRounding ), (float)Math.Round( value.w, midpointRounding ) );
 
 		/// <summary>Rounds the value to the nearest value, snapped to the given interval size</summary>
-		[MethodImpl( INLINE )] public static float Round( float value, float snapInterval ) => Mathf.Round( value / snapInterval ) * snapInterval;
+		[MethodImpl( INLINE )] public static float Round( float value, float snapInterval, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => (float)Math.Round( value / snapInterval, midpointRounding ) * snapInterval;
 
 		/// <summary>Rounds the vector components to the nearest value, snapped to the given interval size</summary>
-		[MethodImpl( INLINE )] public static Vector2 Round( Vector2 value, float snapInterval ) => new Vector2( Round( value.x, snapInterval ), Round( value.y, snapInterval ) );
+		[MethodImpl( INLINE )] public static Vector2 Round( Vector2 value, float snapInterval, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => new Vector2( Round( value.x, snapInterval, midpointRounding ), Round( value.y, snapInterval, midpointRounding ) );
 
-		/// <inheritdoc cref="Mathfs.Round(Vector2,float)"/>
-		[MethodImpl( INLINE )] public static Vector3 Round( Vector3 value, float snapInterval ) => new Vector3( Round( value.x, snapInterval ), Round( value.y, snapInterval ), Round( value.z, snapInterval ) );
+		/// <inheritdoc cref="Mathfs.Round(Vector2,float,MidpointRounding)"/>
+		[MethodImpl( INLINE )] public static Vector3 Round( Vector3 value, float snapInterval, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => new Vector3( Round( value.x, snapInterval, midpointRounding ), Round( value.y, snapInterval, midpointRounding ), Round( value.z, snapInterval, midpointRounding ) );
 
-		/// <inheritdoc cref="Mathfs.Round(Vector2,float)"/>
-		[MethodImpl( INLINE )] public static Vector4 Round( Vector4 value, float snapInterval ) => new Vector4( Round( value.x, snapInterval ), Round( value.y, snapInterval ), Round( value.z, snapInterval ), Round( value.w, snapInterval ) );
+		/// <inheritdoc cref="Mathfs.Round(Vector2,float,MidpointRounding)"/>
+		[MethodImpl( INLINE )] public static Vector4 Round( Vector4 value, float snapInterval, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => new Vector4( Round( value.x, snapInterval, midpointRounding ), Round( value.y, snapInterval, midpointRounding ), Round( value.z, snapInterval, midpointRounding ), Round( value.w, snapInterval, midpointRounding ) );
 
 		/// <summary>Rounds the value to the nearest integer, returning an int value</summary>
-		[MethodImpl( INLINE )] public static int RoundToInt( float value ) => (int)Math.Round( value );
+		[MethodImpl( INLINE )] public static int RoundToInt( float value, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => (int)Math.Round( value, midpointRounding );
 
 		/// <summary>Rounds the vector components to the nearest integer, returning an integer vector</summary>
-		[MethodImpl( INLINE )] public static Vector2Int RoundToInt( Vector2 value ) => new Vector2Int( (int)Math.Round( value.x ), (int)Math.Round( value.y ) );
+		[MethodImpl( INLINE )] public static Vector2Int RoundToInt( Vector2 value, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => new Vector2Int( (int)Math.Round( value.x, midpointRounding ), (int)Math.Round( value.y, midpointRounding ) );
 
-		/// <inheritdoc cref="Mathfs.RoundToInt(Vector2)"/>
-		[MethodImpl( INLINE )] public static Vector3Int RoundToInt( Vector3 value ) => new Vector3Int( (int)Math.Round( value.x ), (int)Math.Round( value.y ), (int)Math.Round( value.z ) );
+		/// <inheritdoc cref="Mathfs.RoundToInt(Vector2,MidpointRounding)"/>
+		[MethodImpl( INLINE )] public static Vector3Int RoundToInt( Vector3 value, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => new Vector3Int( (int)Math.Round( value.x, midpointRounding ), (int)Math.Round( value.y, midpointRounding ), (int)Math.Round( value.z, midpointRounding ) );
 
 		#endregion
 
