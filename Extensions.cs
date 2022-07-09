@@ -182,6 +182,15 @@ namespace Freya {
 			return r;
 		}
 
+		/// <summary>Interpolates a position within this rectangle, given a normalized position</summary>
+		/// <param name="r">The rectangle to get a position within</param>
+		/// <param name="tPos">The normalized position within this rectangle</param>
+		public static Vector2 Lerp( this Rect r, Vector2 tPos ) =>
+			new(
+				Mathfs.Lerp( r.xMin, r.xMax, tPos.x ),
+				Mathfs.Lerp( r.yMin, r.yMax, tPos.y )
+			);
+
 		#endregion
 
 		#region Simple float and int operations
