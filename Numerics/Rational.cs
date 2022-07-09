@@ -35,7 +35,7 @@ namespace Freya {
 						( n, d ) = ( 0, 1 );
 						break;
 					}
-					
+
 					// ensure only the numerator carries the sign
 					int sign = Mathfs.Sign( den );
 					n = sign * num;
@@ -81,6 +81,7 @@ namespace Freya {
 
 		// type casting
 		public static implicit operator Rational( int n ) => new(n, 1);
+		public static explicit operator int( Rational r ) => r.IsInteger ? r.n : throw new ArithmeticException( $"Rational value {r} can't be cast to an integer" );
 		public static explicit operator float( Rational r ) => (float)r.n / r.d;
 		public static explicit operator double( Rational r ) => (double)r.n / r.d;
 
