@@ -17,6 +17,8 @@ namespace Freya {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 
+		public static readonly bool[] bools = { false, true };
+
 		#region Constants
 
 		/// <summary>The circle constant. Defined as the circumference of a circle divided by its radius. Equivalent to 2*pi</summary>
