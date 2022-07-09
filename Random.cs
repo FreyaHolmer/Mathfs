@@ -20,9 +20,14 @@ namespace Freya {
 		public static float Direction1D => Sign;
 
 		/// <summary>Randomly returns a value between <c>min</c> [inclusive] and <c>max</c> [inclusive]</summary>
-		/// <param name="min">The minimum value</param>
-		/// <param name="max">The maximum value</param>
+		/// <param name="min">The minimum value [inclusive] </param>
+		/// <param name="max">The maximum value [inclusive]</param>
 		public static float Range( float min, float max ) => UnityRandom.Range( min, max );
+		
+		/// <summary>Randomly returns a value between <c>min</c> [inclusive] and <c>max</c> [exclusive]</summary>
+		/// <param name="min">The minimum value [inclusive]</param>
+		/// <param name="max">The maximum value [exclusive]</param>
+		public static int Range( int min, int max ) => UnityRandom.Range( min, max );
 
 		// 2D
 		/// <summary>Returns a random point on the unit circle</summary>
