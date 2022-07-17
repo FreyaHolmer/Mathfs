@@ -168,6 +168,7 @@ namespace Freya {
 		public static Polynomial3D operator *( Polynomial3D p, float v ) => new(p.C0 * v, p.C1 * v, p.C2 * v, p.C3 * v);
 		public static Polynomial3D operator *( float v, Polynomial3D p ) => p * v;
 
+		public static explicit operator Polynomial2D( Polynomial3D p ) => new(p.x, p.y);
 		public static explicit operator Vector3Matrix3x1( Polynomial3D poly ) => new(poly.C0, poly.C1, poly.C2);
 		public static explicit operator Vector3Matrix4x1( Polynomial3D poly ) => new(poly.C0, poly.C1, poly.C2, poly.C3);
 		public static explicit operator BezierQuad3D( Polynomial3D poly ) => poly.Degree < 3 ? new BezierQuad3D( CharMatrix.quadraticBezierInverse * (Vector3Matrix3x1)poly ) : throw new InvalidCastException( "Cannot cast a cubic polynomial to a quadratic curve" );
@@ -177,7 +178,7 @@ namespace Freya {
 		public static explicit operator UBSCubic3D( Polynomial3D poly ) => new(CharMatrix.cubicUniformBsplineInverse * (Vector3Matrix4x1)poly);
 
 		#endregion
-		
+
 	}
 
 }
