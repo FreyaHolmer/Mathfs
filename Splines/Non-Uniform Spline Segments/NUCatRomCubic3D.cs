@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Freya {
 
 	/// <summary>A non-uniform cubic catmull-rom 3D curve</summary>
-	[Serializable] public struct NUCatRomCubic3D : IParamSplineSegment<Polynomial3D,Vector3Matrix4x1> {
+	[Serializable] public struct NUCatRomCubic3D : IParamSplineSegment<Polynomial3D, Vector3Matrix4x1> {
 
 		public enum KnotCalcMode {
 			Manual,
@@ -19,14 +19,19 @@ namespace Freya {
 
 		#region Constructors
 
-		/// <inheritdoc cref="NUCatRomCubic2D(Vector2,Vector2,Vector2,Vector2,float,float,float,float)"/>
-		public NUCatRomCubic3D( Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float k0, float k1, float k2, float k3 ) {
-			pointMatrix = new Vector3Matrix4x1( p0, p1, p2, p3 );
-			( this.k0, this.k1, this.k2, this.k3 ) = ( k0, k1, k2, k3 );
+		/// <inheritdoc cref="NUCatRomCubic2D(Vector2Matrix4x1,Matrix4x1)"/>
+		public NUCatRomCubic3D( Vector3Matrix4x1 pointMatrix, Matrix4x1 knotVector ) {
+			this.pointMatrix = pointMatrix;
+			this.knotVector = knotVector;
 			validCoefficients = false;
 			curve = default;
 			knotCalcMode = KnotCalcMode.Manual;
 			alpha = default; // unused when using manual knots
+		}
+
+		/// <inheritdoc cref="NUCatRomCubic2D(Vector2,Vector2,Vector2,Vector2,float,float,float,float)"/>
+		public NUCatRomCubic3D( Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float k0, float k1, float k2, float k3 )
+			: this( new Vector3Matrix4x1( p0, p1, p2, p3 ), new Matrix4x1( k0, k1, k2, k3 ) ) {
 		}
 
 		/// <inheritdoc cref="NUCatRomCubic2D(Vector2,Vector2,Vector2,Vector2)"/>
@@ -43,7 +48,7 @@ namespace Freya {
 			pointMatrix = new Vector3Matrix4x1( p0, p1, p2, p3 );
 			validCoefficients = false;
 			curve = default;
-			k0 = k1 = k2 = k3 = default;
+			knotVector = default;
 			knotCalcMode = parameterizeToUnitInterval ? KnotCalcMode.AutoUnitInterval : KnotCalcMode.Auto;
 			this.alpha = alpha;
 		}
@@ -56,7 +61,15 @@ namespace Freya {
 			get => pointMatrix;
 			set => _ = ( pointMatrix = value, validCoefficients = false );
 		}
-		[SerializeField] float k0, k1, k2, k3; // knot vector
+		[SerializeField] Matrix4x1 knotVector;
+		public Matrix4x1 KnotVector {
+			get {
+				if( knotCalcMode != KnotCalcMode.Manual )
+					ReadyCoefficients();
+				return knotVector;
+			}
+			set => _ = ( knotVector = value, validCoefficients = false );
+		}
 
 		// knot auto-calculation fields
 		[SerializeField] KnotCalcMode knotCalcMode; // knot recalculation mode
@@ -95,39 +108,23 @@ namespace Freya {
 
 		/// <inheritdoc cref="NUCatRomCubic2D.K0"/>
 		public float K0 {
-			[MethodImpl( INLINE )] get {
-				if( knotCalcMode != KnotCalcMode.Manual )
-					ReadyCoefficients();
-				return k0;
-			}
-			set => _ = ( k0 = value, validCoefficients = false );
+			[MethodImpl( INLINE )] get => KnotVector.m0;
+			[MethodImpl( INLINE )] set => _ = ( knotVector.m0 = value, validCoefficients = false );
 		}
 		/// <inheritdoc cref="NUCatRomCubic2D.K1"/>
 		public float K1 {
-			[MethodImpl( INLINE )] get {
-				if( knotCalcMode != KnotCalcMode.Manual )
-					ReadyCoefficients();
-				return k1;
-			}
-			set => _ = ( k1 = value, validCoefficients = false );
+			[MethodImpl( INLINE )] get => KnotVector.m1;
+			[MethodImpl( INLINE )] set => _ = ( knotVector.m1 = value, validCoefficients = false );
 		}
 		/// <inheritdoc cref="NUCatRomCubic2D.K2"/>
 		public float K2 {
-			[MethodImpl( INLINE )] get {
-				if( knotCalcMode != KnotCalcMode.Manual )
-					ReadyCoefficients();
-				return k2;
-			}
-			set => _ = ( k2 = value, validCoefficients = false );
+			[MethodImpl( INLINE )] get => KnotVector.m2;
+			[MethodImpl( INLINE )] set => _ = ( knotVector.m2 = value, validCoefficients = false );
 		}
 		/// <inheritdoc cref="NUCatRomCubic2D.K3"/>
 		public float K3 {
-			[MethodImpl( INLINE )] get {
-				if( knotCalcMode != KnotCalcMode.Manual )
-					ReadyCoefficients();
-				return k3;
-			}
-			set => _ = ( k3 = value, validCoefficients = false );
+			[MethodImpl( INLINE )] get => KnotVector.m3;
+			[MethodImpl( INLINE )] set => _ = ( knotVector.m3 = value, validCoefficients = false );
 		}
 
 		/// <inheritdoc cref="NUCatRomCubic2D.Alpha"/>
@@ -146,19 +143,19 @@ namespace Freya {
 				return; // no need to update
 			validCoefficients = true;
 			if( knotCalcMode != KnotCalcMode.Manual )
-				( k0, k1, k2, k3 ) = SplineUtils.CalcCatRomKnots( pointMatrix, alpha, knotCalcMode == KnotCalcMode.AutoUnitInterval );
-			curve = SplineUtils.CalculateCatRomCurve( pointMatrix, k0, k1, k2, k3 );
+				KnotVector = SplineUtils.CalcCatRomKnots( pointMatrix, alpha, knotCalcMode == KnotCalcMode.AutoUnitInterval );
+			curve = SplineUtils.CalculateCatRomCurve( pointMatrix, knotVector );
 		}
 
 		/// <inheritdoc cref="NUCatRomCubic2D.GetPointWeightAtKnotValue(int,float)"/>
 		public float GetPointWeightAtKnotValue( int i, float u ) {
-			float a = Mathfs.InverseLerp( k0, k1, u );
-			float b = Mathfs.InverseLerp( k1, k2, u );
-			float c = Mathfs.InverseLerp( k2, k3, u );
-			float d = Mathfs.InverseLerp( k0, k2, u );
-			float g = Mathfs.InverseLerp( k1, k3, u );
+			float a = Mathfs.InverseLerp( K0, K1, u );
+			float b = Mathfs.InverseLerp( K1, K2, u );
+			float c = Mathfs.InverseLerp( K2, K3, u );
+			float d = Mathfs.InverseLerp( K0, K2, u );
+			float g = Mathfs.InverseLerp( K1, K3, u );
 			switch( i ) {
-				case 0:  return -( a - 1 ) * ( b - 1 ) * ( d - 1 );
+				case 0:  return ( 1 - a ) * ( 1 - b ) * ( 1 - d );
 				case 1:  return ( b - 1 ) * ( a * d - a + b * ( d + g - 1 ) - d );
 				case 2:  return -b * ( b * ( d + g - 1 ) + g * ( c - 1 ) - d );
 				case 3:  return b * c * g;
