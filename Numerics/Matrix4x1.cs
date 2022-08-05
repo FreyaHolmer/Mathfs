@@ -16,6 +16,9 @@ namespace Freya {
 				}
 			}
 		}
+		/// <summary>Linearly interpolates between two matrices, based on a value <c>t</c></summary>
+		/// <param name="t">The value to blend by</param>
+		public static Matrix4x1 Lerp( Matrix4x1 a, Matrix4x1 b, float t ) => new Matrix4x1(Mathfs.Lerp( a.m0, b.m0, t ), Mathfs.Lerp( a.m1, b.m1, t ), Mathfs.Lerp( a.m2, b.m2, t ), Mathfs.Lerp( a.m3, b.m3, t ));
 		public static bool operator ==( Matrix4x1 a, Matrix4x1 b ) => a.m0 == b.m0 && a.m1 == b.m1 && a.m2 == b.m2 && a.m3 == b.m3;
 		public static bool operator !=( Matrix4x1 a, Matrix4x1 b ) => !( a == b );
 		public bool Equals( Matrix4x1 other ) => m0.Equals( other.m0 ) && m1.Equals( other.m1 ) && m2.Equals( other.m2 ) && m3.Equals( other.m3 );

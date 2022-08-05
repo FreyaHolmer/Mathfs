@@ -186,8 +186,8 @@ namespace Freya {
 			string[] compRangeStr = compRange.Select( c => vCompStr[c].ToString() ).ToArray();
 			string JoinRange( string separator, Func<int, string> elem ) => string.Join( separator, elemRange.Select( elem ) );
 			string typePrefix = dim switch { > 1 => $"Vector{dim}", _ => "" };
-			string elemType = dim switch { 1     => "float", > 1      => $"Vector{dim}", _ => throw new Exception( "Invalid type" ) };
-
+			string lerpName = GetLerpName( dim );
+			string elemType = dim switch { 1 => "float", > 1 => $"Vector{dim}", _ => throw new Exception( "Invalid type" ) };
 			string typeName = $"{typePrefix}Matrix{count}x1";
 			string csParams = JoinRange( ", ", i => $"m{i}" );
 			string csParamsThis = JoinRange( ", ", i => $"this.m{i}" );
@@ -196,6 +196,7 @@ namespace Freya {
 			string indexerGetterCases = JoinRange( ", ", i => $"{i} => m{i}" ) + $", _ => {indexerException}";
 			string equalsCompare = JoinRange( " && ", i => $"m{i}.Equals( other.m{i} )" );
 			string equalsOpCompare = JoinRange( " && ", i => $"a.m{i} == b.m{i}" );
+			string lerpAtoB = JoinRange( ", ", i => $"{lerpName}( a.m{i}, b.m{i}, t )" );
 
 
 			// generate content
@@ -238,6 +239,11 @@ namespace Freya {
 							code.Append( $"public Matrix{count}x1 {vCompStrUp[c]} => new({parameters});" );
 						}
 					}
+
+					// interpolation
+					code.Summary( "Linearly interpolates between two matrices, based on a value <c>t</c>" );
+					code.Param( "t", "The value to blend by" );
+					code.Append( $"public static {typeName} Lerp( {typeName} a, {typeName} b, float t ) => new {typeName}({lerpAtoB});" );
 
 					// comparison/operators
 					code.Append( $"public static bool operator ==( {typeName} a, {typeName} b ) => {equalsOpCompare};" );
@@ -298,12 +304,12 @@ namespace Freya {
 					code.LineBreak();
 
 					// constructors
-					string ctorSummary = $"Creates a uniform {dim}D {degFullLower} {type.prettyNameLower} segment, from {ptCount} control points"; 
+					string ctorSummary = $"Creates a uniform {dim}D {degFullLower} {type.prettyNameLower} segment, from {ptCount} control points";
 					code.Summary( ctorSummary );
 					for( int i = 0; i < ptCount; i++ )
 						type.AppendParamStrings( code, degree, i );
 					code.Append( $"public {structName}( {ctorParams} ) : this(new {pointMatrixType}({csPoints})){{}}" );
-					
+
 					code.Summary( ctorSummary );
 					code.Param( "pointMatrix", "The matrix containing the control points of this spline" );
 					code.Append( $"public {structName}( {pointMatrixType} pointMatrix ) => (this.pointMatrix,curve,validCoefficients) = (pointMatrix,default,false);" );
