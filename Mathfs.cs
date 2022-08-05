@@ -592,7 +592,7 @@ namespace Freya {
 		[MethodImpl( INLINE )] public static float Repeat( float value, float length ) => Clamp( value - Floor( value / length ) * length, 0.0f, length );
 
 		/// <summary>Modulo, but, behaves the way you want with negative values, for stuff like array[(n+1)%length] etc.</summary>
-		[MethodImpl( INLINE )] public static int Mod( int value, int length ) => ( value % length + length ) % length;
+		[MethodImpl( INLINE )] public static int Mod( int value, int length ) => value >= 0 ? value % length : ( value % length + length ) % length;
 
 		/// <summary>Repeats a value within a range, going back and forth</summary>
 		[MethodImpl( INLINE )] public static float PingPong( float t, float length ) => length - Abs( Repeat( t, length * 2f ) - length );
