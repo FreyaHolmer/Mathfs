@@ -183,7 +183,7 @@ namespace Freya {
 
 			if( Circle2D.FromThreePoints( default, b2D, c2D, out Circle2D circle2D ) ) {
 				Vector3 origin = xAxis * circle2D.center.x + yAxis * circle2D.center.y;
-				circle = new Circle3D( origin, normal, circle2D.radius );
+				circle = new Circle3D( a + origin, normal, circle2D.radius );
 				return true;
 			}
 
