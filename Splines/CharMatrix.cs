@@ -87,6 +87,17 @@ namespace Freya {
 				_ => throw new IndexOutOfRangeException( "Basis index needs to be between 0 and 3" )
 			};
 		}
+		
+		/// <inheritdoc cref="GetBasisFunction(RationalMatrix4x4,int)"/>
+		public static Polynomial GetBasisFunction( Matrix4x4 c, int i ) {
+			return i switch {
+				0 => new Polynomial( c.m00, c.m10, c.m20, c.m30 ),
+				1 => new Polynomial( c.m01, c.m11, c.m21, c.m31 ),
+				2 => new Polynomial( c.m02, c.m12, c.m22, c.m32 ),
+				3 => new Polynomial( c.m03, c.m13, c.m23, c.m33 ),
+				_ => throw new IndexOutOfRangeException( "Basis index needs to be between 0 and 3" )
+			};
+		}
 
 
 	}
