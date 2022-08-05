@@ -100,6 +100,9 @@ namespace Freya {
 			return new Bounds( center, size );
 		}
 
+		public static FloatRange operator -( FloatRange range, float v ) => new(range.a - v, range.b - v);
+		public static FloatRange operator +( FloatRange range, float v ) => new(range.a + v, range.b + v);
+
 		public static implicit operator FloatRange( (float a, float b) tuple ) => new FloatRange( tuple.a, tuple.b );
 		public static bool operator ==( FloatRange a, FloatRange b ) => a.a == b.a && a.b == b.b;
 		public static bool operator !=( FloatRange a, FloatRange b ) => a.a != b.a || a.b != b.b;
