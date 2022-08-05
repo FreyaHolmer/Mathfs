@@ -191,6 +191,14 @@ namespace Freya {
 				Mathfs.Lerp( r.yMin, r.yMax, tPos.y )
 			);
 
+		/// <summary>The x axis range of this rectangle</summary>
+		/// <param name="rect">The rectangle to get the x range of</param>
+		public static FloatRange RangeX( this Rect rect ) => ( rect.xMin, rect.xMax );
+
+		/// <summary>The y axis range of this rectangle</summary>
+		/// <param name="rect">The rectangle to get the y range of</param>
+		public static FloatRange RangeY( this Rect rect ) => ( rect.yMin, rect.yMax );
+
 		#endregion
 
 		#region Simple float and int operations
