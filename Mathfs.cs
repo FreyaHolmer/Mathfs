@@ -157,6 +157,9 @@ namespace Freya {
 		/// <summary>A very small value, used for various floating point inaccuracy thresholds</summary>
 		public static readonly float Epsilon = UnityEngineInternal.MathfInternal.IsFlushToZeroEnabled ? UnityEngineInternal.MathfInternal.FloatMinNormal : UnityEngineInternal.MathfInternal.FloatMinDenormal;
 
+        /// <summary>A very small value, multiplied by 8, used for various floating point approximate checks</summary>
+		public static readonly float Epsilon8 = Epsilon * 8;
+
 		/// <summary>float.PositiveInfinity</summary>
 		public const float Infinity = float.PositiveInfinity;
 
@@ -167,7 +170,7 @@ namespace Freya {
 		/// They are considered equal if they are within a <c>Mathfs.Epsilon*8</c> or <c>max(a,b)*0.000001f</c> range of each other</summary>
 		/// <param name="a">The first value to compare</param>
 		/// <param name="b">The second value to compare</param>
-		[MethodImpl( INLINE )] public static bool Approximately( float a, float b ) => Abs( b - a ) < Max( 0.000001f * Max( Abs( a ), Abs( b ) ), Epsilon * 8 );
+		[MethodImpl( INLINE )] public static bool Approximately( float a, float b ) => Abs( b - a ) < Max( 0.000001f * Max( Abs( a ), Abs( b ) ), Epsilon8 );
 
 		/// <inheritdoc cref="Approximately(float,float)"/>
 		[MethodImpl( INLINE )] public static bool Approximately( Vector2 a, Vector2 b ) => Approximately( a.x, b.x ) && Approximately( a.y, b.y );
