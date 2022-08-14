@@ -172,6 +172,25 @@ namespace Freya {
 		/// <param name="b">The second value to compare</param>
 		[MethodImpl( INLINE )] public static bool Approximately( float a, float b ) => Abs( b - a ) < Max( 0.000001f * Max( Abs( a ), Abs( b ) ), Epsilon8 );
 
+		/// <summary>Returns whether or not three values are approximately equal.
+		/// They are considered equal if they are within a <c>Mathfs.Epsilon*8</c> or <c>max(a,b)*0.000001f</c> range of each other</summary>
+		/// <param name="a">The first value to compare</param>
+		/// <param name="b">The second value to compare</param>
+		/// <param name="c">The third value to compare</param>
+		[MethodImpl( INLINE )] public static bool Approximately( float a, float b, float c ) => Approximately( Min( a, b, c ), Max( a, b, c ) );
+
+		/// <summary>Returns whether or not four values are approximately equal.
+		/// They are considered equal if they are within a <c>Mathfs.Epsilon*8</c> or <c>max(a,b)*0.000001f</c> range of each other</summary>
+		/// <param name="a">The first value to compare</param>
+		/// <param name="b">The second value to compare</param>
+		/// <param name="c">The third value to compare</param>
+		/// <param name="d">The fourth value to compare</param>
+		[MethodImpl( INLINE )] public static bool Approximately( float a, float b, float c, float d ) => Approximately( Min( a, b, c, d ), Max( a, b, c, d ) );
+
+		/// <summary>Returns whether or not the given values are approximately equal.
+		/// They are considered equal if they are within a <c>Mathfs.Epsilon*8</c> or <c>max(a,b)*0.000001f</c> range of each other</summary>
+		[MethodImpl( INLINE )] public static bool Approximately( params float[] values ) => Approximately( Min( values ), Max( values ) );
+
 		/// <inheritdoc cref="Approximately(float,float)"/>
 		[MethodImpl( INLINE )] public static bool Approximately( Vector2 a, Vector2 b ) => Approximately( a.x, b.x ) && Approximately( a.y, b.y );
 
