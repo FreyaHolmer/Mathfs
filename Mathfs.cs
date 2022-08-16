@@ -274,10 +274,10 @@ namespace Freya {
 		[MethodImpl( INLINE )] public static float Tanh( float x ) => (float)Math.Tanh( x );
 
 		/// <summary>Returns the hyperbolic arc cosine of the given value</summary>
-		[MethodImpl( INLINE )] public static float Acosh( float x ) => (float)Math.Log( x + Mathf.Sqrt( x * x - 1 ) );
+		[MethodImpl( INLINE )] public static float Acosh( float x ) => (float)Math.Log( x + Sqrt( x * x - 1 ) );
 
 		/// <summary>Returns the hyperbolic arc sine of the given value</summary>
-		[MethodImpl( INLINE )] public static float Asinh( float x ) => (float)Math.Log( x + Mathf.Sqrt( x * x + 1 ) );
+		[MethodImpl( INLINE )] public static float Asinh( float x ) => (float)Math.Log( x + Sqrt( x * x + 1 ) );
 
 		/// <summary>Returns the hyperbolic arc tangent of the given value</summary>
 		[MethodImpl( INLINE )] public static float Atanh( float x ) => (float)( 0.5 * Math.Log( ( 1 + x ) / ( 1 - x ) ) );
@@ -635,7 +635,7 @@ namespace Freya {
 		[MethodImpl( INLINE )] public static Vector4 Round( Vector4 value ) => new Vector4( (float)Math.Round( value.x ), (float)Math.Round( value.y ), (float)Math.Round( value.z ), (float)Math.Round( value.w ) );
 
 		/// <summary>Rounds the value to the nearest value, snapped to the given interval size</summary>
-		[MethodImpl( INLINE )] public static float Round( float value, float snapInterval ) => Mathf.Round( value / snapInterval ) * snapInterval;
+		[MethodImpl( INLINE )] public static float Round( float value, float snapInterval ) => Round( value / snapInterval ) * snapInterval;
 
 		/// <summary>Rounds the vector components to the nearest value, snapped to the given interval size</summary>
 		[MethodImpl( INLINE )] public static Vector2 Round( Vector2 value, float snapInterval ) => new Vector2( Round( value.x, snapInterval ), Round( value.y, snapInterval ) );
@@ -861,13 +861,13 @@ namespace Freya {
 		/// <param name="a">The start value</param>
 		/// <param name="b">The end value</param>
 		/// <param name="t">The t-value from 0 to 1 representing position along the eerp</param>
-		[MethodImpl( INLINE )] public static float Eerp( float a, float b, float t ) => Mathf.Pow( a, 1 - t ) * Mathf.Pow( b, t );
+		[MethodImpl( INLINE )] public static float Eerp( float a, float b, float t ) => Pow( a, 1 - t ) * Pow( b, t );
 
 		/// <summary>Inverse exponential interpolation, the multiplicative version of InverseLerp, useful for values such as scaling or zooming</summary>
 		/// <param name="a">The start value</param>
 		/// <param name="b">The end value</param>
 		/// <param name="v">A value between a and b. Note: values outside this range are still valid, and will be extrapolated</param>
-		[MethodImpl( INLINE )] public static float InverseEerp( float a, float b, float v ) => Mathf.Log( a / v ) / Mathf.Log( a / b );
+		[MethodImpl( INLINE )] public static float InverseEerp( float a, float b, float v ) => Log( a / v ) / Log( a / b );
 
 		#endregion
 
@@ -878,9 +878,9 @@ namespace Freya {
 		/// <param name="target">The value to move towards</param>
 		/// <param name="maxDelta">The maximum change that should be applied to the value</param>
 		public static float MoveTowards( float current, float target, float maxDelta ) {
-			if( Mathf.Abs( target - current ) <= maxDelta )
+			if( Abs( target - current ) <= maxDelta )
 				return target;
-			return current + Mathf.Sign( target - current ) * maxDelta;
+			return current + Sign( target - current ) * maxDelta;
 		}
 
 		/// <summary>Gradually changes a value towards a desired goal over time.
@@ -907,7 +907,7 @@ namespace Freya {
 		/// <param name="deltaTime">The time since the last call to this function. By default Time.deltaTime</param>
 		public static float SmoothDamp( float current, float target, ref float currentVelocity, float smoothTime, [Uei.DefaultValue( "Mathf.Infinity" )] float maxSpeed, [Uei.DefaultValue( "Time.deltaTime" )] float deltaTime ) {
 			// Based on Game Programming Gems 4 Chapter 1.10
-			smoothTime = Mathf.Max( 0.0001F, smoothTime );
+			smoothTime = Max( 0.0001F, smoothTime );
 			float omega = 2F / smoothTime;
 
 			float x = omega * deltaTime;
@@ -917,7 +917,7 @@ namespace Freya {
 
 			// Clamp maximum speed
 			float maxChange = maxSpeed * smoothTime;
-			change = Mathf.Clamp( change, -maxChange, maxChange );
+			change = Clamp( change, -maxChange, maxChange );
 			target = current - change;
 
 			float temp = ( currentVelocity + omega * change ) * deltaTime;
@@ -1088,12 +1088,12 @@ namespace Freya {
 		/// <summary>Returns the direction of the input angle, as a normalized vector</summary>
 		/// <param name="aRad">The input angle, in radians</param>
 		/// <seealso cref="MathfsExtensions.Angle"/>
-		[MethodImpl( INLINE )] public static Vector2 AngToDir( float aRad ) => new Vector2( Mathf.Cos( aRad ), Mathf.Sin( aRad ) );
+		[MethodImpl( INLINE )] public static Vector2 AngToDir( float aRad ) => new Vector2( Cos( aRad ), Sin( aRad ) );
 
 		/// <summary>Returns the angle of the input vector, in radians. You can also use <c>myVector.Angle()</c></summary>
 		/// <param name="vec">The vector to get the angle of. It does not have to be normalized</param>
 		/// <seealso cref="MathfsExtensions.Angle"/>
-		[MethodImpl( INLINE )] public static float DirToAng( Vector2 vec ) => Mathf.Atan2( vec.y, vec.x );
+		[MethodImpl( INLINE )] public static float DirToAng( Vector2 vec ) => Atan2( vec.y, vec.x );
 
 		/// <summary>Returns a 2D orientation from a vector, representing the X axis</summary>
 		/// <param name="v">The direction to create a 2D orientation from (does not have to be normalized)</param>
@@ -1192,13 +1192,13 @@ namespace Freya {
 		}
 
 		/// <summary>Returns the signed angle between <c>a</c> and <c>b</c>, in the range -tau/2 to tau/2 (-pi to pi)</summary>
-		[MethodImpl( INLINE )] public static float SignedAngle( Vector2 a, Vector2 b ) => AngleBetween( a, b ) * Mathf.Sign( Determinant( a, b ) ); // -tau/2 to tau/2
+		[MethodImpl( INLINE )] public static float SignedAngle( Vector2 a, Vector2 b ) => AngleBetween( a, b ) * Sign( Determinant( a, b ) ); // -tau/2 to tau/2
 
 		/// <summary>Returns the shortest angle between <c>a</c> and <c>b</c>, in the range 0 to tau/2 (0 to pi)</summary>
-		[MethodImpl( INLINE )] public static float AngleBetween( Vector2 a, Vector2 b ) => Mathf.Acos( Vector2.Dot( a.normalized, b.normalized ).ClampNeg1to1() );
+		[MethodImpl( INLINE )] public static float AngleBetween( Vector2 a, Vector2 b ) => Acos( Vector2.Dot( a.normalized, b.normalized ).ClampNeg1to1() );
 
 		/// <inheritdoc cref="AngleBetween(Vector2,Vector2)"/>
-		[MethodImpl( INLINE )] public static float AngleBetween( Vector3 a, Vector3 b ) => Mathf.Acos( Vector3.Dot( a.normalized, b.normalized ).ClampNeg1to1() );
+		[MethodImpl( INLINE )] public static float AngleBetween( Vector3 a, Vector3 b ) => Acos( Vector3.Dot( a.normalized, b.normalized ).ClampNeg1to1() );
 
 		/// <summary>Returns the clockwise angle between <c>from</c> and <c>to</c>, in the range 0 to tau (0 to 2*pi)</summary>
 		[MethodImpl( INLINE )] public static float AngleFromToCW( Vector2 from, Vector2 to ) => Determinant( from, to ) < 0 ? AngleBetween( from, to ) : TAU - AngleBetween( from, to );
