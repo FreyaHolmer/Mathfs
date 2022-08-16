@@ -770,6 +770,18 @@ namespace Freya {
 		/// <param name="value">The value to remap</param>
 		[MethodImpl( INLINE )] public static float RemapClamped( float iMin, float iMax, float oMin, float oMax, float value ) => Lerp( oMin, oMax, InverseLerpClamped( iMin, iMax, value ) );
 
+		/// <summary>Remaps a value from the input range [iMin to iMax] into the output range [0 to 1].
+        /// Equivalent to Lerp(0f,1f,InverseLerp(iMin,iMax,value))</summary>
+        [MethodImpl( INLINE )] public static float Remap01( float iMin, float iMax, float value ) => Lerp( 0f, 1f, InverseLerp( iMin, iMax, value ) );
+
+		/// <summary>Remaps a value from the input range [iMin to iMax] into the output range [0 to 1], clamping to make sure it does not extrapolate.
+        /// Equivalent to Lerp(0f,1f,InverseLerpClamped(iMin,iMax,value))</summary>
+        /// <param name="inputMin">The start value of the input range</param>
+        /// <param name="inputMax">The end value of the input range</param>
+        /// <param name="value">The value to remap</param>
+        [MethodImpl( INLINE )]
+        public static float Remap01Clamped( float inputMin, float inputMax, float value ) => Lerp( 0f, 1f, InverseLerpClamped( inputMin, inputMax, value ) );
+
 		/// <summary>Remaps a value from the input Rect to the output Rect</summary>
 		/// <param name="iRect">The input Rect</param>
 		/// <param name="oRect">The output Rect</param>

@@ -487,6 +487,12 @@ namespace Freya {
 		/// <inheritdoc cref="Mathfs.Remap(float,float,float,float,float)"/>
 		[MethodImpl( INLINE )] public static float RemapClamped( this float value, float iMin, float iMax, float oMin, float oMax ) => Mathfs.Lerp( oMin, oMax, Mathfs.InverseLerpClamped( iMin, iMax, value ) );
 
+		/// <inheritdoc cref="Mathfs.Remap01(float,float,float)"/>
+        [MethodImpl( INLINE )] public static float Remap01( this float value, float iMin, float iMax ) => Mathfs.Remap01( iMin, iMax, value );
+
+		/// <inheritdoc cref="Mathfs.Remap01Clamped(float,float,float)"/>
+        [MethodImpl( INLINE )] public static float Remap01Clamped( this float value, float iMin, float iMax ) => Mathfs.Remap01Clamped( iMin, iMax, value );
+
 		#endregion
 
 		#region Vector Math
