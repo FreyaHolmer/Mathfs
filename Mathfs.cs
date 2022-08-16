@@ -301,6 +301,12 @@ namespace Freya {
 		/// <inheritdoc cref="Mathfs.Abs(Vector2)"/>
 		[MethodImpl( INLINE )] public static Vector4 Abs( Vector4 v ) => new Vector4( Abs( v.x ), Abs( v.y ), Abs( v.z ), Abs( v.w ) );
 
+		/// <inheritdoc cref="Mathfs.Abs(Vector2)"/>
+		[MethodImpl( INLINE )] public static Vector2Int Abs( Vector2Int v ) => new Vector2Int( Abs( v.x ), Abs( v.y ) );
+
+		/// <inheritdoc cref="Mathfs.Abs(Vector2)"/>
+		[MethodImpl( INLINE )] public static Vector3Int Abs( Vector3Int v ) => new Vector3Int( Abs( v.x ), Abs( v.y ), Abs( v.z ));
+
 		#endregion
 
 		#region Clamping
@@ -335,6 +341,21 @@ namespace Freya {
 				v.w < min.w ? min.w : v.w > max.w ? max.w : v.w
 			);
 
+		/// <inheritdoc cref="Mathfs.Clamp(Vector2,Vector2,Vector2)"/>
+		public static Vector2Int Clamp( Vector2Int v, Vector2Int min, Vector2Int max ) =>
+            new Vector2Int(
+                v.x < min.x ? min.x : v.x > max.x ? max.x : v.x,
+                v.y < min.y ? min.y : v.y > max.y ? max.y : v.y
+            );
+
+		/// <inheritdoc cref="Mathfs.Clamp(Vector2,Vector2,Vector2)"/>
+		public static Vector3Int Clamp( Vector3Int v, Vector3Int min, Vector3Int max ) =>
+            new Vector3Int(
+                v.x < min.x ? min.x : v.x > max.x ? max.x : v.x,
+                v.y < min.y ? min.y : v.y > max.y ? max.y : v.y,
+                v.z < min.z ? min.z : v.z > max.z ? max.z : v.z
+            );
+
 		/// <inheritdoc cref="Mathfs.Clamp(float,float,float)"/>
 		public static int Clamp( int value, int min, int max ) => value < min ? min : value > max ? max : value;
 
@@ -365,6 +386,21 @@ namespace Freya {
 				v.w < 0f ? 0f : v.w > 1f ? 1f : v.w
 			);
 
+		/// <inheritdoc cref="Mathfs.Clamp01(Vector2)"/>
+		public static Vector2Int Clamp01( Vector2Int v ) =>
+            new Vector2Int(
+                v.x < 0 ? 0 : v.x > 1 ? 1 : v.x,
+                v.y < 0 ? 0 : v.y > 1 ? 1 : v.y
+            );
+
+		/// <inheritdoc cref="Mathfs.Clamp01(Vector2)"/>
+		public static Vector3Int Clamp01( Vector3Int v ) =>
+            new Vector3Int(
+                v.x < 0 ? 0 : v.x > 1 ? 1 : v.x,
+                v.y < 0 ? 0 : v.y > 1 ? 1 : v.y,
+                v.z < 0 ? 0 : v.z > 1 ? 1 : v.z
+            );
+
 		/// <summary>Clamps the value between -1 and 1</summary>
 		public static float ClampNeg1to1( float value ) => value < -1f ? -1f : value > 1f ? 1f : value;
 
@@ -375,7 +411,7 @@ namespace Freya {
 				v.y < -1f ? -1f : v.y > 1f ? 1f : v.y
 			);
 
-		/// <summary>Clamps each component between -1 and 1</summary>
+		/// <inheritdoc cref="Mathfs.ClampNeg1to1(Vector2)"/>
 		public static Vector3 ClampNeg1to1( Vector3 v ) =>
 			new Vector3(
 				v.x < -1f ? -1f : v.x > 1f ? 1f : v.x,
@@ -383,7 +419,7 @@ namespace Freya {
 				v.z < -1f ? -1f : v.z > 1f ? 1f : v.z
 			);
 
-		/// <summary>Clamps each component between -1 and 1</summary>
+        /// <inheritdoc cref="Mathfs.ClampNeg1to1(Vector2)"/>
 		public static Vector4 ClampNeg1to1( Vector4 v ) =>
 			new Vector4(
 				v.x < -1f ? -1f : v.x > 1f ? 1f : v.x,
@@ -391,6 +427,21 @@ namespace Freya {
 				v.z < -1f ? -1f : v.z > 1f ? 1f : v.z,
 				v.w < -1f ? -1f : v.w > 1f ? 1f : v.w
 			);
+
+		/// <inheritdoc cref="Mathfs.ClampNeg1to1(Vector2)"/>
+		public static Vector2Int ClampNeg1to1( Vector2Int v ) =>
+            new Vector2Int(
+                v.x < -1 ? -1 : v.x > 1 ? 1 : v.x,
+                v.y < -1 ? -1 : v.y > 1 ? 1 : v.y
+            );
+
+		/// <inheritdoc cref="Mathfs.ClampNeg1to1(Vector2)"/>
+		public static Vector3Int ClampNeg1to1( Vector3Int v ) =>
+            new Vector3Int(
+                v.x < -1 ? -1 : v.x > 1 ? 1 : v.x,
+                v.y < -1 ? -1 : v.y > 1 ? 1 : v.y,
+                v.z < -1 ? -1 : v.z > 1 ? 1 : v.z
+            );
 
 		#endregion
 
@@ -461,6 +512,18 @@ namespace Freya {
 
 		/// <inheritdoc cref="Mathfs.Max(Vector2)"/>
 		[MethodImpl( INLINE )] public static float Max( Vector4 v ) => Max( v.x, v.y, v.z, v.w );
+
+		/// <inheritdoc cref="Mathfs.Min(Vector2)"/>
+		[MethodImpl( INLINE )] public static int Min( Vector2Int v ) => Min( v.x, v.y );
+
+		/// <inheritdoc cref="Mathfs.Min(Vector2)"/>
+		[MethodImpl( INLINE )] public static int Min( Vector3Int v ) => Min( v.x, v.y, v.z );
+
+		/// <inheritdoc cref="Mathfs.Max(Vector2)"/>
+		[MethodImpl( INLINE )] public static int Max( Vector2Int v ) => Max( v.x, v.y );
+
+		/// <inheritdoc cref="Mathfs.Max(Vector2)"/>
+		[MethodImpl( INLINE )] public static int Max( Vector3Int v ) => Max( v.x, v.y, v.z );
 
 		#endregion
 
