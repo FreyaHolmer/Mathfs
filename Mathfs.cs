@@ -1285,8 +1285,7 @@ namespace Freya {
 		/// <summary>Given a position within a -1 to 1 square, remaps it to the unit circle</summary>
 		/// <param name="c">The input position inside the square</param>
 		public static Vector2 SquareToDisc( Vector2 c ) {
-			c.x = c.x.ClampNeg1to1();
-			c.y = c.y.ClampNeg1to1();
+			c = c.ClampNeg1to1();
 			float u = c.x * Sqrt( 1 - ( c.y * c.y ) / 2 );
 			float v = c.y * Sqrt( 1 - ( c.x * c.x ) / 2 );
 			return new Vector2( u, v );
