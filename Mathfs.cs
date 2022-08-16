@@ -714,15 +714,15 @@ namespace Freya {
 
 		#region Value & Vector interpolation
 
-		/// <summary>Blends between a and b, based on the t-value. When t = 0 it returns a, when t = 1 it returns b, and any values between are blended linearly </summary>
+		/// <summary>Blends between a and b, based on the t-value. When t = 0 it returns a, when t = 1 it returns b, and any values between are blended linearly</summary>
 		/// <param name="a">The start value, when t is 0</param>
-		/// <param name="b">The start value, when t is 1</param>
+		/// <param name="b">The end value, when t is 1</param>
 		/// <param name="t">The t-value from 0 to 1 representing position along the lerp</param>
 		[MethodImpl( INLINE )] public static float Lerp( float a, float b, float t ) => ( 1f - t ) * a + t * b;
 
-		/// <summary>Blends between a and b of each component, based on the t-value of each component in the t-vector. When t = 0 it returns a, when t = 1 it returns b, and any values between are blended linearly </summary>
+		/// <summary>Blends between a and b of each component, based on the t-value of each component in the t-vector. When t = 0 it returns a, when t = 1 it returns b, and any values between are blended linearly</summary>
 		/// <param name="a">The start value, when t is 0</param>
-		/// <param name="b">The start value, when t is 1</param>
+		/// <param name="b">The end value, when t is 1</param>
 		/// <param name="t">The t-values from 0 to 1 representing position along the lerp</param>
 		[MethodImpl( INLINE )] public static Vector2 Lerp( Vector2 a, Vector2 b, Vector2 t ) => new Vector2( Lerp( a.x, b.x, t.x ), Lerp( a.y, b.y, t.y ) );
 
@@ -734,7 +734,7 @@ namespace Freya {
 
 		/// <summary>Linearly blends between two rectangles, moving and resizing from the center. Note: this lerp is unclamped</summary>
 		/// <param name="a">The start value, when t is 0</param>
-		/// <param name="b">The start value, when t is 1</param>
+		/// <param name="b">The end value, when t is 1</param>
 		/// <param name="t">The t-values from 0 to 1 representing position along the lerp</param>
 		public static Rect Lerp( Rect a, Rect b, float t ) {
 			Vector2 center = Vector2.LerpUnclamped( a.center, b.center, t );
@@ -744,13 +744,13 @@ namespace Freya {
 
 		/// <summary>Blends between a and b, based on the t-value. When t = 0 it returns a, when t = 1 it returns b, and any values between are blended linearly</summary>
 		/// <param name="a">The start value, when t is 0</param>
-		/// <param name="b">The start value, when t is 1</param>
+		/// <param name="b">The end value, when t is 1</param>
 		/// <param name="t">The t-value from 0 to 1 representing position along the lerp, clamped between 0 and 1</param>
 		[MethodImpl( INLINE )] public static float LerpClamped( float a, float b, float t ) => Lerp( a, b, Clamp01( t ) );
 
 		/// <summary>Lerps between a and b, applying cubic smoothing to the t-value</summary>
 		/// <param name="a">The start value, when t is 0</param>
-		/// <param name="b">The start value, when t is 1</param>
+		/// <param name="b">The end value, when t is 1</param>
 		/// <param name="t">The t-value from 0 to 1 representing position along the lerp, clamped between 0 and 1</param>
 		[MethodImpl( INLINE )] public static float LerpSmooth( float a, float b, float t ) => Lerp( a, b, Smooth01( Clamp01( t ) ) );
 
