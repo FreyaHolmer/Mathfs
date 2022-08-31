@@ -155,6 +155,20 @@ namespace Freya {
 
 
 		#region Quaternions
+
+		public static Quaternion Log( this Quaternion q ) {
+			double vMagSq = (double)q.x * q.x + (double)q.y * q.y + (double)q.z * q.z;
+			double vMag = Math.Sqrt( vMagSq );
+			double qMag = Math.Sqrt( vMagSq + (double)q.w * q.w );
+			double theta = Math.Atan2( vMag, q.w );
+			double scV = vMag < 0.01f ? SincRcp( theta ) / qMag : theta / vMag;
+			return new Quaternion(
+				(float)( scV * q.x ),
+				(float)( scV * q.y ),
+				(float)( scV * q.z ),
+				(float)Math.Log( qMag )
+			);
+		}
 		public static Quaternion Mul( this Quaternion q, float c ) => new Quaternion( c * q.x, c * q.y, c * q.z, c * q.w );
 
 		#endregion
