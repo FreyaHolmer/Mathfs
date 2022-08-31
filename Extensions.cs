@@ -152,6 +152,12 @@ namespace Freya {
 
 		/// <inheritdoc cref="ScaleAround(Vector2,Vector2,Vector2)"/>
 		[MethodImpl( INLINE )] public static Vector3 ScaleAround( this Vector3 p, Vector3 pivot, Vector3 scale ) => new(pivot.x + ( p.x - pivot.x ) * scale.x, pivot.y + ( p.y - pivot.y ) * scale.y, pivot.z + ( p.z - pivot.z ) * scale.z);
+
+
+		#region Quaternions
+		public static Quaternion Mul( this Quaternion q, float c ) => new Quaternion( c * q.x, c * q.y, c * q.z, c * q.w );
+
+		#endregion
 		#endregion
 
 		#region Color manipulation
