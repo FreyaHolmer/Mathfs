@@ -240,6 +240,26 @@ namespace Freya {
 		/// <param name="angRad">Angle in radians</param>
 		[MethodImpl( INLINE )] public static float Crd( float angRad ) => 2 * (float)Math.Sin( angRad / 2 );
 
+		const double SINC_W = 0.01;
+		const double SINC_P_C2 = -1 / 6.0;
+		const double SINC_P_C4 = 1 / 120.0;
+
+		/// <summary>The unnormalized sinc function sin(x)/x, properly handling the removable singularity around x = 0</summary>
+		/// <param name="x">The input value for the Sinc function</param>
+		public static float Sinc( float x ) => (float)Sinc( (double)x );
+
+		/// <inheritdoc cref="Sinc(float)"/>
+		public static double Sinc( double x ) {
+			x = Math.Abs( x ); // sinc is symmetric
+			if( x < SINC_W ) {
+				// approximate the singularity w. a polynomial
+				double x2 = x * x;
+				double x4 = x2 * x2;
+				return 1 + SINC_P_C2 * x2 + SINC_P_C4 * x4;
+			}
+
+			return Math.Sin( x ) / x;
+		}
 		#endregion
 
 		#region Hyperbolic Trigonometry
