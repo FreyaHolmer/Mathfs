@@ -85,6 +85,10 @@ namespace Freya {
 		/// <param name="scale">The value to scale the range by</param>
 		public FloatRange ScaleFromStart( float scale ) => new FloatRange( a, a + scale * ( b - a ) );
 
+		/// <summary>Returns this range mirrored around a given value</summary>
+		/// <param name="pivot">The value to mirror around</param>
+		public FloatRange MirrorAround( float pivot ) => new FloatRange( 2 * pivot - a, 2 * pivot - b );
+
 		/// <summary>Returns the rectangle encapsulating the region defined by a range per axis. Note: The direction of each range is ignored</summary>
 		/// <param name="rangeX">The range of the X axis</param>
 		/// <param name="rangeY">The range of the Y axis</param>
