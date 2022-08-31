@@ -1140,7 +1140,7 @@ namespace Freya {
 		/// <summary>Returns the frenet-serret (curvature-based) normal direction at a given point in a curve</summary>
 		/// <param name="velocity">The first derivative of the point in the curve</param>
 		/// <param name="acceleration">The second derivative of the point in the curve</param>
-		[MethodImpl( INLINE )] public static Vector3 GetArcNormal( Vector3 velocity, Vector3 acceleration ) => Vector3.Cross( velocity, Vector3.Cross( acceleration, velocity ) ).normalized;
+		[MethodImpl( INLINE )] public static Vector3 GetArcNormal( Vector3 velocity, Vector3 acceleration ) => Vector3.Cross( Vector3.Cross( velocity, acceleration ).normalized, velocity.normalized );
 
 		/// <summary>Returns the frenet-serret (curvature-based) binormal direction at a given point in a curve</summary>
 		/// <param name="velocity">The first derivative of the point in the curve</param>
