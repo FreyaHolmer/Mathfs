@@ -114,6 +114,8 @@ namespace Freya {
 		public override bool Equals( object obj ) => obj is FloatRange other && Equals( other );
 		public override int GetHashCode() => HashCode.Combine( a, b );
 
+		public override string ToString() => $"[{a},{b}]";
+
 	}
 
 }
