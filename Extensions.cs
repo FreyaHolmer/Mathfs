@@ -143,6 +143,15 @@ namespace Freya {
 
 		/// <inheritdoc cref="MirrorAround(Vector2,Vector2)"/>
 		[MethodImpl( INLINE )] public static Vector3 MirrorAround( this Vector3 p, Vector3 pivot ) => new(2 * pivot.x - p.x, 2 * pivot.y - p.y, 2 * pivot.z - p.z);
+
+		/// <summary>Scale the point <c>p</c> around <c>pivot</c> by <c>scale</c></summary>
+		/// <param name="p">The point to scale</param>
+		/// <param name="pivot">The pivot to scale around</param>
+		/// <param name="scale">The scale to scale by</param>
+		[MethodImpl( INLINE )] public static Vector2 ScaleAround( this Vector2 p, Vector2 pivot, Vector2 scale ) => new(pivot.x + ( p.x - pivot.x ) * scale.x, pivot.y + ( p.y - pivot.y ) * scale.y);
+
+		/// <inheritdoc cref="ScaleAround(Vector2,Vector2,Vector2)"/>
+		[MethodImpl( INLINE )] public static Vector3 ScaleAround( this Vector3 p, Vector3 pivot, Vector3 scale ) => new(pivot.x + ( p.x - pivot.x ) * scale.x, pivot.y + ( p.y - pivot.y ) * scale.y, pivot.z + ( p.z - pivot.z ) * scale.z);
 		#endregion
 
 		#region Color manipulation
