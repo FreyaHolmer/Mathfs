@@ -243,6 +243,8 @@ namespace Freya {
 		const double SINC_W = 0.01;
 		const double SINC_P_C2 = -1 / 6.0;
 		const double SINC_P_C4 = 1 / 120.0;
+		const double SINCRCP_P_C2 = 1 / 6.0;
+		const double SINCRCP_P_C4 = 7 / 360.0;
 
 		/// <summary>The unnormalized sinc function sin(x)/x, properly handling the removable singularity around x = 0</summary>
 		/// <param name="x">The input value for the Sinc function</param>
@@ -260,6 +262,24 @@ namespace Freya {
 
 			return Math.Sin( x ) / x;
 		}
+
+		/// <summary>The unnormalized reciprocal sinc function x/sin(x), properly handling the removable singularity around x = 0</summary>
+		/// <param name="x">The input value for the reciprocal Sinc function</param>
+		public static float SincRcp( float x ) => (float)SincRcp( (double)x );
+
+		/// <inheritdoc cref="SincRcp(float)"/>
+		public static double SincRcp( double x ) {
+			x = Math.Abs( x ); // sinc is symmetric
+			if( x < SINC_W ) {
+				// approximate the singularity w. a polynomial
+				double x2 = x * x;
+				double x4 = x2 * x2;
+				return 1 + SINCRCP_P_C2 * x2 + SINCRCP_P_C4 * x4;
+			}
+
+			return x / Math.Sin( x );
+		}
+
 		#endregion
 
 		#region Hyperbolic Trigonometry
