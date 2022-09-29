@@ -64,3 +64,8 @@ Mathfs.cs **does not fully match Unity's Mathf.cs**, I've made a few changes:
    - LerpSmooth (which is how it was implemented) and
    - InverseLerpSmooth (which is how it is implemented everywhere but Unity's Mathf.cs)
  - Min/Max functions with arbitrary inputs/array input will throw on empty instead of returning 0
+ 
+## Installation instructions
+- Download or Git Clone the repository
+- Place the downloaded files in a folder in your Unity project Assets/ folder
+- Access the library in script by including namespace "using Freya" 
