@@ -256,7 +256,7 @@ namespace Freya {
 
 
 			// save/finalize
-			string path = $"Assets/Mathfs/Numerics/{typeName}.cs";
+			string path = $"Assets/Mathfs/Runtime/Numerics/{typeName}.cs";
 			File.WriteAllLines( path, code.content );
 		}
 
@@ -469,7 +469,7 @@ namespace Freya {
 				}
 			}
 
-			string path = $"Assets/Mathfs/Splines/Uniform Spline Segments/{structName}.cs";
+			string path = $"Assets/Mathfs/Runtime/Splines/Uniform Spline Segments/{structName}.cs";
 			File.WriteAllLines( path, code.content );
 		}
 

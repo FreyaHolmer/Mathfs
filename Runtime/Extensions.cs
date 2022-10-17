@@ -161,7 +161,7 @@ namespace Freya {
 			double vMag = Math.Sqrt( vMagSq );
 			double qMag = Math.Sqrt( vMagSq + (double)q.w * q.w );
 			double theta = Math.Atan2( vMag, q.w );
-			double scV = vMag < 0.01f ? SincRcp( theta ) / qMag : theta / vMag;
+			double scV = vMag < 0.01f ? Mathfs.SincRcp( theta ) / qMag : theta / vMag;
 			return new Quaternion(
 				(float)( scV * q.x ),
 				(float)( scV * q.y ),
@@ -174,7 +174,7 @@ namespace Freya {
 			Vector3 v = new(q.x, q.y, q.z);
 			double vMag = Math.Sqrt( (double)v.x * v.x + (double)v.y * v.y + (double)v.z * v.z );
 			double sc = Math.Exp( q.w );
-			double scV = sc * Sinc( vMag );
+			double scV = sc * Mathfs.Sinc( vMag );
 			return new Quaternion( (float)( scV * v.x ), (float)( scV * v.y ), (float)( scV * v.z ), (float)( sc * Math.Cos( vMag ) ) );
 		}
 
