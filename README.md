@@ -1,6 +1,18 @@
 # Mathfs
 Expanded Math Functionality for Unity
 
+## Installation instructions
+
+There are several ways to install this library into our project:
+
+- **Plain install**: Clone or [download](https://github.com/FreyaHolmer/Mathfs/archive/refs/heads/master.zip) this repository and put it somewhere in your Unity project
+- **Unity Package Manager (UPM)**: Add the following line to *Packages/manifest.json*:
+   - `"com.freyaholmer.mathfs": "https://github.com/FreyaHolmer/Mathfs#1.0.0",`
+- **[OpenUPM](https://openupm.com)**: After installing [openupm-cli](https://github.com/openupm/openupm-cli), run the following command:
+   - `openupm add com.freyaholmer.mathfs`
+
+After installation you will be able to access the library in script by including namespace `using Freya`
+
 ## Features
  - 2D Intersection tests between all combinations of:
    - Ray
@@ -64,8 +76,3 @@ Mathfs.cs **does not fully match Unity's Mathf.cs**, I've made a few changes:
    - LerpSmooth (which is how it was implemented) and
    - InverseLerpSmooth (which is how it is implemented everywhere but Unity's Mathf.cs)
  - Min/Max functions with arbitrary inputs/array input will throw on empty instead of returning 0
- 
-## Installation instructions
-- Download or Git Clone the repository
-- Place the downloaded files in a folder in your Unity project Assets/ folder
-- Access the library in script by including namespace "using Freya" 
