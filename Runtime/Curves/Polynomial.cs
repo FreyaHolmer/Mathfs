@@ -349,6 +349,8 @@ namespace Freya {
 		public static Polynomial operator /( float v, Polynomial p ) => new(v / p.c0, v / p.c1, v / p.c2, v / p.c3);
 		public static Polynomial operator *( Polynomial p, float v ) => new(p.c0 * v, p.c1 * v, p.c2 * v, p.c3 * v);
 		public static Polynomial operator *( float v, Polynomial p ) => p * v;
+		public static Polynomial operator +( Polynomial a, Polynomial b ) => new(a.c0 + b.c0, a.c1 + b.c1, a.c2 + b.c2, a.c3 + b.c3);
+		public static Polynomial operator -( Polynomial a, Polynomial b ) => new(a.c0 - b.c0, a.c1 - b.c1, a.c2 - b.c2, a.c3 - b.c3);
 
 		public static explicit operator Matrix3x1( Polynomial poly ) => new(poly.c0, poly.c1, poly.c2);
 		public static explicit operator Matrix4x1( Polynomial poly ) => new(poly.c0, poly.c1, poly.c2, poly.c3);
