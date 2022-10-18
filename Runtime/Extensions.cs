@@ -632,10 +632,10 @@ namespace Freya {
 		/// <inheritdoc cref="Mathfs.RemapClamped(float,float,float,float,float)"/>
 		[MethodImpl( INLINE )] public static float RemapClamped( this float value, float iMin, float iMax, float oMin, float oMax ) => Mathfs.RemapClamped( iMin, iMax, oMin, oMax, value );
 
-		/// <inheritdoc cref="Mathfs.Remap(float,FloatRange,FloatRange)"/>
+		/// <inheritdoc cref="Mathfs.Remap(FloatRange,FloatRange,float)"/>
 		[MethodImpl( INLINE )] public static float Remap( this float value, FloatRange inRange, FloatRange outRange ) => Mathfs.Remap( inRange.a, inRange.b, outRange.a, outRange.b, value );
 
-		/// <inheritdoc cref="Mathfs.RemapClamped(float,FloatRange,FloatRange)"/>
+		/// <inheritdoc cref="Mathfs.RemapClamped(FloatRange,FloatRange,float)"/>
 		[MethodImpl( INLINE )] public static float RemapClamped( this float value, FloatRange inRange, FloatRange outRange ) => Mathfs.RemapClamped( inRange.a, inRange.b, outRange.a, outRange.b, value );
 
 		/// <inheritdoc cref="Mathfs.Remap(float,float,float,float,int)"/>
