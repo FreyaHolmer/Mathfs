@@ -1,14 +1,23 @@
 # Mathfs
-Expanded math functionality for Unity
+Freya's expanded math functionality for Unity!
+- This is primarily a way for me to share the math functionality I write and use in my own personal projects
+- I will recklessly edit and adapt things without too much thought into backwards compatibility
+- Minimum Unity version is currently 2021.2 due to using newer C# version features. It may be possible to auto-downgrade through your IDE if necessary
+- Commits with version tags should be relatively stable. Other commits may not be
 
 ## Installation instructions
 
-There are several ways to install this library into our project:
+There are several ways to install this library into your project:
 
-- **Plain install**: Clone or [download](https://github.com/FreyaHolmer/Mathfs/archive/refs/heads/master.zip) this repository and put it somewhere in the Assets folder of your Unity project
-- **Unity Package Manager (UPM)**: Add the following line to *Packages/manifest.json*:
-   - `"com.acegikmo.mathfs": "https://github.com/FreyaHolmer/Mathfs#1.0.0",`
-- **[OpenUPM](https://openupm.com)**: After installing [openupm-cli](https://github.com/openupm/openupm-cli), run the following command:
+- **Plain install**
+   - Clone or [download](https://github.com/FreyaHolmer/Mathfs/archive/refs/heads/master.zip) this repository and put it somewhere in the Assets folder of your Unity project
+- **Unity Package Manager (UPM)**:
+   - Add either of the the following lines to *Packages/manifest.json*:
+   - `"com.acegikmo.mathfs": "https://github.com/FreyaHolmer/Mathfs#0.1.0",` if you want to target a specific version (recommended)
+   - `"com.acegikmo.mathfs": "https://github.com/FreyaHolmer/Mathfs",` if you want to pull the latest commit (potentially unstable)
+   - More information about UPM and git [here](https://docs.unity3d.com/Manual/upm-git.html)
+- **[OpenUPM](https://openupm.com)**
+   - After installing [openupm-cli](https://github.com/openupm/openupm-cli), run the following command:
    - `openupm add com.acegikmo.mathfs`
 
 After installation you will be able to access the library in scripts by including the namespace `using Freya`
