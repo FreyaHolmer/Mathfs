@@ -187,6 +187,21 @@ namespace Freya {
 
 		/// <inheritdoc cref="Quaternion.Inverse(Quaternion)"/>
 		public static Quaternion Inverse( this Quaternion q ) => Quaternion.Inverse( q );
+
+		#endregion
+
+		#region Transform extensions
+
+		/// <summary>Transforms a rotation from local space to world space</summary>
+		/// <param name="tf">The transform to use</param>
+		/// <param name="quat">The local space rotation</param>
+		public static Quaternion TransformRotation( this Transform tf, Quaternion quat ) => tf.rotation * quat;
+
+		/// <summary>Transforms a rotation from world space to local space</summary>
+		/// <param name="tf">The transform to use</param>
+		/// <param name="quat">The world space rotation</param>
+		public static Quaternion InverseTransformRotation( this Transform tf, Quaternion quat ) => tf.rotation * quat;
+
 		#endregion
 		#endregion
 
