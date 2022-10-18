@@ -2,6 +2,7 @@
 
 using System;
 using System.Runtime.CompilerServices;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -361,6 +362,37 @@ namespace Freya {
 		public static explicit operator UBSCubic1D( Polynomial poly ) => new(CharMatrix.cubicUniformBsplineInverse * (Matrix4x1)poly);
 
 		#endregion
+
+		static StringBuilder strBuilder = new StringBuilder( 64 );
+		static string[] tPowerSuffixStr = new[] { "", "x", "x²", "x³" };
+
+		public override string ToString() {
+			strBuilder.Clear();
+
+			bool hasAddedFirstTerm = false;
+			for( int c = 0; c < 4; c++ ) {
+				float value = this[c];
+				if( value != 0 ) {
+					if( hasAddedFirstTerm == false ) {
+						hasAddedFirstTerm = true;
+						strBuilder.Append( this[c] );
+					} else {
+						if( value > 0 )
+							strBuilder.Append( "+" );
+						strBuilder.Append( this[c] );
+						if( c > 0 )
+							strBuilder.Append( tPowerSuffixStr[c] );
+					}
+				}
+			}
+
+			if( hasAddedFirstTerm == false )
+				return "0"; // no terms. constant 0
+
+			return strBuilder.ToString();
+		}
+
+		public string ToStringCoefficients() => $"({c0},{c1},{c2},{c3})";
 
 	}
 
