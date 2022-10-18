@@ -7,7 +7,7 @@ There are several ways to install this library into our project:
 
 - **Plain install**: Clone or [download](https://github.com/FreyaHolmer/Mathfs/archive/refs/heads/master.zip) this repository and put it somewhere in the Assets folder of your Unity project
 - **Unity Package Manager (UPM)**: Add the following line to *Packages/manifest.json*:
-   - `"com.acegikmo.mathfs": "https://github.com/FreyaHolmer/Mathfs#1.0.0",`
+   - `"com.acegikmo.mathfs": "https://github.com/FreyaHolmer/Mathfs#dev",`
 - **[OpenUPM](https://openupm.com)**: After installing [openupm-cli](https://github.com/openupm/openupm-cli), run the following command:
    - `openupm add com.acegikmo.mathfs`
 
