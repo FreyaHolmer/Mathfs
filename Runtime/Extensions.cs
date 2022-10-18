@@ -205,6 +205,12 @@ namespace Freya {
 		/// <param name="m">The multiplier for the alpha</param>
 		[MethodImpl( INLINE )] public static Color MultiplyA( this Color c, float m ) => new Color( c.r, c.g, c.b, c.a * m );
 
+		/// <summary>Converts this color to the nearest 32 bit hex string, including the alpha channel.
+		/// A pure red color of (1,0,0,1) returns "FF0000FF"</summary>
+		/// <param name="c">The color to get the hex string of</param>
+		/// <returns></returns>
+		[MethodImpl( INLINE )] public static string ToHexString( this Color c ) => ColorUtility.ToHtmlStringRGBA( c );
+
 		#endregion
 
 		#region Rect
