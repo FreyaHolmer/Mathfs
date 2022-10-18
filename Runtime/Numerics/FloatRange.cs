@@ -73,6 +73,14 @@ namespace Freya {
 			return separation < rTotal;
 		}
 
+		/// <summary>Wraps/repeats the input value to stay within this range</summary>
+		/// <param name="value">The value to wrap/repeat in this interval</param>
+		public float Wrap( float value ) => a + Mathfs.Repeat( value - a, b - a );
+
+		/// <summary>Clamps the input value to this range</summary>
+		/// <param name="value">The value to clamp to this interval</param>
+		public float Clamp( float value ) => Mathfs.Clamp( value, Min, Max );
+
 		/// <summary>Expands the minimum or maximum value to contain the given <c>value</c></summary>
 		/// <param name="value">The value to include</param>
 		public FloatRange Encapsulate( float value ) =>
@@ -88,6 +96,9 @@ namespace Freya {
 		/// <summary>Returns this range mirrored around a given value</summary>
 		/// <param name="pivot">The value to mirror around</param>
 		public FloatRange MirrorAround( float pivot ) => new FloatRange( 2 * pivot - a, 2 * pivot - b );
+
+		/// <summary>Returns a reversed version of this range, where a and b is swapped</summary>
+		public FloatRange Reverse() => ( b, a );
 
 		/// <summary>Returns the rectangle encapsulating the region defined by a range per axis. Note: The direction of each range is ignored</summary>
 		/// <param name="rangeX">The range of the X axis</param>
