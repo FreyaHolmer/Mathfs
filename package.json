@@ -1,10 +1,14 @@
 {
-  "name": "com.freyaholmer.mathfs",
+  "name": "com.acegikmo.mathfs",
+  "version": "0.1.0",
   "displayName": "Mathfs",
-  "description": "Expanded Math Functionality for Unity",
-  "author": "Freya Holmér",
-  "version": "1.0.0",
+  "description": "Advanced math functionality for Unity",
   "unity": "2021.2",
   "documentationUrl": "https://github.com/FreyaHolmer/Mathfs",
-  "licensesUrl": "https://github.com/FreyaHolmer/Mathfs/LICENSE.txt"
+  "licensesUrl": "https://github.com/FreyaHolmer/Mathfs/LICENSE.txt",
+  "author": {
+    "name": "Freya Holmér",
+    "email": "acegikmo@gmail.com",
+    "url": "https://acegikmo.com/"
+  }
 }
