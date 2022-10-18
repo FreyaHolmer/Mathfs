@@ -156,6 +156,7 @@ namespace Freya {
 
 		#region Quaternions
 
+		/// <summary>Returns the natural logarithm of a quaternion</summary>
 		public static Quaternion Log( this Quaternion q ) {
 			double vMagSq = (double)q.x * q.x + (double)q.y * q.y + (double)q.z * q.z;
 			double vMag = Math.Sqrt( vMagSq );
@@ -170,6 +171,7 @@ namespace Freya {
 			);
 		}
 
+		/// <summary>Returns the natural exponent of a quaternion</summary>
 		public static Quaternion Exp( this Quaternion q ) {
 			Vector3 v = new(q.x, q.y, q.z);
 			double vMag = Math.Sqrt( (double)v.x * v.x + (double)v.y * v.y + (double)v.z * v.z );
@@ -178,8 +180,13 @@ namespace Freya {
 			return new Quaternion( (float)( scV * v.x ), (float)( scV * v.y ), (float)( scV * v.z ), (float)( sc * Math.Cos( vMag ) ) );
 		}
 
+		/// <summary>Multiplies a quaternion by a scalar</summary>
+		/// <param name="q">The quaternion to multiply</param>
+		/// <param name="c">The scalar value to multiply with</param>
 		public static Quaternion Mul( this Quaternion q, float c ) => new Quaternion( c * q.x, c * q.y, c * q.z, c * q.w );
 
+		/// <inheritdoc cref="Quaternion.Inverse(Quaternion)"/>
+		public static Quaternion Inverse( this Quaternion q ) => Quaternion.Inverse( q );
 		#endregion
 		#endregion
 
