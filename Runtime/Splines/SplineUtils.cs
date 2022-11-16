@@ -82,7 +82,7 @@ namespace Freya {
 			return new(k0, k1, k2, k3);
 		}
 
-		static Matrix4x4 GetNUCatRomCharMatrix( Matrix4x1 knots ) {
+		public static Matrix4x4 GetNUCatRomCharMatrix( Matrix4x1 knots ) {
 			float k0 = knots.m0;
 			float k1 = knots.m1;
 			float k2 = knots.m2;
@@ -141,16 +141,65 @@ namespace Freya {
 			float i12sq = i12 * i12;
 			float i13 = k1 - k3;
 			float i23 = k2 - k3;
-			float p0sc = 1f / ( i01 * i02 * i12 );
-			float p1sc = 1f / ( i01 * i12sq * i13 );
-			float p2sc = 1f / ( i02 * i12sq * i23 );
-			float p3sc = 1f / ( i12 * i13 * i23 );
+			float p0sc = ( i01 * i02 * i12 );
+			float p1sc = ( i01 * i12sq * i13 );
+			float p2sc = ( i02 * i12sq * i23 );
+			float p3sc = ( i12 * i13 * i23 );
 			return CharMatrix.Create(
-				p0sc * p0u0, p1sc * p1u0, p2sc * p2u0, p3sc * p3u0,
-				p0sc * p0u1, p1sc * p1u1, p2sc * p2u1, p3sc * p3u1,
-				p0sc * p0u2, p1sc * p1u2, p2sc * p2u2, p3sc * p3u2,
-				p0sc * p0u3, p1sc * p1u3, p2sc * p2u3, p3sc * p3u3
+				p0u0 / p0sc, p1u0 / p1sc, p2u0 / p2sc, p3u0 / p3sc,
+				p0u1 / p0sc, p1u1 / p1sc, p2u1 / p2sc, p3u1 / p3sc,
+				p0u2 / p0sc, p1u2 / p1sc, p2u2 / p2sc, p3u2 / p3sc,
+				p0u3 / p0sc, p1u3 / p1sc, p2u3 / p2sc, p3u3 / p3sc
 			);
+		}
+
+		public static Vector3 GetNUCatRomCharMatrixC2End( Matrix4x1 knots, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3 ) {
+			float k0 = knots.m0;
+			float k1 = knots.m1;
+			float k2 = knots.m2;
+			float k3 = knots.m3;
+
+			float k1k1 = k1 * k1;
+			float k2k2 = k2 * k2;
+			float k0k1 = k0 * k1;
+			float _2k0k1 = 2 * k0k1;
+			float k0k2 = k0 * k2;
+			float k1k2 = k1 * k2;
+			float k1k3 = k1 * k3;
+			float k2k3 = k2 * k3;
+			float _2k2k3 = 2 * k2k3;
+
+			float common = _2k0k1 + k0k2 - k1k3 - _2k2k3;
+
+			// CHAR matrix COLUMN 0:
+			// CHAR matrix COLUMN 1:
+			// CHAR matrix COLUMN 2:
+			// CHAR matrix COLUMN 3:
+
+			float i01 = k0 - k1;
+			float i02 = k0 - k2;
+			float i12 = k1 - k2;
+			float i12sq = i12 * i12;
+			float i13 = k1 - k3;
+			float i23 = k2 - k3;
+			float p0sc = ( i01 * i02 * i12 );
+			float p1sc = ( i01 * i12sq * i13 );
+			float p2sc = ( i02 * i12sq * i23 );
+			float p3sc = ( i12 * i13 * i23 );
+
+			float m20 = (-k1 - 2 * k2) / p0sc;
+			float m21 = (common - k1k1 + k1k2) / p1sc;
+			float m22 = (-common - k2k2 + k1k2) / p2sc;
+			float m23 = (2 * k1 + k2) / p3sc;
+			float m30 = 1f / p0sc;
+			float m31 = (k3 - k0) / p1sc;
+			float m32 = (k0 - k3) / p2sc;
+			float m33 = -1f / p3sc;
+
+			return p0 * ( ( m20 + 3 * m30 ) / m23 ) +
+				   p1 * ( ( m21 + 3 * m31 - m20 ) / m23 ) +
+				   p2 * ( ( m22 + 3 * m32 - m21 ) / m23 ) +
+				   p3 * ( 1 + ( 3 * m33 - m22 ) / m23 );
 		}
 
 		static Matrix4x4 GetNUCatRomCharMatrixUnitInterval( float k0, float k3 ) {
@@ -176,9 +225,9 @@ namespace Freya {
 
 			return CharMatrix.Create(
 				0, 1, 0, 0,
-				p0sc, p1sc * p1u1, p2sc * p2u1, 0,
-				p0sc * -2, p1sc * p1u2, p2sc * p2u2, p3sc,
-				p0sc, p1sc * p1u3, p2sc * p2u3, -p3sc
+				p0sc, -p1u1 / k0k3, p2sc * p2u1, 0,
+				p0sc * -2, -p1u2 / k0k3, p2sc * p2u2, p3sc,
+				p0sc, -p1u3 / k0k3, p2sc * p2u3, -p3sc
 			);
 		}
 
