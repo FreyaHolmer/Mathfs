@@ -24,8 +24,9 @@ namespace Freya {
 			this.knots = knots;
 			this.degree = degree;
 			this.evalBuffer = new Vector2[degree + 1];
-			if( knots.Length != SplineUtils.BSplineKnotCount( this.points.Length, this.degree ) )
-				throw new ArgumentException( $"The knots array has to be of length (degree+pointCount+1). Got an array of {knots.Length} knots, expected ${KnotCount}", nameof(knots) );
+			int expectedKnotCount = SplineUtils.BSplineKnotCount( this.points.Length, this.degree );
+			if( knots.Length != expectedKnotCount )
+				throw new ArgumentException( $"The knots array has to be of length (degree+pointCount+1). Got an array of {knots.Length} knots, expected {expectedKnotCount}", nameof(knots) );
 		}
 
 		/// <summary>Creates a uniform B-spline of the given degree, automatically configuring the knot vector to be uniform</summary>
