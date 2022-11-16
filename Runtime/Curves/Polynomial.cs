@@ -183,6 +183,21 @@ namespace Freya {
 		/// <param name="c1">The linear coefficient <c>a</c> in <c>ax+b</c></param>
 		public static Polynomial Linear( float c0, float c1 ) => new Polynomial( c0, c1, 0, 0 );
 
+		/// <summary>Creates a linear polynomial of the form <c>ax+b</c> from two points a and b</summary>
+		/// <param name="a">The first point</param>
+		/// <param name="b">The second point</param>
+		public static Polynomial Linear( Vector2 a, Vector2 b ) => Linear( a.x, a.y, b.x, b.y );
+
+		/// <summary>Creates a linear polynomial of the form <c>ax+b</c> from two points</summary>
+		/// <param name="x0">The coordinate of the first point</param>
+		/// <param name="y0">The value of the first point</param>
+		/// <param name="x1">The coordinate of the second point</param>
+		/// <param name="y1">The value of the second point</param>
+		public static Polynomial Linear( float x0, float y0, float x1, float y1 ) {
+			float d = ( y1 - y0 ) / ( x1 - x0 );
+			return new Polynomial( y0 - d * x0, d, 0, 0 );
+		}
+
 		/// <summary>Creates a quadratic polynomial</summary>
 		/// <param name="c0">The constant coefficient</param>
 		/// <param name="c1">The linear coefficient</param>
