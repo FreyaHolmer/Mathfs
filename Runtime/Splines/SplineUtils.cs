@@ -190,6 +190,59 @@ namespace Freya {
 			return new Polynomial3D( GetNUCatRomCharMatrix( knots ).MultiplyColumnVector( m ) );
 		}
 
+		internal static Polynomial3D CalculateHermiteCurve( Vector3Matrix4x1 m, float k0, float k1 ) {
+			return new Polynomial3D( GetNUHermiteCharMatrix( k0, k1 ).MultiplyColumnVector( m ) );
+		}
+
+		internal static Polynomial2D CalculateHermiteCurve( Vector2Matrix4x1 m, float k0, float k1 ) {
+			return new Polynomial2D( GetNUHermiteCharMatrix( k0, k1 ).MultiplyColumnVector( m ) );
+		}
+
+		static Matrix4x4 GetNUHermiteCharMatrix( float k0, float k1 ) {
+			float d = k1 - k0;
+			float d2 = d * d;
+			float d3 = d * d * d;
+			float k0_2 = k0 * k0;
+			float k0_3 = k0 * k0 * k0;
+
+			// row 0
+			float m02 = ( 3 * k0_2 ) / d2 + ( 2 * k0_3 ) / d3;
+			float m00 = 1 - m02;
+			float _k02d = k0_2 / d;
+			float _k03d2 = k0_3 / d2;
+			float m03 = -_k02d - _k03d2;
+			float m01 = -k0 - 2 * _k02d - _k03d2;
+
+			// row 1
+			float _2k0d = 2 * k0 / d;
+			float _3k02d2 = 3 * k0_2 / d2;
+			float m13 = _2k0d + _3k02d2;
+			float m11 = 1 + 2 * _2k0d + _3k02d2;
+			float m10 = 6 * ( k0 / d2 + k0_2 / d3 );
+			float m12 = -m10;
+
+			// row 2
+			float m22 = 3 / d2 + ( 6 * k0 ) / d3;
+			float m20 = -m22;
+			float _dRcp = 1 / d;
+			float _3k0d2 = 3 * k0 / d2;
+			float m23 = -_dRcp - _3k0d2;
+			float m21 = m23 - _dRcp;
+
+			// row 3
+			float m30 = 2 / d3;
+			float m31 = 1 / d2;
+			float m32 = -m30;
+			float m33 = m31;
+
+			return CharMatrix.Create(
+				m00, m01, m02, m03,
+				m10, m11, m12, m13,
+				m20, m21, m22, m23,
+				m30, m31, m32, m33
+			);
+		}
+
 	}
 
 }
