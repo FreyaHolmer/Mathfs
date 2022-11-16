@@ -30,31 +30,27 @@ namespace Freya {
 		/// <summary>Gets a point along this line</summary>
 		/// <param name="linear">The linear object to get a point along (Ray2D, Line2D or LineSegment2D)</param>
 		/// <param name="t">The t-value along the ray to get the point of. If the ray direction is normalized, t is equivalent to distance</param>
-		[MethodImpl( INLINE )] public static Vector2 GetPoint<T>( this T linear, float t ) where T : ILinear2D {
-			return linear.Origin + linear.Dir * t;
-		}
+		[MethodImpl( INLINE )] public static Vector2 GetPoint<T>( this T linear, float t ) where T : ILinear2D => linear.Origin + linear.Dir * t;
 
 		/// <summary>Returns the t-value of a point projected onto this line</summary>
 		/// <param name="linear">The linear object to project onto (Ray2D, Line2D or LineSegment2D)</param>
 		/// <param name="point">The point to use when projecting</param>
-		[MethodImpl( INLINE )] public static float ProjectPointTValue<T>( this T linear, Vector2 point ) where T : ILinear2D {
-			float t = Line2D.ProjectPointToLineTValue( linear.Origin, linear.Dir, point );
-			return linear.ClampTValue( t );
-		}
+		[MethodImpl( INLINE )] public static float ProjectPointTValue<T>( this T linear, Vector2 point ) where T : ILinear2D => linear.ClampTValue( Line2D.ProjectPointToLineTValue( linear.Origin, linear.Dir, point ) );
 
 		/// <summary>Projects a point onto this line</summary>
 		/// <param name="linear">The linear object to project onto (Ray2D, Line2D or LineSegment2D)</param>
 		/// <param name="point">The point to project</param>
-		[MethodImpl( INLINE )] public static Vector2 ProjectPoint<T>( this T linear, Vector2 point ) where T : ILinear2D {
-			return linear.GetPoint( linear.ProjectPointTValue( point ) );
-		}
+		[MethodImpl( INLINE )] public static Vector2 ProjectPoint<T>( this T linear, Vector2 point ) where T : ILinear2D => linear.GetPoint( linear.ProjectPointTValue( point ) );
 
 		/// <summary>The shortest distance from this line to a point</summary>
 		/// <param name="linear">The linear object to check distance from (Ray2D, Line2D or LineSegment2D)</param>
 		/// <param name="point">The point to check the distance to</param>
-		[MethodImpl( INLINE )] public static float Distance<T>( this T linear, Vector2 point ) where T : ILinear2D {
-			return Vector2.Distance( point, linear.ProjectPoint( point ) );
-		}
+		[MethodImpl( INLINE )] public static float Distance<T>( this T linear, Vector2 point ) where T : ILinear2D => Mathfs.Sqrt( DistanceSqr( linear, point ) );
+
+		/// <summary>The shortest squared distance from this line to a point</summary>
+		/// <param name="linear">The linear object to check distance from (Ray2D, Line2D or LineSegment2D)</param>
+		/// <param name="point">The point to check the distance to</param>
+		[MethodImpl( INLINE )] public static float DistanceSqr<T>( this T linear, Vector2 point ) where T : ILinear2D => ( point - linear.ProjectPoint( point ) ).sqrMagnitude;
 
 		#region Intersection Tests
 
