@@ -156,6 +156,25 @@ namespace Freya {
 
 		#region Quaternions
 
+		[MethodImpl( INLINE )] public static Quaternion Rotate180AroundWorldX( this Quaternion q ) => new(q.w, -q.z, q.y, -q.x);
+		[MethodImpl( INLINE )] public static Quaternion Rotate180AroundWorldY( this Quaternion q ) => new(q.z, q.w, -q.x, -q.y);
+		[MethodImpl( INLINE )] public static Quaternion Rotate180AroundWorldZ( this Quaternion q ) => new(-q.y, q.x, q.w, -q.z);
+		[MethodImpl( INLINE )] public static Quaternion Rotate180AroundSelfX( this Quaternion q ) => new(q.w, q.z, -q.y, -q.x);
+		[MethodImpl( INLINE )] public static Quaternion Rotate180AroundSelfY( this Quaternion q ) => new(-q.z, q.w, q.x, -q.y);
+		[MethodImpl( INLINE )] public static Quaternion Rotate180AroundSelfZ( this Quaternion q ) => new(q.y, -q.x, q.w, -q.z);
+
+		/// <summary>Returns an 180° rotated version of this quaternion around the given axis</summary>
+		/// <param name="q">The quaternion to rotate</param>
+		/// <param name="axis">The axis to rotate around</param>
+		/// <param name="space">The space of the axis</param>
+		public static Quaternion Rotate180Around( this Quaternion q, int axis, Space space ) {
+			return axis switch {
+				0 => space == Space.Self ? Rotate180AroundSelfX( q ) : Rotate180AroundWorldX( q ),
+				1 => space == Space.Self ? Rotate180AroundSelfY( q ) : Rotate180AroundWorldY( q ),
+				2 => space == Space.Self ? Rotate180AroundSelfZ( q ) : Rotate180AroundWorldZ( q ),
+				_ => throw new ArgumentOutOfRangeException( nameof(axis), $"Invalid axis: {axis}. Expected 0, 1 or 2" )
+			};
+		}
 		/// <summary>Returns the natural logarithm of a quaternion</summary>
 		public static Quaternion Log( this Quaternion q ) {
 			double vMagSq = (double)q.x * q.x + (double)q.y * q.y + (double)q.z * q.z;
