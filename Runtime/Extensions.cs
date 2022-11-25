@@ -156,23 +156,69 @@ namespace Freya {
 
 		#region Quaternions
 
-		[MethodImpl( INLINE )] public static Quaternion Rotate180AroundWorldX( this Quaternion q ) => new(q.w, -q.z, q.y, -q.x);
-		[MethodImpl( INLINE )] public static Quaternion Rotate180AroundWorldY( this Quaternion q ) => new(q.z, q.w, -q.x, -q.y);
-		[MethodImpl( INLINE )] public static Quaternion Rotate180AroundWorldZ( this Quaternion q ) => new(-q.y, q.x, q.w, -q.z);
+		/// <summary>Rotates 180° around the extrinsic pre-rotation X axis, sometimes this is interpreted as a world space rotation, as opposed to rotating around its own axes</summary>
+		[MethodImpl( INLINE )] public static Quaternion Rotate180AroundExtrX( this Quaternion q ) => new(q.w, -q.z, q.y, -q.x);
+
+		/// <summary>Rotates 180° around the extrinsic pre-rotation Y axis, sometimes this is interpreted as a world space rotation, as opposed to rotating around its own axes</summary>
+		[MethodImpl( INLINE )] public static Quaternion Rotate180AroundExtrY( this Quaternion q ) => new(q.z, q.w, -q.x, -q.y);
+
+		/// <summary>Rotates 180° around the extrinsic pre-rotation Z axis, sometimes this is interpreted as a world space rotation, as opposed to rotating around its own axes</summary>
+		[MethodImpl( INLINE )] public static Quaternion Rotate180AroundExtrZ( this Quaternion q ) => new(-q.y, q.x, q.w, -q.z);
+
+		/// <summary>Rotates 180° around its local X axis</summary>
 		[MethodImpl( INLINE )] public static Quaternion Rotate180AroundSelfX( this Quaternion q ) => new(q.w, q.z, -q.y, -q.x);
+
+		/// <summary>Rotates 180° around its local Y axis</summary>
 		[MethodImpl( INLINE )] public static Quaternion Rotate180AroundSelfY( this Quaternion q ) => new(-q.z, q.w, q.x, -q.y);
+
+		/// <summary>Rotates 180° around its local Z axis</summary>
 		[MethodImpl( INLINE )] public static Quaternion Rotate180AroundSelfZ( this Quaternion q ) => new(q.y, -q.x, q.w, -q.z);
 
 		/// <summary>Returns an 180° rotated version of this quaternion around the given axis</summary>
 		/// <param name="q">The quaternion to rotate</param>
 		/// <param name="axis">The axis to rotate around</param>
-		/// <param name="space">The space of the axis</param>
-		public static Quaternion Rotate180Around( this Quaternion q, int axis, Space space ) {
+		/// <param name="space">The rotation space of the axis, if it should be intrinsic/self/local or extrinsic/"world"</param>
+		public static Quaternion Rotate180Around( this Quaternion q, Axis axis, RotationSpace space = RotationSpace.Self ) {
 			return axis switch {
-				0 => space == Space.Self ? Rotate180AroundSelfX( q ) : Rotate180AroundWorldX( q ),
-				1 => space == Space.Self ? Rotate180AroundSelfY( q ) : Rotate180AroundWorldY( q ),
-				2 => space == Space.Self ? Rotate180AroundSelfZ( q ) : Rotate180AroundWorldZ( q ),
-				_ => throw new ArgumentOutOfRangeException( nameof(axis), $"Invalid axis: {axis}. Expected 0, 1 or 2" )
+				Axis.X => space == RotationSpace.Self ? Rotate180AroundSelfX( q ) : Rotate180AroundExtrX( q ),
+				Axis.Y => space == RotationSpace.Self ? Rotate180AroundSelfY( q ) : Rotate180AroundExtrY( q ),
+				Axis.Z => space == RotationSpace.Self ? Rotate180AroundSelfZ( q ) : Rotate180AroundExtrZ( q ),
+				_      => throw new ArgumentOutOfRangeException( nameof(axis), $"Invalid axis: {axis}. Expected 0, 1 or 2" )
+			};
+		}
+
+		/// <summary>Returns the quaternion rotated around the given axis by the given angle in radians</summary>
+		/// <param name="q">The quaternion to rotate</param>
+		/// <param name="axis">The axis to rotate around</param>
+		/// <param name="angRad">The angle to rotate by (in radians)</param>
+		/// <param name="space">The rotation space of the axis, if it should be intrinsic/self/local or extrinsic/"world"</param>
+		public static Quaternion RotateAround( this Quaternion q, Axis axis, float angRad, RotationSpace space = RotationSpace.Self ) {
+			float aHalf = angRad / 2;
+			float c = Mathf.Cos( aHalf );
+			float s = Mathf.Sin( aHalf );
+			float xc = q.x * c;
+			float yc = q.y * c;
+			float zc = q.z * c;
+			float wc = q.w * c;
+			float xs = q.x * s;
+			float ys = q.y * s;
+			float zs = q.z * s;
+			float ws = q.w * s;
+
+			return space switch {
+				RotationSpace.Self => axis switch {
+					Axis.X => new Quaternion( xc + ws, yc + zs, zc - ys, wc - xs ),
+					Axis.Y => new Quaternion( xc - zs, yc + ws, zc + xs, wc - ys ),
+					Axis.Z => new Quaternion( xc + ys, yc - xs, zc + ws, wc - zs ),
+					_      => throw new ArgumentOutOfRangeException( nameof(axis) )
+				},
+				RotationSpace.Extrinsic => axis switch {
+					Axis.X => new Quaternion( xc + ws, yc - zs, zc + ys, wc - xs ),
+					Axis.Y => new Quaternion( xc + zs, yc + ws, zc - xs, wc - ys ),
+					Axis.Z => new Quaternion( xc - ys, yc + xs, zc + ws, wc - zs ),
+					_      => throw new ArgumentOutOfRangeException( nameof(axis) )
+				},
+				_ => throw new ArgumentOutOfRangeException( nameof(space) )
 			};
 		}
 
