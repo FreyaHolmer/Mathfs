@@ -175,6 +175,7 @@ namespace Freya {
 				_ => throw new ArgumentOutOfRangeException( nameof(axis), $"Invalid axis: {axis}. Expected 0, 1 or 2" )
 			};
 		}
+
 		/// <summary>Returns the natural logarithm of a quaternion</summary>
 		public static Quaternion Log( this Quaternion q ) {
 			double vMagSq = (double)q.x * q.x + (double)q.y * q.y + (double)q.z * q.z;
