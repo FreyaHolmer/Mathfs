@@ -227,7 +227,7 @@ namespace Freya {
 		/// <param name="axis">The axis to rotate around</param>
 		/// <param name="space">The rotation space of the axis, if it should be intrinsic/self/local or extrinsic/"world"</param>
 		public static Quaternion Rotate90Around( this Quaternion q, Axis axis, RotationSpace space = RotationSpace.Self ) {
-			const float v = Mathfs.SQRT2; // 2*cos(90°/2) = 2*sin(90°/2)
+			const float v = Mathfs.RSQRT2; // cos(90°/2) = sin(90°/2)
 			float x = q.x;
 			float y = q.y;
 			float z = q.z;
@@ -255,7 +255,7 @@ namespace Freya {
 		/// <param name="axis">The axis to rotate around</param>
 		/// <param name="space">The rotation space of the axis, if it should be intrinsic/self/local or extrinsic/"world"</param>
 		public static Quaternion RotateNeg90Around( this Quaternion q, Axis axis, RotationSpace space = RotationSpace.Self ) {
-			const float v = Mathfs.SQRT2; // 2*cos(90°/2) = 2*sin(90°/2)
+			const float v = Mathfs.RSQRT2; // cos(90°/2) = sin(90°/2)
 			float x = q.x;
 			float y = q.y;
 			float z = q.z;
