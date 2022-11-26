@@ -222,6 +222,62 @@ namespace Freya {
 			};
 		}
 
+		/// <summary>Returns the quaternion rotated around the given axis by 90°</summary>
+		/// <param name="q">The quaternion to rotate</param>
+		/// <param name="axis">The axis to rotate around</param>
+		/// <param name="space">The rotation space of the axis, if it should be intrinsic/self/local or extrinsic/"world"</param>
+		public static Quaternion Rotate90Around( this Quaternion q, Axis axis, RotationSpace space = RotationSpace.Self ) {
+			const float v = Mathfs.SQRT2; // 2*cos(90°/2) = 2*sin(90°/2)
+			float x = q.x;
+			float y = q.y;
+			float z = q.z;
+			float w = q.w;
+
+			return space switch {
+				RotationSpace.Self => axis switch {
+					Axis.X => new Quaternion( v * ( x + w ), v * ( y + z ), v * ( z - y ), v * ( w - x ) ),
+					Axis.Y => new Quaternion( v * ( x - z ), v * ( y + w ), v * ( z + x ), v * ( w - y ) ),
+					Axis.Z => new Quaternion( v * ( x + y ), v * ( y - x ), v * ( z + w ), v * ( w - z ) ),
+					_      => throw new ArgumentOutOfRangeException( nameof(axis) )
+				},
+				RotationSpace.Extrinsic => axis switch {
+					Axis.X => new Quaternion( v * ( x + w ), v * ( y - z ), v * ( z + y ), v * ( w - x ) ),
+					Axis.Y => new Quaternion( v * ( x + z ), v * ( y + w ), v * ( z - x ), v * ( w - y ) ),
+					Axis.Z => new Quaternion( v * ( x - y ), v * ( y + x ), v * ( z + w ), v * ( w - z ) ),
+					_      => throw new ArgumentOutOfRangeException( nameof(axis) )
+				},
+				_ => throw new ArgumentOutOfRangeException( nameof(space) )
+			};
+		}
+
+		/// <summary>Returns the quaternion rotated around the given axis by -90°</summary>
+		/// <param name="q">The quaternion to rotate</param>
+		/// <param name="axis">The axis to rotate around</param>
+		/// <param name="space">The rotation space of the axis, if it should be intrinsic/self/local or extrinsic/"world"</param>
+		public static Quaternion RotateNeg90Around( this Quaternion q, Axis axis, RotationSpace space = RotationSpace.Self ) {
+			const float v = Mathfs.SQRT2; // 2*cos(90°/2) = 2*sin(90°/2)
+			float x = q.x;
+			float y = q.y;
+			float z = q.z;
+			float w = q.w;
+
+			return space switch {
+				RotationSpace.Self => axis switch {
+					Axis.X => new Quaternion( v * ( x - w ), v * ( y - z ), v * ( z + y ), v * ( w + x ) ),
+					Axis.Y => new Quaternion( v * ( x + z ), v * ( y - w ), v * ( z - x ), v * ( w + y ) ),
+					Axis.Z => new Quaternion( v * ( x - y ), v * ( y + x ), v * ( z - w ), v * ( w + z ) ),
+					_      => throw new ArgumentOutOfRangeException( nameof(axis) )
+				},
+				RotationSpace.Extrinsic => axis switch {
+					Axis.X => new Quaternion( v * ( x - w ), v * ( y + z ), v * ( z - y ), v * ( w + x ) ),
+					Axis.Y => new Quaternion( v * ( x - z ), v * ( y - w ), v * ( z + x ), v * ( w + y ) ),
+					Axis.Z => new Quaternion( v * ( x + y ), v * ( y - x ), v * ( z - w ), v * ( w + z ) ),
+					_      => throw new ArgumentOutOfRangeException( nameof(axis) )
+				},
+				_ => throw new ArgumentOutOfRangeException( nameof(space) )
+			};
+		}
+
 		/// <summary>Returns the natural logarithm of a quaternion</summary>
 		public static Quaternion Log( this Quaternion q ) {
 			double vMagSq = (double)q.x * q.x + (double)q.y * q.y + (double)q.z * q.z;
