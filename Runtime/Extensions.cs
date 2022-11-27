@@ -278,6 +278,53 @@ namespace Freya {
 			};
 		}
 
+		/// <summary>Returns the given axis of this rotation (assumes this quaternion is normalized)</summary>
+		public static Vector3 GetAxis( this Quaternion q, Axis axis ) {
+			return axis switch {
+				Axis.X => q.Right(),
+				Axis.Y => q.Up(),
+				Axis.Z => q.Forward(),
+				_      => throw new ArgumentOutOfRangeException( nameof(axis) )
+			};
+		}
+
+		/// <summary>Returns the X axis of this rotation (assumes this quaternion is normalized)</summary>
+		public static Vector3 Right( this Quaternion q ) => new(q.x * q.x - q.y * q.y - q.z * q.z + q.w * q.w, 2 * ( q.x * q.y + q.z * q.w ), 2 * ( q.x * q.z - q.y * q.w ));
+
+		/// <summary>Returns the Y axis of this rotation (assumes this quaternion is normalized)</summary>
+		public static Vector3 Up( this Quaternion q ) => new(2 * ( q.x * q.y - q.z * q.w ), -q.x * q.x + q.y * q.y - q.z * q.z + q.w * q.w, 2 * ( q.x * q.w + q.y * q.z ));
+
+		/// <summary>Returns the Z axis of this rotation (assumes this quaternion is normalized)</summary>
+		public static Vector3 Forward( this Quaternion q ) => new(2 * ( q.x * q.z + q.y * q.w ), 2 * ( q.y * q.z - q.x * q.w ), -q.x * q.x - q.y * q.y + q.z * q.z + q.w * q.w);
+
+		/// <summary>Converts this quaternion to a rotation matrix</summary>
+		public static Matrix4x4 ToMatrix( this Quaternion q ) {
+			// you could just use Matrix4x4.Rotate( q ) but that's not as fun as doing this math myself
+			float xx = q.x * q.x;
+			float yy = q.y * q.y;
+			float zz = q.z * q.z;
+			float ww = q.w * q.w;
+			float xy = q.x * q.y;
+			float yz = q.y * q.z;
+			float zw = q.z * q.w;
+			float wx = q.w * q.x;
+			float xz = q.x * q.z;
+			float yw = q.y * q.w;
+
+			return new Matrix4x4 {
+				m00 = xx - yy - zz + ww, // X
+				m10 = 2 * ( xy + zw ),
+				m20 = 2 * ( xz - yw ),
+				m01 = 2 * ( xy - zw ), // Y
+				m11 = -xx + yy - zz + ww,
+				m21 = 2 * ( wx + yz ),
+				m02 = 2 * ( xz + yw ), // Z
+				m12 = 2 * ( yz - wx ),
+				m22 = -xx - yy + zz + ww,
+				m33 = 1
+			};
+		}
+
 		/// <summary>Returns the natural logarithm of a quaternion</summary>
 		public static Quaternion Log( this Quaternion q ) {
 			double vMagSq = (double)q.x * q.x + (double)q.y * q.y + (double)q.z * q.z;
