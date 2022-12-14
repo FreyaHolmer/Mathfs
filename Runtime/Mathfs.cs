@@ -1037,6 +1037,18 @@ namespace Freya {
 			return mag < min ? ( v / mag ) * min : mag > max ? ( v / mag ) * max : v;
 		}
 
+		/// <summary>Returns the chebyshev distance between the two vectors</summary>
+		[MethodImpl( INLINE )] public static float ChebyshevDistance( Vector3 a, Vector3 b ) => Max( Abs( a.x - b.x ), Abs( a.y - b.y ), Abs( a.z - b.z ) );
+
+		/// <summary>Returns the taxicab/rectilinear distance between the two vectors</summary>
+		[MethodImpl( INLINE )] public static float TaxicabDistance( Vector3 a, Vector3 b ) => Abs( a.x - b.x ) + Abs( a.y - b.y ) + Abs( a.z - b.z );
+
+		/// <inheritdoc cref="ChebyshevDistance(Vector2,Vector2)"/>
+		[MethodImpl( INLINE )] public static float ChebyshevDistance( Vector2 a, Vector2 b ) => Max( Abs( a.x - b.x ), Abs( a.y - b.y ) );
+
+		/// <inheritdoc cref="TaxicabDistance(Vector2,Vector2)"/>
+		[MethodImpl( INLINE )] public static float TaxicabDistance( Vector2 a, Vector2 b ) => Abs( a.x - b.x ) + Abs( a.y - b.y );
+
 		/// <summary>Returns the average/center of the two input vectors</summary>
 		[MethodImpl( INLINE )] public static Vector2 Average( Vector2 a, Vector2 b ) => ( a + b ) / 2f;
 

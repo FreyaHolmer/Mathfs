@@ -91,6 +91,18 @@ namespace Freya {
 
 		#region Vector directions & magnitudes
 
+		/// <summary>Returns the chebyshev magnitude of this vector</summary>
+		[MethodImpl( INLINE )] public static float ChebyshevMagnitude( this Vector3 v ) => Mathfs.Max( Abs( v.x ), Abs( v.y ), Abs( v.z ) );
+
+		/// <summary>Returns the taxicab/rectilinear magnitude of this vector</summary>
+		[MethodImpl( INLINE )] public static float TaxicabMagnitude( this Vector3 v ) => Abs( v.x ) + Abs( v.y ) + Abs( v.z );
+		
+		/// <inheritdoc cref="ChebyshevMagnitude(Vector3)"/>
+		[MethodImpl( INLINE )] public static float ChebyshevMagnitude( this Vector2 v ) => Mathfs.Max( Abs( v.x ), Abs( v.y ) );
+
+		/// <inheritdoc cref="TaxicabMagnitude(Vector3)"/>
+		[MethodImpl( INLINE )] public static float TaxicabMagnitude( this Vector2 v ) => Abs( v.x ) + Abs( v.y );
+
 		/// <summary>Returns a vector with the same direction, but with the given magnitude.
 		/// Equivalent to <c>v.normalized*mag</c></summary>
 		[MethodImpl( INLINE )] public static Vector2 WithMagnitude( this Vector2 v, float mag ) => v.normalized * mag;
