@@ -6,16 +6,17 @@ using UnityEngine;
 namespace Freya {
 
 	/// <summary>A value range between two values a and b</summary>
-	public readonly struct FloatRange {
+	[Serializable]
+	public struct FloatRange {
 
 		/// <summary>The unit interval of 0 to 1</summary>
 		public static readonly FloatRange unit = new FloatRange( 0, 1 );
 
 		/// <summary>The start of this range</summary>
-		public readonly float a;
+		public float a;
 
 		/// <summary>The end of this range</summary>
-		public readonly float b;
+		public float b;
 
 		/// <summary>Creates a new value range</summary>
 		/// <param name="a">The start of the range</param>
@@ -89,6 +90,14 @@ namespace Freya {
 				_ => ( Mathfs.Min( b, value ), Mathfs.Max( a, value ) ) // reversed - b is min, a is max
 			};
 
+		/// <summary>Expands the minimum or maximum value to contain the given <c>range</c></summary>
+		/// <param name="range">The value range to include</param>
+		public FloatRange Encapsulate( FloatRange range ) =>
+			Direction switch {
+				1 => ( Mathfs.Min( a, range.a ), Mathfs.Max( b, range.b ) ), // forward - a is min, b is max
+				_ => ( Mathfs.Min( b, range.b ), Mathfs.Max( a, range.a ) ) // reversed - b is min, a is max
+			};
+
 		/// <summary>Returns a version of this range, scaled around its start value</summary>
 		/// <param name="scale">The value to scale the range by</param>
 		public FloatRange ScaleFromStart( float scale ) => new FloatRange( a, a + scale * ( b - a ) );
@@ -117,6 +126,10 @@ namespace Freya {
 
 		public static FloatRange operator -( FloatRange range, float v ) => new(range.a - v, range.b - v);
 		public static FloatRange operator +( FloatRange range, float v ) => new(range.a + v, range.b + v);
+		public static FloatRange operator /( FloatRange range, int v ) => new(range.a / v, range.b / v);
+		public static FloatRange operator /( FloatRange range, float v ) => new(range.a / v, range.b / v);
+		public static FloatRange operator *( FloatRange range, int v ) => new(range.a * v, range.b * v);
+		public static FloatRange operator *( FloatRange range, float v ) => new(range.a * v, range.b * v);
 
 		public static implicit operator FloatRange( (float a, float b) tuple ) => new FloatRange( tuple.a, tuple.b );
 		public static bool operator ==( FloatRange a, FloatRange b ) => a.a == b.a && a.b == b.b;
