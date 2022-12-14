@@ -96,7 +96,7 @@ namespace Freya {
 
 		/// <summary>Returns the taxicab/rectilinear magnitude of this vector</summary>
 		[MethodImpl( INLINE )] public static float TaxicabMagnitude( this Vector3 v ) => Abs( v.x ) + Abs( v.y ) + Abs( v.z );
-		
+
 		/// <inheritdoc cref="ChebyshevMagnitude(Vector3)"/>
 		[MethodImpl( INLINE )] public static float ChebyshevMagnitude( this Vector2 v ) => Mathfs.Max( Abs( v.x ), Abs( v.y ) );
 
@@ -165,6 +165,7 @@ namespace Freya {
 		/// <inheritdoc cref="ScaleAround(Vector2,Vector2,Vector2)"/>
 		[MethodImpl( INLINE )] public static Vector3 ScaleAround( this Vector3 p, Vector3 pivot, Vector3 scale ) => new(pivot.x + ( p.x - pivot.x ) * scale.x, pivot.y + ( p.y - pivot.y ) * scale.y, pivot.z + ( p.z - pivot.z ) * scale.z);
 
+		#endregion
 
 		#region Quaternions
 
@@ -301,13 +302,28 @@ namespace Freya {
 		}
 
 		/// <summary>Returns the X axis of this rotation (assumes this quaternion is normalized)</summary>
-		[MethodImpl( INLINE )] public static Vector3 Right( this Quaternion q ) => new(q.x * q.x - q.y * q.y - q.z * q.z + q.w * q.w, 2 * ( q.x * q.y + q.z * q.w ), 2 * ( q.x * q.z - q.y * q.w ));
+		[MethodImpl( INLINE )] public static Vector3 Right( this Quaternion q ) =>
+			new(
+				q.x * q.x - q.y * q.y - q.z * q.z + q.w * q.w,
+				2 * ( q.x * q.y + q.z * q.w ),
+				2 * ( q.x * q.z - q.y * q.w )
+			);
 
 		/// <summary>Returns the Y axis of this rotation (assumes this quaternion is normalized)</summary>
-		[MethodImpl( INLINE )] public static Vector3 Up( this Quaternion q ) => new(2 * ( q.x * q.y - q.z * q.w ), -q.x * q.x + q.y * q.y - q.z * q.z + q.w * q.w, 2 * ( q.x * q.w + q.y * q.z ));
+		[MethodImpl( INLINE )] public static Vector3 Up( this Quaternion q ) =>
+			new(
+				2 * ( q.x * q.y - q.z * q.w ),
+				-q.x * q.x + q.y * q.y - q.z * q.z + q.w * q.w,
+				2 * ( q.x * q.w + q.y * q.z )
+			);
 
 		/// <summary>Returns the Z axis of this rotation (assumes this quaternion is normalized)</summary>
-		[MethodImpl( INLINE )] public static Vector3 Forward( this Quaternion q ) => new(2 * ( q.x * q.z + q.y * q.w ), 2 * ( q.y * q.z - q.x * q.w ), -q.x * q.x - q.y * q.y + q.z * q.z + q.w * q.w);
+		[MethodImpl( INLINE )] public static Vector3 Forward( this Quaternion q ) =>
+			new(
+				2 * ( q.x * q.z + q.y * q.w ),
+				2 * ( q.y * q.z - q.x * q.w ),
+				-q.x * q.x - q.y * q.y + q.z * q.z + q.w * q.w
+			);
 
 		/// <summary>Converts this quaternion to a rotation matrix</summary>
 		public static Matrix4x4 ToMatrix( this Quaternion q ) {
@@ -383,7 +399,6 @@ namespace Freya {
 		/// <param name="quat">The world space rotation</param>
 		public static Quaternion InverseTransformRotation( this Transform tf, Quaternion quat ) => tf.rotation * quat;
 
-		#endregion
 		#endregion
 
 		#region Color manipulation

@@ -1052,25 +1052,23 @@ namespace Freya {
 		/// <summary>Returns the average/center of the two input vectors</summary>
 		[MethodImpl( INLINE )] public static Vector2 Average( Vector2 a, Vector2 b ) => ( a + b ) / 2f;
 
-		/// <summary>Returns the average/center of the two input vectors</summary>
+		/// <inheritdoc cref="Average(Vector2,Vector2)"/>
 		[MethodImpl( INLINE )] public static Vector3 Average( Vector3 a, Vector3 b ) => ( a + b ) / 2f;
 
 		/// <summary>Returns the average/halfway direction between the two input direction vectors. Note that this presumes both <c>aDir</c> and <c>bDir</c> have the same length</summary>
 		[MethodImpl( INLINE )] public static Vector2 AverageDir( Vector2 aDir, Vector2 bDir ) => ( aDir + bDir ).normalized;
 
-		/// <summary>Returns the average/halfway direction between the two input direction vectors. Note that this presumes both <c>aDir</c> and <c>bDir</c> have the same length</summary>
+		/// <inheritdoc cref="AverageDir(Vector2,Vector2)"/>
 		[MethodImpl( INLINE )] public static Vector3 AverageDir( Vector3 aDir, Vector3 bDir ) => ( aDir + bDir ).normalized;
 
 		/// <summary>Returns the squared distance between two points.
 		/// This is faster than the actual distance, and is useful when comparing distances where the absolute distance doesn't matter</summary>
 		[MethodImpl( INLINE )] public static float DistanceSquared( Vector2 a, Vector2 b ) => ( a.x - b.x ).Square() + ( a.y - b.y ).Square();
 
-		/// <summary>Returns the squared distance between two points.
-		/// This is faster than the actual distance, and is useful when comparing distances where the absolute distance doesn't matter</summary>
+		/// <inheritdoc cref="DistanceSquared(Vector2,Vector2)"/>
 		[MethodImpl( INLINE )] public static float DistanceSquared( Vector3 a, Vector3 b ) => ( a.x - b.x ).Square() + ( a.y - b.y ).Square() + ( a.z - b.z ).Square();
 
-		/// <summary>Returns the squared distance between two points.
-		/// This is faster than the actual distance, and is useful when comparing distances where the absolute distance doesn't matter</summary>
+		/// <inheritdoc cref="DistanceSquared(Vector2,Vector2)"/>
 		[MethodImpl( INLINE )] public static float DistanceSquared( Vector4 a, Vector4 b ) => ( a.x - b.x ).Square() + ( a.y - b.y ).Square() + ( a.z - b.z ).Square() + ( a.w - b.w ).Square();
 
 		#endregion

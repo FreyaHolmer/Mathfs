@@ -89,10 +89,8 @@ namespace Freya {
 
 		/// <summary>Returns the derivative of this B-spline, which is a B-spline in and of itself</summary>
 		public BSpline2D Differentiate() {
-			// knots are the same except we remove the two outermost ones
-			float[] dKnots = new float[KnotCount - 2];
-			for( int i = 0; i < dKnots.Length; i++ )
-				dKnots[i] = knots[i + 1];
+			float[] dKnots = new float[KnotCount];
+			knots.CopyTo( dKnots, 0 );
 
 			// one point less
 			Vector2[] dPts = new Vector2[PointCount - 1];
