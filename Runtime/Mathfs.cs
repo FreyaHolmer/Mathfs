@@ -304,6 +304,24 @@ namespace Freya {
 
 		#endregion
 
+		#region Geometric Algebra
+
+		/// <summary>Returns the wedge product between two vectors</summary>
+		public static float Wedge( Vector2 a, Vector2 b ) => a.x * b.y - a.y * b.x;
+
+		/// <summary>Returns the wedge product between two vectors</summary>
+		public static Bivector3 Wedge( Vector3 a, Vector3 b ) =>
+			new Bivector3(
+				a.y * b.z - a.z * b.y,
+				a.z * b.x - a.x * b.z,
+				a.x * b.y - a.y * b.x
+			);
+
+		/// <summary>Returns the geometric product between two vectors</summary>
+		public static Rotor3 GeometricProduct( Vector3 a, Vector3 b ) => new Rotor3( Vector3.Dot( a, b ), Wedge( a, b ) );
+
+		#endregion
+
 		#region Absolute Values
 
 		/// <summary>Returns the absolute value. Basically makes negative numbers positive</summary>
