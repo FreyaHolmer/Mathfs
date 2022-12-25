@@ -45,6 +45,9 @@ namespace Freya {
 				zx: a.yz * b.xy - a.xy * b.yz,
 				xy: a.zx * b.yz - a.yz * b.zx );
 
+		/// <summary>Returns the normal of this bivector plane and its area</summary>
+		public (Vector3 normal, float area) GetNormalAndArea() => ( (Vector3)this ).GetDirAndMagnitude();
+
 		// Multiplication
 		public static Bivector3 operator -( Bivector3 b ) => new Bivector3( -b.yz, -b.zx, -b.xy );
 		public static Bivector3 operator *( float a, Bivector3 b ) => b * a;
