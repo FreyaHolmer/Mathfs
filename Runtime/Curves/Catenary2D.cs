@@ -75,7 +75,6 @@ namespace Freya {
 			// CASE 1:
 			// first, test if it's a line segment
 			if( IsStraightLine() ) {
-				Debug.Log( "line seg" );
 				evaluability = Evaluability.LineSegment;
 				return;
 			}
@@ -88,7 +87,6 @@ namespace Freya {
 			// CASE 2:
 			// check if it's basically a fully vertical hanging chain
 			if( IsFullyVertical( p.x ) ) {
-				Debug.Log( "linear vertical" );
 				evaluability = Evaluability.LinearVertical;
 				return;
 			}
