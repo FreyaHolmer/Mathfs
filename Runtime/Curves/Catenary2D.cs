@@ -46,10 +46,8 @@ namespace Freya {
 			if( evaluability == Evaluability.LineSegment )
 				return Vector3.LerpUnclamped( p0, p1, t ); // chain is almost completely linear
 
-			( Vector2 pLeft, Vector2 pRight ) = p0.x > p1.x ? ( p1, p0 ) : ( p0, p1 );
-			Vector2 p = pRight - pLeft;
+			Vector2 p = p1 - p0;
 			float x = Mathfs.Lerp( 0, p.x, t );
-
 			float y;
 			if( evaluability == Evaluability.LinearVertical ) { // chain is almost completely vertical, use a linear approximation
 				float ts = t * s;
@@ -59,13 +57,13 @@ namespace Freya {
 				y = EvalFrom0( x );
 			}
 
-			return new Vector2( x, y ) + pLeft;
+			return new Vector2( x, y ) + p0;
 		}
 
 		// Passing through (0,0) and point p
 		float EvalFrom0( float x ) => a * Mathfs.Cosh( ( x - delta.x ) / a ) + delta.y;
 
-		bool IsFullyVertical( float dx ) => dx < 0.001f;
+		bool IsFullyVertical( float dx ) => Mathf.Abs( dx ) < 0.001f;
 		bool IsStraightLine() => s <= Vector2.Distance( p0, p1 ) * 1.00005f;
 
 		void ReadyForEvaluation() {
@@ -81,8 +79,6 @@ namespace Freya {
 
 			// relative to origin point p
 			Vector2 p = p1 - p0;
-			if( p.x < 0 )
-				p = -p; // swap 0 and p
 
 			// CASE 2:
 			// check if it's basically a fully vertical hanging chain
@@ -91,76 +87,67 @@ namespace Freya {
 				return;
 			}
 
-			// Now we've got a possible catenary curve on our hands
-
-			// set up function
+			// CASE 3:
+			// Now we've got a catenary on our hands unless something explodes.
 			float c = Mathf.Sqrt( s * s - p.y * p.y );
-			float F( float a ) => 2 * a * Mathfs.Sinh( p.x / ( 2 * a ) ) - c;
+			float pAbsX = p.x.Abs(); // solve only in x > 0
+			float R( float a ) => 2 * a * Mathfs.Sinh( pAbsX / ( 2 * a ) ) - c; // set up root solve function
 
 			// find bounds of the root
 			float xRoot = ( p.x * p.x ) / ( 2 * s ); // intial guess based on freya's flawless heuristics
-			bool rootFound = FindRootRangeExponential( F, xRoot, out FloatRange xRange, out FloatRange yRange );
-
-			if( rootFound == false ) { // refine if it hasn't already been found
+			if( TryFindRootBounds( R, xRoot, out FloatRange xRange ) ) {
+				// refine range, if necessary (which is very likely)
+				if( Mathf.Approximately( xRange.Length, 0 ) == false )
+					RootFindBisections( R, ref xRange, BISECT_REFINE_COUNT ); // Catenary seems valid, with roots inside, refine the range
+				a = xRange.Center; // set a to the middle of the latest range
+				delta = CalcCatenaryDelta( a, p ); // find delta to pass through both points
+				evaluability = Evaluability.Catenary;
+			} else {
 				// CASE 4:
-				// it's possible we failed to find a valid root range
-				if( yRange.Contains( 0 ) == false ) {
-					evaluability = Evaluability.LinearVertical;
-					return;
-				}
-
-				// CASE 5:
-				// Catenary seems valid, with roots inside! now refine this range
-				RootFindBisections( F, ref xRange, BISECT_REFINE_COUNT );
+				// something exploded, couldn't find a range, so let's use a straight line as a fallback
+				evaluability = Evaluability.LineSegment;
 			}
-
-			// set a to the middle of the latest range
-			a = xRange.Center;
-
-			// cached delta, for faster evaluation:
-			delta.x = ( p.x - a * Mathf.Log( ( s + p.y ) / ( s - p.y ) ) ) / 2;
-			delta.y = -a * Mathfs.Cosh( -delta.x / a );
-			evaluability = Evaluability.Catenary;
 		}
 
-		static bool FindRootRangeExponential( Func<float, float> F, float initialGuess, out FloatRange xRange, out FloatRange yRange ) {
-			float xRoot = initialGuess;
-			float yTest = F( xRoot );
-			xRange = new FloatRange( xRoot, xRoot );
-			yRange = new FloatRange( yTest, yTest );
+		// Calculates the required offset to make a catenary pass through the origin and a point p
+		static Vector2 CalcCatenaryDelta( float a, Vector2 p ) {
+			Vector2 d;
+			d.x = p.x / 2 - a * Mathfs.Asinh( p.y / ( 2 * a * Mathfs.Sinh( p.x / ( 2 * a ) ) ) );
+			d.y = -a * Mathfs.Cosh( -d.x / a );
+			return d;
+		}
 
-			// find which direction to search in
-			if( Mathf.Approximately( yTest, 0 ) ) {
-				// already on the root, no need to iterate
+		// presumes a decreasing function with one root in x > 0
+		// g = initial guess
+		static bool TryFindRootBounds( Func<float, float> R, float g, out FloatRange xRange ) {
+			float y = R( g );
+			xRange = new FloatRange( g, g );
+			if( Mathfs.Approximately( y, 0 ) ) // somehow landed *on* our root in our initial guess
 				return true;
-			} else if( yTest > 0 ) { // search forwards for a negative value, set upper bound
-				for( int i = 0; i < INTERVAL_SEARCH_ITERATIONS; i++ ) {
-					xRoot *= 2;
-					float value = F( xRoot );
-					if( value < 0 ) {
-						xRange.b = xRoot; // found negative value!
-						yRange.b = value;
-						break;
-					} else {
-						xRange.a = xRoot; // still positive, shift left bound
-						yRange.a = value;
-					}
-				}
-			} else { // search backwards for a positive value, set lower bound
-				for( int i = 0; i < INTERVAL_SEARCH_ITERATIONS; i++ ) {
-					xRoot *= 0.5f;
-					float value = F( xRoot );
-					if( value > 0 ) {
-						xRange.a = xRoot; // found positive value!
-						yRange.a = value;
-						break;
-					} else {
-						xRange.b = xRoot; // still negative, shift right bound
-						yRange.b = value;
-					}
+
+			bool findingUpper = y > 0;
+
+			for( int n = 1; n <= INTERVAL_SEARCH_ITERATIONS; n++ ) {
+				if( findingUpper ) {
+					// It's positive - we found our lower bound
+					// exponentially search for upper bound
+					xRange.a = xRange.b;
+					xRange.b = g * Mathf.Pow( 2, n );
+					y = R( xRange.b );
+					if( y < 0 )
+						return true; // upper bound found!
+				} else {
+					// It's negative - we found our upper bound
+					// exponentially search for lower bound
+					xRange.b = xRange.a;
+					xRange.a = g * Mathf.Pow( 2, -n );
+					y = R( xRange.a );
+					if( y > 0 )
+						return true; // lower bound found!
 				}
 			}
-			return false; // not found yet
+
+			return false; // no root found
 		}
 
 		static void RootFindBisections( Func<float, float> F, ref FloatRange xRange, int iterationCount ) {
