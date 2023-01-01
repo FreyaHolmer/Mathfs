@@ -42,14 +42,14 @@ namespace Freya {
 		// data
 		Vector2 p0, p1;
 		float s;
-		
+
 		// cached state
 		float a;
 		Vector2 p;
 		Vector2 delta;
 		float arcLenSampleOffset;
 		Evaluability evaluability;
-		
+
 		public float Length {
 			get => s;
 			set => ( s, evaluability ) = ( value, Evaluability.Unknown );
