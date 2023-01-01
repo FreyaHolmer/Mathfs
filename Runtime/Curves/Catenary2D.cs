@@ -8,6 +8,27 @@ namespace Freya {
 	/// <summary>A catenary curve passing through two points with a given an arc length</summary>
 	public struct Catenary2D {
 
+		#region Standard catenary equations
+
+		/// <summary>Returns the y coordinate of a catenary at the given x value</summary>
+		/// <param name="x">The x coordinate to evaluate at</param>
+		/// <param name="a">The a-parameter of the catenary</param>
+		public static float Eval( float x, float a ) => a * Mathfs.Cosh( x / a );
+
+		/// <summary>Evaluates the arc length from the apex of the catenary, to the given x coordinate.
+		/// Note that this is negative when x is less than 0</summary>
+		/// <param name="x">The x coordinate to get the length to</param>
+		/// <param name="a">The a-parameter of the catenary</param>
+		public static float EvalArcLen( float x, float a ) => a * Mathfs.Sinh( x / a );
+
+		/// <summary>Evaluates the x coordinate at the given arc length relative to the apex of the catenary.
+		/// Note that the input arc length can be negative, to get the negative x coordinates</summary>
+		/// <param name="s">The arc length to get the x coordinate of</param>
+		/// <param name="a">The a-parameter of the catenary</param>
+		public static float EvalXByArcLength( float s, float a ) => a * Mathfs.Asinh( s / a );
+
+		#endregion
+
 		enum Evaluability {
 			Unknown = 0,
 			Catenary,
