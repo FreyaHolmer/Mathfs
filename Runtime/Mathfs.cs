@@ -294,13 +294,13 @@ namespace Freya {
 		[MethodImpl( INLINE )] public static float Tanh( float x ) => (float)Math.Tanh( x );
 
 		/// <summary>Returns the hyperbolic arc cosine of the given value</summary>
-		[MethodImpl( INLINE )] public static float Acosh( float x ) => (float)Math.Log( x + Mathf.Sqrt( x * x - 1 ) );
+		[MethodImpl( INLINE )] public static float Acosh( float x ) => (float)Math.Acosh( x );
 
 		/// <summary>Returns the hyperbolic arc sine of the given value</summary>
-		[MethodImpl( INLINE )] public static float Asinh( float x ) => (float)Math.Log( x + Mathf.Sqrt( x * x + 1 ) );
+		[MethodImpl( INLINE )] public static float Asinh( float x ) => (float)Math.Asinh( x );
 
 		/// <summary>Returns the hyperbolic arc tangent of the given value</summary>
-		[MethodImpl( INLINE )] public static float Atanh( float x ) => (float)( 0.5 * Math.Log( ( 1 + x ) / ( 1 - x ) ) );
+		[MethodImpl( INLINE )] public static float Atanh( float x ) => (float)Math.Atanh( x );
 
 		#endregion
 
