@@ -84,7 +84,7 @@ namespace Freya {
 
 		/// <summary>The number of curves in this spline</summary>
 		public int CurveCount {
-			[MethodImpl( INLINE )] get => ControlPointCount - ( IncludeEndpoints ? 1 : 3 );
+			[MethodImpl( INLINE )] get => ControlPointCount - ( IncludeEndpoints ? 1 : 2 );
 		}
 
 		/// <summary>The knot value at the start of the spline</summary>
