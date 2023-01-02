@@ -1,5 +1,6 @@
 ﻿// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
+using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using static Freya.Mathfs;
@@ -73,7 +74,7 @@ namespace Freya {
 				Vector2 p = curve.Eval( unit ? t : interval.Lerp( t ) );
 				float dx = p.x - prev.x;
 				float dy = p.y - prev.y;
-				totalDist += Mathf.Sqrt( dx * dx + dy * dy );
+				totalDist += MathF.Sqrt( dx * dx + dy * dy );
 				prev = p;
 			}
 
@@ -101,7 +102,7 @@ namespace Freya {
 				float dx = p.x - prev.x;
 				float dy = p.y - prev.y;
 				float dz = p.z - prev.z;
-				totalDist += Mathf.Sqrt( dx * dx + dy * dy + dz * dz );
+				totalDist += MathF.Sqrt( dx * dx + dy * dy + dz * dz );
 				prev = p;
 			}
 
@@ -211,7 +212,7 @@ namespace Freya {
 
 		/// <summary>Returns a pseudovector at the given t-value on the curve, where the magnitude is the curvature in radians per distance unit, and the direction is the axis of curvature</summary>
 		/// <param name="t">The t-value along the curve to sample</param>
-		[MethodImpl( INLINE )] public static Vector3 EvalCurvature<T>( this T curve, float t ) where T : IParamCurve2Diff<Vector3> => Mathfs.GetCurvature( curve.EvalDerivative( t ), curve.EvalSecondDerivative( t ) );
+		[MethodImpl( INLINE )] public static Bivector3 EvalCurvature<T>( this T curve, float t ) where T : IParamCurve2Diff<Vector3> => Mathfs.GetCurvature( curve.EvalDerivative( t ), curve.EvalSecondDerivative( t ) );
 
 		/// <inheritdoc cref="IParamCurve2DiffExt2D.EvalOsculatingCircle{T}"/>
 		[MethodImpl( INLINE )] public static Circle3D EvalOsculatingCircle<T>( this T curve, float t ) where T : IParamCurve2Diff<Vector3> => Circle3D.GetOsculatingCircle( curve.Eval( t ), curve.EvalDerivative( t ), curve.EvalSecondDerivative( t ) );

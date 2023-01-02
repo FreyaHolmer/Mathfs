@@ -1,5 +1,6 @@
 ﻿// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
+using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using static Freya.Mathfs;
@@ -226,10 +227,10 @@ namespace Freya {
 			if( Vector3.Dot( xAxis, startTangent ).Abs() < 0.9999f ) {
 				float h = d / 2;
 				float ang = AngleBetween( xAxis, startTangent );
-				float fh = h * Mathf.Tan( ang + TAU / 4 );
+				float fh = h * MathF.Tan( ang + TAU / 4 );
 				float x2D = h;
 				float y2D = fh;
-				float r = Mathf.Sqrt( h * h + fh * fh );
+				float r = MathF.Sqrt( h * h + fh * fh );
 				Vector3 normal = Vector3.Cross( xAxis, startTangent ).normalized;
 				Vector3 yAxis = Vector3.Cross( normal, xAxis );
 				Vector3 center = startPt + xAxis * x2D + yAxis * y2D;

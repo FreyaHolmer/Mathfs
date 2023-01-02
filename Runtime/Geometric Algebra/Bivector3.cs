@@ -24,7 +24,7 @@ namespace Freya {
 			this.xy = bv.xy;
 		}
 
-		public float Magnitude => Mathf.Sqrt( SqrMagnitude );
+		public float Magnitude => MathF.Sqrt( SqrMagnitude );
 		public Bivector3 Normalized => new Bivector3( yz, zx, xy ) / Magnitude;
 		public Vector3 Normal => new Vector3( yz, zx, xy ) / Magnitude;
 		public float SqrMagnitude => yz * yz + zx * zx + xy * xy;

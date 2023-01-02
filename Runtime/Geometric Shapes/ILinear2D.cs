@@ -1,5 +1,6 @@
 ﻿// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
+using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
@@ -45,7 +46,7 @@ namespace Freya {
 		/// <summary>The shortest distance from this line to a point</summary>
 		/// <param name="linear">The linear object to check distance from (Ray2D, Line2D or LineSegment2D)</param>
 		/// <param name="point">The point to check the distance to</param>
-		[MethodImpl( INLINE )] public static float Distance<T>( this T linear, Vector2 point ) where T : ILinear2D => Mathfs.Sqrt( DistanceSqr( linear, point ) );
+		[MethodImpl( INLINE )] public static float Distance<T>( this T linear, Vector2 point ) where T : ILinear2D => MathF.Sqrt( DistanceSqr( linear, point ) );
 
 		/// <summary>The shortest squared distance from this line to a point</summary>
 		/// <param name="linear">The linear object to check distance from (Ray2D, Line2D or LineSegment2D)</param>

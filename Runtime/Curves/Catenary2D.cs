@@ -63,7 +63,7 @@ namespace Freya {
 			set => ( p1, evaluability ) = ( value, Evaluability.Unknown );
 		}
 
-		public bool IsVertical => Mathf.Abs( p.x ) < 0.001f;
+		public bool IsVertical => MathF.Abs( p.x ) < 0.001f;
 		public bool IsStraightLine => s <= Vector2.Distance( p0, p1 ) * 1.00005f;
 
 		/// <summary>Creates a catenary curve between two points, given an arc length <c>s</c></summary>
@@ -146,7 +146,7 @@ namespace Freya {
 
 			// CASE 3:
 			// Now we've got a catenary on our hands unless something explodes.
-			float c = Mathf.Sqrt( s * s - p.y * p.y );
+			float c = MathF.Sqrt( s * s - p.y * p.y );
 			float pAbsX = p.x.Abs(); // solve only in x > 0
 			float R( float a ) => 2 * a * Mathfs.Sinh( pAbsX / ( 2 * a ) ) - c; // set up root solve function
 
@@ -154,7 +154,7 @@ namespace Freya {
 			float xRoot = ( p.x * p.x ) / ( 2 * s ); // intial guess based on freya's flawless heuristics
 			if( TryFindRootBounds( R, xRoot, out FloatRange xRange ) ) {
 				// refine range, if necessary (which is very likely)
-				if( Mathf.Approximately( xRange.Length, 0 ) == false )
+				if( Mathfs.Approximately( xRange.Length, 0 ) == false )
 					RootFindBisections( R, ref xRange, BISECT_REFINE_COUNT ); // Catenary seems valid, with roots inside, refine the range
 				a = xRange.Center; // set a to the middle of the latest range
 				delta = CalcCatenaryDelta( a, p ); // find delta to pass through both points
@@ -193,7 +193,7 @@ namespace Freya {
 					// It's positive - we found our lower bound
 					// exponentially search for upper bound
 					xRange.a = xRange.b;
-					xRange.b = g * Mathf.Pow( 2, n );
+					xRange.b = g * MathF.Pow( 2, n );
 					y = R( xRange.b );
 					if( y < 0 )
 						return true; // upper bound found!
@@ -201,7 +201,7 @@ namespace Freya {
 					// It's negative - we found our upper bound
 					// exponentially search for lower bound
 					xRange.b = xRange.a;
-					xRange.a = g * Mathf.Pow( 2, -n );
+					xRange.a = g * MathF.Pow( 2, -n );
 					y = R( xRange.a );
 					if( y > 0 )
 						return true; // lower bound found!

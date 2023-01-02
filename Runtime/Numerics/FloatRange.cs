@@ -27,13 +27,13 @@ namespace Freya {
 		public float Center => ( a + b ) / 2;
 
 		/// <summary>The length/span of this value range</summary>
-		public float Length => Mathfs.Abs( b - a );
+		public float Length => MathF.Abs( b - a );
 
 		/// <summary>The minimum value of this range</summary>
-		public float Min => Mathfs.Min( a, b );
+		public float Min => MathF.Min( a, b );
 
 		/// <summary>The maximum value of this range</summary>
-		public float Max => Mathfs.Max( a, b );
+		public float Max => MathF.Max( a, b );
 
 		/// <summary>The direction of this value range. Returns -1 if <c>b</c> is greater than <c>a</c>, otherwise returns 1</summary>
 		public int Direction => b > a ? 1 : -1;
@@ -69,7 +69,7 @@ namespace Freya {
 		/// <summary>Returns whether or not this range overlaps another range</summary>
 		/// <param name="other">The other range to test overlap with</param>
 		public bool Overlaps( FloatRange other ) {
-			float separation = Mathfs.Abs( other.Center - Center );
+			float separation = MathF.Abs( other.Center - Center );
 			float rTotal = ( other.Length + Length ) / 2;
 			return separation < rTotal;
 		}

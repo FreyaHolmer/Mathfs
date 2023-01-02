@@ -71,7 +71,7 @@ namespace Freya {
 
 		#region IParamCurve3Diff interface implementations
 
-		public int Degree => Mathf.Max( (int)x.Degree, (int)y.Degree );
+		public int Degree => Mathfs.Max( x.Degree, y.Degree );
 		public Vector2 EvalDerivative( float t ) => Differentiate().Eval( t );
 		public Vector2 EvalSecondDerivative( float t ) => Differentiate( 2 ).Eval( t );
 		public Vector2 EvalThirdDerivative( float t = 0 ) => Differentiate( 3 ).Eval( 0 );

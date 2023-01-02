@@ -50,7 +50,7 @@ namespace Freya {
 		#region Math operations
 
 		/// <summary>Returns the square root of the given value</summary>
-		[MethodImpl( INLINE )] public static float Sqrt( float value ) => (float)Math.Sqrt( value );
+		[MethodImpl( INLINE )] public static float Sqrt( float value ) => MathF.Sqrt( value );
 
 		/// <summary>Returns the square root of each component</summary>
 		[MethodImpl( INLINE )] public static Vector2 Sqrt( Vector2 v ) => new Vector2( Sqrt( v.x ), Sqrt( v.y ) );
@@ -62,22 +62,22 @@ namespace Freya {
 		[MethodImpl( INLINE )] public static Vector4 Sqrt( Vector4 v ) => new Vector4( Sqrt( v.x ), Sqrt( v.y ), Sqrt( v.z ), Sqrt( v.w ) );
 
 		/// <summary>Returns the cube root of the given value, properly handling negative values unlike Pow(v,1/3)</summary>
-		[MethodImpl( INLINE )] public static float Cbrt( float value ) => value < 0 ? -Pow( -value, 1f / 3f ) : Pow( value, 1f / 3f );
+		[MethodImpl( INLINE )] public static float Cbrt( float value ) => MathF.Cbrt( value );
 
 		/// <summary>Returns <c>value</c> raised to the power of <c>exponent</c></summary>
-		[MethodImpl( INLINE )] public static float Pow( float value, float exponent ) => (float)Math.Pow( value, exponent );
+		[MethodImpl( INLINE )] public static float Pow( float value, float exponent ) => MathF.Pow( value, exponent );
 
 		/// <summary>Returns e to the power of the given value</summary>
-		[MethodImpl( INLINE )] public static float Exp( float power ) => (float)Math.Exp( power );
+		[MethodImpl( INLINE )] public static float Exp( float power ) => MathF.Exp( power );
 
 		/// <summary>Returns the logarithm of a value, with the given base</summary>
-		[MethodImpl( INLINE )] public static float Log( float value, float @base ) => (float)Math.Log( value, @base );
+		[MethodImpl( INLINE )] public static float Log( float value, float @base ) => MathF.Log( value, @base );
 
 		/// <summary>Returns the natural logarithm of the given value</summary>
-		[MethodImpl( INLINE )] public static float Log( float value ) => (float)Math.Log( value );
+		[MethodImpl( INLINE )] public static float Log( float value ) => MathF.Log( value );
 
 		/// <summary>Returns the base 10 logarithm of the given value</summary>
-		[MethodImpl( INLINE )] public static float Log10( float value ) => (float)Math.Log10( value );
+		[MethodImpl( INLINE )] public static float Log10( float value ) => MathF.Log10( value );
 
 		/// <summary>Returns the binomial coefficient n over k</summary>
 		public static ulong BinomialCoef( uint n, uint k ) {
@@ -189,56 +189,56 @@ namespace Freya {
 
 		/// <summary>Returns the cosine of the given angle. Equivalent to the x-component of a unit vector with the same angle</summary>
 		/// <param name="angRad">Angle in radians</param>
-		[MethodImpl( INLINE )] public static float Cos( float angRad ) => (float)Math.Cos( angRad );
+		[MethodImpl( INLINE )] public static float Cos( float angRad ) => MathF.Cos( angRad );
 
 		/// <summary>Returns the sine of the given angle. Equivalent to the y-component of a unit vector with the same angle</summary>
 		/// <param name="angRad">Angle in radians</param>
-		[MethodImpl( INLINE )] public static float Sin( float angRad ) => (float)Math.Sin( angRad );
+		[MethodImpl( INLINE )] public static float Sin( float angRad ) => MathF.Sin( angRad );
 
 		/// <summary>Returns the tangent of the given angle</summary>
 		/// <param name="angRad">Angle in radians</param>
-		[MethodImpl( INLINE )] public static float Tan( float angRad ) => (float)Math.Tan( angRad );
+		[MethodImpl( INLINE )] public static float Tan( float angRad ) => MathF.Tan( angRad );
 
 		/// <summary>Returns the arc cosine of the given value, in radians</summary>
 		/// <param name="value">A value between -1 and 1</param>
-		[MethodImpl( INLINE )] public static float Acos( float value ) => (float)Math.Acos( value );
+		[MethodImpl( INLINE )] public static float Acos( float value ) => MathF.Acos( value );
 
 		/// <summary>Returns the arc sine of the given value, in radians</summary>
 		/// <param name="value">A value between -1 and 1</param>
-		[MethodImpl( INLINE )] public static float Asin( float value ) => (float)Math.Asin( value );
+		[MethodImpl( INLINE )] public static float Asin( float value ) => MathF.Asin( value );
 
 		/// <summary>Returns the arc tangent of the given value, in radians</summary>
 		/// <param name="value">A value between -1 and 1</param>
-		[MethodImpl( INLINE )] public static float Atan( float value ) => (float)Math.Atan( value );
+		[MethodImpl( INLINE )] public static float Atan( float value ) => MathF.Atan( value );
 
 		/// <summary>Returns the angle of a vector. I don't recommend using this function, it's confusing~ Use Mathfs.DirToAng instead</summary>
 		/// <param name="y">The y component of the vector. They're flipped yeah I know but this is how everyone implements if for some godforsaken reason</param>
 		/// <param name="x">The x component of the vector. They're flipped yeah I know but this is how everyone implements if for some godforsaken reason</param>
-		[MethodImpl( INLINE )] public static float Atan2( float y, float x ) => (float)Math.Atan2( y, x );
+		[MethodImpl( INLINE )] public static float Atan2( float y, float x ) => MathF.Atan2( y, x );
 
 		/// <summary>Returns the cosecant of the given angle</summary>
 		/// <param name="angRad">Angle in radians</param>
-		[MethodImpl( INLINE )] public static float Csc( float angRad ) => 1f / (float)Math.Sin( angRad );
+		[MethodImpl( INLINE )] public static float Csc( float angRad ) => 1f / MathF.Sin( angRad );
 
 		/// <summary>Returns the secant of the given angle</summary>
 		/// <param name="angRad">Angle in radians</param>
-		[MethodImpl( INLINE )] public static float Sec( float angRad ) => 1f / (float)Math.Cos( angRad );
+		[MethodImpl( INLINE )] public static float Sec( float angRad ) => 1f / MathF.Cos( angRad );
 
 		/// <summary>Returns the cotangent of the given angle</summary>
 		/// <param name="angRad">Angle in radians</param>
-		[MethodImpl( INLINE )] public static float Cot( float angRad ) => 1f / (float)Math.Tan( angRad );
+		[MethodImpl( INLINE )] public static float Cot( float angRad ) => 1f / MathF.Tan( angRad );
 
 		/// <summary>Returns the versine of the given angle</summary>
 		/// <param name="angRad">Angle in radians</param>
-		[MethodImpl( INLINE )] public static float Ver( float angRad ) => 1 - (float)Math.Cos( angRad );
+		[MethodImpl( INLINE )] public static float Ver( float angRad ) => 1 - MathF.Cos( angRad );
 
 		/// <summary>Returns the coversine of the given angle</summary>
 		/// <param name="angRad">Angle in radians</param>
-		[MethodImpl( INLINE )] public static float Cvs( float angRad ) => 1 - (float)Math.Sin( angRad );
+		[MethodImpl( INLINE )] public static float Cvs( float angRad ) => 1 - MathF.Sin( angRad );
 
 		/// <summary>Returns the chord of the given angle</summary>
 		/// <param name="angRad">Angle in radians</param>
-		[MethodImpl( INLINE )] public static float Crd( float angRad ) => 2 * (float)Math.Sin( angRad / 2 );
+		[MethodImpl( INLINE )] public static float Crd( float angRad ) => 2 * MathF.Sin( angRad / 2 );
 
 		const double SINC_W = 0.01;
 		const double SINC_P_C2 = -1 / 6.0;
@@ -285,22 +285,22 @@ namespace Freya {
 		#region Hyperbolic Trigonometry
 
 		/// <summary>Returns the hyperbolic cosine of the given hyperbolic angle</summary>
-		[MethodImpl( INLINE )] public static float Cosh( float x ) => (float)Math.Cosh( x );
+		[MethodImpl( INLINE )] public static float Cosh( float x ) => MathF.Cosh( x );
 
 		/// <summary>Returns the hyperbolic sine of the given hyperbolic angle</summary>
-		[MethodImpl( INLINE )] public static float Sinh( float x ) => (float)Math.Sinh( x );
+		[MethodImpl( INLINE )] public static float Sinh( float x ) => MathF.Sinh( x );
 
 		/// <summary>Returns the hyperbolic tangent of the given hyperbolic angle</summary>
-		[MethodImpl( INLINE )] public static float Tanh( float x ) => (float)Math.Tanh( x );
+		[MethodImpl( INLINE )] public static float Tanh( float x ) => MathF.Tanh( x );
 
 		/// <summary>Returns the hyperbolic arc cosine of the given value</summary>
-		[MethodImpl( INLINE )] public static float Acosh( float x ) => (float)Math.Acosh( x );
+		[MethodImpl( INLINE )] public static float Acosh( float x ) => MathF.Acosh( x );
 
 		/// <summary>Returns the hyperbolic arc sine of the given value</summary>
-		[MethodImpl( INLINE )] public static float Asinh( float x ) => (float)Math.Asinh( x );
+		[MethodImpl( INLINE )] public static float Asinh( float x ) => MathF.Asinh( x );
 
 		/// <summary>Returns the hyperbolic arc tangent of the given value</summary>
-		[MethodImpl( INLINE )] public static float Atanh( float x ) => (float)Math.Atanh( x );
+		[MethodImpl( INLINE )] public static float Atanh( float x ) => MathF.Atanh( x );
 
 		#endregion
 
@@ -556,16 +556,16 @@ namespace Freya {
 		[MethodImpl( INLINE )] public static int SignWithZeroAsInt( float value, float zeroThreshold = 0.000001f ) => Abs( value ) < zeroThreshold ? 0 : SignAsInt( value );
 
 		/// <summary>Rounds the value down to the nearest integer</summary>
-		[MethodImpl( INLINE )] public static float Floor( float value ) => (float)Math.Floor( value );
+		[MethodImpl( INLINE )] public static float Floor( float value ) => MathF.Floor( value );
 
 		/// <summary>Rounds the vector components down to the nearest integer</summary>
-		[MethodImpl( INLINE )] public static Vector2 Floor( Vector2 value ) => new Vector2( (float)Math.Floor( value.x ), (float)Math.Floor( value.y ) );
+		[MethodImpl( INLINE )] public static Vector2 Floor( Vector2 value ) => new Vector2( MathF.Floor( value.x ), MathF.Floor( value.y ) );
 
 		/// <inheritdoc cref="Mathfs.Floor(Vector2)"/>
-		[MethodImpl( INLINE )] public static Vector3 Floor( Vector3 value ) => new Vector3( (float)Math.Floor( value.x ), (float)Math.Floor( value.y ), (float)Math.Floor( value.z ) );
+		[MethodImpl( INLINE )] public static Vector3 Floor( Vector3 value ) => new Vector3( MathF.Floor( value.x ), MathF.Floor( value.y ), MathF.Floor( value.z ) );
 
 		/// <inheritdoc cref="Mathfs.Floor(Vector2)"/>
-		[MethodImpl( INLINE )] public static Vector4 Floor( Vector4 value ) => new Vector4( (float)Math.Floor( value.x ), (float)Math.Floor( value.y ), (float)Math.Floor( value.z ), (float)Math.Floor( value.w ) );
+		[MethodImpl( INLINE )] public static Vector4 Floor( Vector4 value ) => new Vector4( MathF.Floor( value.x ), MathF.Floor( value.y ), MathF.Floor( value.z ), MathF.Floor( value.w ) );
 
 		/// <summary>Rounds the value down to the nearest integer, returning an int value</summary>
 		[MethodImpl( INLINE )] public static int FloorToInt( float value ) => (int)Math.Floor( value );
@@ -577,16 +577,16 @@ namespace Freya {
 		[MethodImpl( INLINE )] public static Vector3Int FloorToInt( Vector3 value ) => new Vector3Int( (int)Math.Floor( value.x ), (int)Math.Floor( value.y ), (int)Math.Floor( value.z ) );
 
 		/// <summary>Rounds the value up to the nearest integer</summary>
-		[MethodImpl( INLINE )] public static float Ceil( float value ) => (float)Math.Ceiling( value );
+		[MethodImpl( INLINE )] public static float Ceil( float value ) => MathF.Ceiling( value );
 
 		/// <summary>Rounds the vector components up to the nearest integer</summary>
-		[MethodImpl( INLINE )] public static Vector2 Ceil( Vector2 value ) => new Vector2( (float)Math.Ceiling( value.x ), (float)Math.Ceiling( value.y ) );
+		[MethodImpl( INLINE )] public static Vector2 Ceil( Vector2 value ) => new Vector2( MathF.Ceiling( value.x ), MathF.Ceiling( value.y ) );
 
 		/// <inheritdoc cref="Mathfs.Ceil(Vector2)"/>
-		[MethodImpl( INLINE )] public static Vector3 Ceil( Vector3 value ) => new Vector3( (float)Math.Ceiling( value.x ), (float)Math.Ceiling( value.y ), (float)Math.Ceiling( value.z ) );
+		[MethodImpl( INLINE )] public static Vector3 Ceil( Vector3 value ) => new Vector3( MathF.Ceiling( value.x ), MathF.Ceiling( value.y ), MathF.Ceiling( value.z ) );
 
 		/// <inheritdoc cref="Mathfs.Ceil(Vector2)"/>
-		[MethodImpl( INLINE )] public static Vector4 Ceil( Vector4 value ) => new Vector4( (float)Math.Ceiling( value.x ), (float)Math.Ceiling( value.y ), (float)Math.Ceiling( value.z ), (float)Math.Ceiling( value.w ) );
+		[MethodImpl( INLINE )] public static Vector4 Ceil( Vector4 value ) => new Vector4( MathF.Ceiling( value.x ), MathF.Ceiling( value.y ), MathF.Ceiling( value.z ), MathF.Ceiling( value.w ) );
 
 		/// <summary>Rounds the value up to the nearest integer, returning an int value</summary>
 		[MethodImpl( INLINE )] public static int CeilToInt( float value ) => (int)Math.Ceiling( value );
@@ -601,16 +601,16 @@ namespace Freya {
 		[MethodImpl( INLINE )] public static float Round( float value, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => (float)MathF.Round( value, midpointRounding );
 
 		/// <summary>Rounds the vector components to the nearest integer</summary>
-		[MethodImpl( INLINE )] public static Vector2 Round( Vector2 value, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => new Vector2( (float)Math.Round( value.x, midpointRounding ), (float)Math.Round( value.y, midpointRounding ) );
+		[MethodImpl( INLINE )] public static Vector2 Round( Vector2 value, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => new Vector2( MathF.Round( value.x, midpointRounding ), MathF.Round( value.y, midpointRounding ) );
 
 		/// <inheritdoc cref="Mathfs.Round(Vector2,MidpointRounding)"/>
-		[MethodImpl( INLINE )] public static Vector3 Round( Vector3 value, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => new Vector3( (float)Math.Round( value.x, midpointRounding ), (float)Math.Round( value.y, midpointRounding ), (float)Math.Round( value.z, midpointRounding ) );
+		[MethodImpl( INLINE )] public static Vector3 Round( Vector3 value, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => new Vector3( MathF.Round( value.x, midpointRounding ), MathF.Round( value.y, midpointRounding ), MathF.Round( value.z, midpointRounding ) );
 
 		/// <inheritdoc cref="Mathfs.Round(Vector2,MidpointRounding)"/>
-		[MethodImpl( INLINE )] public static Vector4 Round( Vector4 value, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => new Vector4( (float)Math.Round( value.x, midpointRounding ), (float)Math.Round( value.y, midpointRounding ), (float)Math.Round( value.z, midpointRounding ), (float)Math.Round( value.w, midpointRounding ) );
+		[MethodImpl( INLINE )] public static Vector4 Round( Vector4 value, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => new Vector4( MathF.Round( value.x, midpointRounding ), MathF.Round( value.y, midpointRounding ), MathF.Round( value.z, midpointRounding ), MathF.Round( value.w, midpointRounding ) );
 
 		/// <summary>Rounds the value to the nearest value, snapped to the given interval size</summary>
-		[MethodImpl( INLINE )] public static float Round( float value, float snapInterval, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => (float)Math.Round( value / snapInterval, midpointRounding ) * snapInterval;
+		[MethodImpl( INLINE )] public static float Round( float value, float snapInterval, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => MathF.Round( value / snapInterval, midpointRounding ) * snapInterval;
 
 		/// <summary>Rounds the vector components to the nearest value, snapped to the given interval size</summary>
 		[MethodImpl( INLINE )] public static Vector2 Round( Vector2 value, float snapInterval, MidpointRounding midpointRounding = MidpointRounding.ToEven ) => new Vector2( Round( value.x, snapInterval, midpointRounding ), Round( value.y, snapInterval, midpointRounding ) );
@@ -667,13 +667,13 @@ namespace Freya {
 			if( a == int.MinValue || b == int.MinValue ) {
 				if( a == int.MinValue && b == int.MinValue )
 					return int.MinValue; // the only negative return value, bc we can't negate this number
-				int v = Mathf.Max( a, b ).Abs();
+				int v = Max( a, b ).Abs();
 				return v & -v;
 			}
 
 			if( a == b )
 				return a.Abs();
-			( a, b ) = ( Mathf.Abs( a ), Mathf.Abs( b ) );
+			( a, b ) = ( Abs( a ), Abs( b ) );
 			while( a != 0 && b != 0 )
 				_ = a > b ? a %= b : b %= a;
 			return a | b;
@@ -858,14 +858,14 @@ namespace Freya {
 			t switch {
 				0f => a,
 				1f => b,
-				_  => Mathf.Pow( a, 1 - t ) * Mathf.Pow( b, t )
+				_  => MathF.Pow( a, 1 - t ) * MathF.Pow( b, t )
 			};
 
 		/// <summary>Inverse exponential interpolation, the multiplicative version of InverseLerp, useful for values such as scaling or zooming</summary>
 		/// <param name="a">The start value</param>
 		/// <param name="b">The end value</param>
 		/// <param name="v">A value between a and b. Note: values outside this range are still valid, and will be extrapolated</param>
-		[MethodImpl( INLINE )] public static float InverseEerp( float a, float b, float v ) => Mathf.Log( a / v ) / Mathf.Log( a / b );
+		[MethodImpl( INLINE )] public static float InverseEerp( float a, float b, float v ) => MathF.Log( a / v ) / MathF.Log( a / b );
 
 		#endregion
 
@@ -876,9 +876,9 @@ namespace Freya {
 		/// <param name="target">The value to move towards</param>
 		/// <param name="maxDelta">The maximum change that should be applied to the value</param>
 		public static float MoveTowards( float current, float target, float maxDelta ) {
-			if( Mathf.Abs( target - current ) <= maxDelta )
+			if( MathF.Abs( target - current ) <= maxDelta )
 				return target;
-			return current + Mathf.Sign( target - current ) * maxDelta;
+			return current + MathF.Sign( target - current ) * maxDelta;
 		}
 
 		/// <summary>Gradually changes a value towards a desired goal over time.
@@ -905,7 +905,7 @@ namespace Freya {
 		/// <param name="deltaTime">The time since the last call to this function. By default Time.deltaTime</param>
 		public static float SmoothDamp( float current, float target, ref float currentVelocity, float smoothTime, [Uei.DefaultValue( "Mathf.Infinity" )] float maxSpeed, [Uei.DefaultValue( "Time.deltaTime" )] float deltaTime ) {
 			// Based on Game Programming Gems 4 Chapter 1.10
-			smoothTime = Mathf.Max( 0.0001F, smoothTime );
+			smoothTime = MathF.Max( 0.0001F, smoothTime );
 			float omega = 2F / smoothTime;
 
 			float x = omega * deltaTime;
@@ -915,7 +915,7 @@ namespace Freya {
 
 			// Clamp maximum speed
 			float maxChange = maxSpeed * smoothTime;
-			change = Mathf.Clamp( change, -maxChange, maxChange );
+			change = Clamp( change, -maxChange, maxChange );
 			target = current - change;
 
 			float temp = ( currentVelocity + omega * change ) * deltaTime;
@@ -1096,12 +1096,12 @@ namespace Freya {
 		/// <summary>Returns the direction of the input angle, as a normalized vector</summary>
 		/// <param name="aRad">The input angle, in radians</param>
 		/// <seealso cref="MathfsExtensions.Angle"/>
-		[MethodImpl( INLINE )] public static Vector2 AngToDir( float aRad ) => new Vector2( Mathf.Cos( aRad ), Mathf.Sin( aRad ) );
+		[MethodImpl( INLINE )] public static Vector2 AngToDir( float aRad ) => new Vector2( MathF.Cos( aRad ), MathF.Sin( aRad ) );
 
 		/// <summary>Returns the angle of the input vector, in radians. You can also use <c>myVector.Angle()</c></summary>
 		/// <param name="vec">The vector to get the angle of. It does not have to be normalized</param>
 		/// <seealso cref="MathfsExtensions.Angle"/>
-		[MethodImpl( INLINE )] public static float DirToAng( Vector2 vec ) => Mathf.Atan2( vec.y, vec.x );
+		[MethodImpl( INLINE )] public static float DirToAng( Vector2 vec ) => MathF.Atan2( vec.y, vec.x );
 
 		/// <summary>Returns a 2D orientation from a vector, representing the X axis</summary>
 		/// <param name="v">The direction to create a 2D orientation from (does not have to be normalized)</param>
@@ -1200,13 +1200,13 @@ namespace Freya {
 		}
 
 		/// <summary>Returns the signed angle between <c>a</c> and <c>b</c>, in the range -tau/2 to tau/2 (-pi to pi)</summary>
-		[MethodImpl( INLINE )] public static float SignedAngle( Vector2 a, Vector2 b ) => AngleBetween( a, b ) * Mathf.Sign( Determinant( a, b ) ); // -tau/2 to tau/2
+		[MethodImpl( INLINE )] public static float SignedAngle( Vector2 a, Vector2 b ) => AngleBetween( a, b ) * MathF.Sign( Determinant( a, b ) ); // -tau/2 to tau/2
 
 		/// <summary>Returns the shortest angle between <c>a</c> and <c>b</c>, in the range 0 to tau/2 (0 to pi)</summary>
-		[MethodImpl( INLINE )] public static float AngleBetween( Vector2 a, Vector2 b ) => Mathf.Acos( Vector2.Dot( a.normalized, b.normalized ).ClampNeg1to1() );
+		[MethodImpl( INLINE )] public static float AngleBetween( Vector2 a, Vector2 b ) => MathF.Acos( Vector2.Dot( a.normalized, b.normalized ).ClampNeg1to1() );
 
 		/// <inheritdoc cref="AngleBetween(Vector2,Vector2)"/>
-		[MethodImpl( INLINE )] public static float AngleBetween( Vector3 a, Vector3 b ) => Mathf.Acos( Vector3.Dot( a.normalized, b.normalized ).ClampNeg1to1() );
+		[MethodImpl( INLINE )] public static float AngleBetween( Vector3 a, Vector3 b ) => MathF.Acos( Vector3.Dot( a.normalized, b.normalized ).ClampNeg1to1() );
 
 		/// <summary>Returns the clockwise angle between <c>from</c> and <c>to</c>, in the range 0 to tau (0 to 2*pi)</summary>
 		[MethodImpl( INLINE )] public static float AngleFromToCW( Vector2 from, Vector2 to ) => Determinant( from, to ) < 0 ? AngleBetween( from, to ) : TAU - AngleBetween( from, to );

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Freya {
@@ -27,7 +28,7 @@ namespace Freya {
 			this.b = b;
 		}
 
-		public float Magnitude => Mathf.Sqrt( SqrMagnitude );
+		public float Magnitude => MathF.Sqrt( SqrMagnitude );
 		public float SqrMagnitude => r * r + b.SqrMagnitude;
 
 		public Rotor3 Normalized() => this / Magnitude;

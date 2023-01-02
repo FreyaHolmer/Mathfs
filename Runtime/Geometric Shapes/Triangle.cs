@@ -100,7 +100,7 @@ namespace Freya {
 
 	public partial struct Triangle2D {
 		/// <summary>The area of the triangle</summary>
-		public float Area => Mathf.Abs( SignedArea );
+		public float Area => MathF.Abs( SignedArea );
 
 		// todo: verify clockwise vs ccw
 		/// <summary>The signed area of the triangle. When the triangle is defined clockwise, the area will be negative</summary>
@@ -323,8 +323,8 @@ namespace Freya {
 				Vector2 abDir = ( b - a ).normalized;
 				Vector2 acDir = ( c - a ).normalized;
 				Vector2 bcDir = ( c - b ).normalized;
-				float angA = Mathf.Acos( Vector2.Dot( abDir, acDir ).ClampNeg1to1() );
-				float angB = Mathf.Acos( Vector2.Dot( -abDir, bcDir ).ClampNeg1to1() );
+				float angA = MathF.Acos( Vector2.Dot( abDir, acDir ).ClampNeg1to1() );
+				float angB = MathF.Acos( Vector2.Dot( -abDir, bcDir ).ClampNeg1to1() );
 				float angC = PI - angA - angB;
 				return ( angA, angB, angC );
 			}
@@ -375,8 +375,8 @@ namespace Freya {
 				Vector2 abDir = ( b - a ).normalized;
 				Vector2 acDir = ( c - a ).normalized;
 				Vector2 bcDir = ( c - b ).normalized;
-				float angA = Mathf.Acos( Vector2.Dot( abDir, acDir ).ClampNeg1to1() );
-				float angB = Mathf.Acos( Vector2.Dot( -abDir, bcDir ).ClampNeg1to1() );
+				float angA = MathF.Acos( Vector2.Dot( abDir, acDir ).ClampNeg1to1() );
+				float angB = MathF.Acos( Vector2.Dot( -abDir, bcDir ).ClampNeg1to1() );
 				float angC = PI - angA - angB;
 				return ( angA, angB, angC );
 			}

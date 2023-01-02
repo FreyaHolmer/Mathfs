@@ -16,7 +16,7 @@ namespace Freya {
 		/// <summary>Returns the angle of this vector, in radians</summary>
 		/// <param name="v">The vector to get the angle of. It does not have to be normalized</param>
 		/// <seealso cref="Mathfs.DirToAng"/>
-		[MethodImpl( INLINE )] public static float Angle( this Vector2 v ) => Mathf.Atan2( v.y, v.x );
+		[MethodImpl( INLINE )] public static float Angle( this Vector2 v ) => MathF.Atan2( v.y, v.x );
 
 		/// <summary>Rotates the vector 90 degrees clockwise (negative Z axis rotation)</summary>
 		[MethodImpl( INLINE )] public static Vector2 Rotate90CW( this Vector2 v ) => new Vector2( v.y, -v.x );
@@ -34,8 +34,8 @@ namespace Freya {
 		/// <param name="v">The vector to rotate</param>
 		/// <param name="angRad">The angle to rotate by, in radians</param>
 		public static Vector2 Rotate( this Vector2 v, float angRad ) {
-			float ca = Mathf.Cos( angRad );
-			float sa = Mathf.Sin( angRad );
+			float ca = MathF.Cos( angRad );
+			float sa = MathF.Sin( angRad );
 			return new Vector2( ca * v.x - sa * v.y, sa * v.x + ca * v.y );
 		}
 
@@ -207,8 +207,8 @@ namespace Freya {
 		/// <param name="space">The rotation space of the axis, if it should be intrinsic/self/local or extrinsic/"world"</param>
 		public static Quaternion RotateAround( this Quaternion q, Axis axis, float angRad, RotationSpace space = RotationSpace.Self ) {
 			float aHalf = angRad / 2;
-			float c = Mathf.Cos( aHalf );
-			float s = Mathf.Sin( aHalf );
+			float c = MathF.Cos( aHalf );
+			float s = MathF.Sin( aHalf );
 			float xc = q.x * c;
 			float yc = q.y * c;
 			float zc = q.z * c;
@@ -437,10 +437,10 @@ namespace Freya {
 		/// <param name="r">The rectangle to expand</param>
 		/// <param name="p">The point to encapsulate</param>
 		public static Rect Encapsulate( this Rect r, Vector2 p ) {
-			r.xMax = Mathf.Max( r.xMax, p.x );
-			r.xMin = Mathf.Min( r.xMin, p.x );
-			r.yMax = Mathf.Max( r.yMax, p.y );
-			r.yMin = Mathf.Min( r.yMin, p.y );
+			r.xMax = MathF.Max( r.xMax, p.x );
+			r.xMin = MathF.Min( r.xMin, p.x );
+			r.yMax = MathF.Max( r.yMax, p.y );
+			r.yMin = MathF.Min( r.yMin, p.y );
 			return r;
 		}
 
@@ -560,7 +560,7 @@ namespace Freya {
 		#region Math operations
 
 		/// <inheritdoc cref="Mathfs.Sqrt(float)"/>
-		[MethodImpl( INLINE )] public static float Sqrt( this float value ) => Mathfs.Sqrt( value );
+		[MethodImpl( INLINE )] public static float Sqrt( this float value ) => MathF.Sqrt( value );
 
 		/// <inheritdoc cref="Mathfs.Sqrt(Vector2)"/>
 		[MethodImpl( INLINE )] public static Vector2 Sqrt( this Vector2 value ) => Mathfs.Sqrt( value );
@@ -572,10 +572,10 @@ namespace Freya {
 		[MethodImpl( INLINE )] public static Vector4 Sqrt( this Vector4 value ) => Mathfs.Sqrt( value );
 
 		/// <inheritdoc cref="Mathfs.Cbrt(float)"/>
-		[MethodImpl( INLINE )] public static float Cbrt( this float value ) => Mathfs.Cbrt( value );
+		[MethodImpl( INLINE )] public static float Cbrt( this float value ) => MathF.Cbrt( value );
 
 		/// <inheritdoc cref="Mathfs.Pow(float, float)"/>
-		[MethodImpl( INLINE )] public static float Pow( this float value, float exponent ) => Mathfs.Pow( value, exponent );
+		[MethodImpl( INLINE )] public static float Pow( this float value, float exponent ) => MathF.Pow( value, exponent );
 
 		/// <summary>Calculates exact positive integer powers</summary>
 		/// <param name="value"></param>
@@ -611,7 +611,7 @@ namespace Freya {
 		#region Absolute Values
 
 		/// <inheritdoc cref="Mathfs.Abs(float)"/>
-		[MethodImpl( INLINE )] public static float Abs( this float value ) => Mathfs.Abs( value );
+		[MethodImpl( INLINE )] public static float Abs( this float value ) => MathF.Abs( value );
 
 		/// <inheritdoc cref="Mathfs.Abs(int)"/>
 		[MethodImpl( INLINE )] public static int Abs( this int value ) => Mathfs.Abs( value );
