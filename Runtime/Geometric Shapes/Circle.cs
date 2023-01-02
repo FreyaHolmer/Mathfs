@@ -315,8 +315,8 @@ namespace Freya {
 
 		/// <inheritdoc cref="Circle2D.GetOsculatingCircle(Vector2,Vector2,Vector2)"/>
 		public static Circle3D GetOsculatingCircle( Vector3 point, Vector3 velocity, Vector3 acceleration ) {
-			Vector3 curvatureVector = GetCurvature( velocity, acceleration );
-			( Vector3 axis, float curvature ) = curvatureVector.GetDirAndMagnitude();
+			Bivector3 curvatureBivector = GetCurvature( velocity, acceleration );
+			( Vector3 axis, float curvature ) = curvatureBivector.GetNormalAndArea();
 			Vector3 normal = Vector3.Cross( velocity, Vector3.Cross( acceleration, velocity ) ).normalized;
 			float signedRadius = 1f / curvature;
 			return new Circle3D( point + normal * signedRadius, axis, Abs( signedRadius ) );

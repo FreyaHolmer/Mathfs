@@ -1148,12 +1148,14 @@ namespace Freya {
 			return Determinant( velocity, acceleration ) / ( dMag * dMag * dMag );
 		}
 
-		/// <summary>Returns a pseudovector of a point in a curve, where the magnitude is the curvature in radians per distance unit, and the direction is the axis of curvature</summary>
+		/// <summary>Returns the curvature of a point in a 3D curve, as a Bivector.
+		/// The magnitude is the curvature in radians per distance unit,
+		/// casting it to a Vector3 gives you the axis of curvature</summary>
 		/// <param name="velocity">The first derivative of the point in the curve</param>
 		/// <param name="acceleration">The second derivative of the point in the curve</param>
-		[MethodImpl( INLINE )] public static Vector3 GetCurvature( Vector3 velocity, Vector3 acceleration ) {
+		[MethodImpl( INLINE )] public static Bivector3 GetCurvature( Vector3 velocity, Vector3 acceleration ) {
 			float dMag = velocity.magnitude;
-			return Vector3.Cross( velocity, acceleration ) / ( dMag * dMag * dMag );
+			return Wedge( velocity, acceleration ) / ( dMag * dMag * dMag );
 		}
 
 		/// <summary>Returns the torsion of a given point in a curve, in radians per distance unit</summary>
