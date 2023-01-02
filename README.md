@@ -13,8 +13,8 @@ There are several ways to install this library into your project:
    - Clone or [download](https://github.com/FreyaHolmer/Mathfs/archive/refs/heads/master.zip) this repository and put it somewhere in the Assets folder of your Unity project
 - **Unity Package Manager (UPM)**:
    - Add either of the the following lines to *Packages/manifest.json*:
-   - `"com.acegikmo.mathfs": "https://github.com/FreyaHolmer/Mathfs#0.1.0",` if you want to target a specific version (recommended)
-   - `"com.acegikmo.mathfs": "https://github.com/FreyaHolmer/Mathfs",` if you want to pull the latest commit (potentially unstable)
+   - `"com.acegikmo.mathfs": "https://github.com/FreyaHolmer/Mathfs.git#0.1.0",` if you want to target a specific version (recommended)
+   - `"com.acegikmo.mathfs": "https://github.com/FreyaHolmer/Mathfs.git",` if you want to pull the latest commit (potentially unstable)
    - More information about UPM and git [here](https://docs.unity3d.com/Manual/upm-git.html)
 - **[OpenUPM](https://openupm.com)**
    - After installing [openupm-cli](https://github.com/openupm/openupm-cli), run the following command:
