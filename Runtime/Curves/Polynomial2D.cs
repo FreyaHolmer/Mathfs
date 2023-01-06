@@ -53,6 +53,9 @@ namespace Freya {
 		/// <inheritdoc cref="Polynomial.Eval(float)"/>
 		public Vector2 Eval( float t ) => new(x.Eval( t ), y.Eval( t ));
 
+		/// <inheritdoc cref="Polynomial.Eval(float,int)"/>
+		public Vector2 Eval( float t, int n ) => Differentiate( n ).Eval( t );
+
 		/// <inheritdoc cref="Polynomial.Differentiate(int)"/>
 		public Polynomial2D Differentiate( int n = 1 ) => new(x.Differentiate( n ), y.Differentiate( n ));
 

@@ -91,6 +91,11 @@ namespace Freya {
 		/// <param name="t">The value to sample at</param>
 		public float Eval( float t ) => c3 * ( t * t * t ) + c2 * ( t * t ) + c1 * t + c0;
 
+		/// <summary>Evaluates the <c>n</c>:th derivative of the polynomial at the given value <c>t</c></summary>
+		/// <param name="t">The value to sample at</param>
+		/// <param name="n">The derivative to evaluate</param>
+		public float Eval( float t, int n ) => Differentiate( n ).Eval( t );
+
 		/// <summary>Differentiates this function, returning the n-th derivative of this polynomial</summary>
 		/// <param name="n">The number of times to differentiate this function. 0 returns the function itself, 1 returns the first derivative</param>
 		public Polynomial Differentiate( int n = 1 ) {
