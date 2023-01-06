@@ -56,7 +56,7 @@ namespace Freya {
 		public Polynomial4D( Vector4Matrix3x1 coefficients ) => ( x, y, z, w ) = ( new Polynomial( coefficients.X ), new Polynomial( coefficients.Y ), new Polynomial( coefficients.Z ), new Polynomial( coefficients.W ) );
 
 		/// <inheritdoc cref="Polynomial.Eval(float)"/>
-		public Vector4 Eval( float t ) => new(x.Eval( t ), y.Eval( t ), z.Eval( t ));
+		public Vector4 Eval( float t ) => new(x.Eval( t ), y.Eval( t ), z.Eval( t ), w.Eval( t ));
 
 		/// <inheritdoc cref="Polynomial.Differentiate(int)"/>
 		public Polynomial4D Differentiate( int n = 1 ) => new(x.Differentiate( n ), y.Differentiate( n ), z.Differentiate( n ), w.Differentiate( n ));
