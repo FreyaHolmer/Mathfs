@@ -9,6 +9,8 @@ namespace Freya {
 		public readonly int start;
 		public readonly int count;
 
+		public int this[ int i ] => start + i;
+
 		/// <summary>The last integer in the range</summary>
 		public int Last => start + count - 1;
 
