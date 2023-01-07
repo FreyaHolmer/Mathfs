@@ -6,6 +6,9 @@ namespace Freya {
 
 	/// <summary>An integer range</summary>
 	public readonly struct IntRange {
+
+		public static readonly IntRange empty = new IntRange( 0, 0 );
+
 		public readonly int start;
 		public readonly int count;
 
