@@ -397,7 +397,7 @@ namespace Freya {
 		/// <summary>Transforms a rotation from world space to local space</summary>
 		/// <param name="tf">The transform to use</param>
 		/// <param name="quat">The world space rotation</param>
-		public static Quaternion InverseTransformRotation( this Transform tf, Quaternion quat ) => tf.rotation * quat;
+		public static Quaternion InverseTransformRotation( this Transform tf, Quaternion quat ) => Quaternion.Inverse( tf.rotation ) * quat;
 
 		#endregion
 
