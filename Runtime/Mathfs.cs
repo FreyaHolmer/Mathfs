@@ -263,6 +263,17 @@ namespace Freya {
 			return Math.Sin( x ) / x;
 		}
 
+		/// <summary>The unnormalized cosinc or cosc function (1-cos(x))/x, properly handling the removable singularity around x = 0</summary>
+		/// <param name="x">The input value for the Cosinc function</param>
+		public static float Cosinc( float x ) => (float)Cosinc( (double)x );
+
+		/// <inheritdoc cref="Cosinc(float)"/>
+		public static double Cosinc( double x ) {
+			if( Math.Abs( x ) < 0.01 )
+				return x / 2 - ( x * x * x ) / 24; // approximate the singularity w. a polynomial, based on the taylor series expansion
+			return ( 1 - Math.Cos( x ) ) / x;
+		}
+
 		/// <summary>The unnormalized reciprocal sinc function x/sin(x), properly handling the removable singularity around x = 0</summary>
 		/// <param name="x">The input value for the reciprocal Sinc function</param>
 		public static float SincRcp( float x ) => (float)SincRcp( (double)x );
