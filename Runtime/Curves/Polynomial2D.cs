@@ -43,6 +43,12 @@ namespace Freya {
 			this.x = new Polynomial( c0.x, c1.x, c2.x );
 			this.y = new Polynomial( c0.y, c1.y, c2.y );
 		}
+		
+		/// <inheritdoc cref="Polynomial(float,float)"/>
+		public Polynomial2D( Vector2 c0, Vector2 c1 ) {
+			this.x = new Polynomial( c0.x, c1.x, 0, 0 );
+			this.y = new Polynomial( c0.y, c1.y, 0, 0 );
+		}
 
 		/// <inheritdoc cref="Polynomial(Matrix4x1)"/>
 		public Polynomial2D( Vector2Matrix4x1 coefficients ) => ( x, y ) = ( new Polynomial( coefficients.X ), new Polynomial( coefficients.Y ) );
