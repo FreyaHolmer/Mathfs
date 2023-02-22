@@ -87,15 +87,24 @@ namespace Freya {
 
 		public float Length {
 			get => s;
-			set => ( s, evaluability ) = ( value, Evaluability.Unknown );
+			set {
+				if( value != s )
+					( s, evaluability ) = ( value, Evaluability.Unknown );
+			}
 		}
 		public Vector2 P0 {
 			get => p0;
-			set => ( p0, evaluability ) = ( value, Evaluability.Unknown );
+			set {
+				if( value != p0 )
+					( p0, evaluability ) = ( value, Evaluability.Unknown );
+			}
 		}
 		public Vector2 P1 {
 			get => p1;
-			set => ( p1, evaluability ) = ( value, Evaluability.Unknown );
+			set {
+				if( value != p1 )
+					( p1, evaluability ) = ( value, Evaluability.Unknown );
+			}
 		}
 
 		public bool IsVertical => MathF.Abs( p.x ) < 0.001f;
