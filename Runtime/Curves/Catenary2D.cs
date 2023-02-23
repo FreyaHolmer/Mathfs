@@ -8,62 +8,6 @@ namespace Freya {
 	/// <summary>A catenary curve passing through two points with a given an arc length</summary>
 	public struct Catenary2D {
 
-		#region Standard catenary equations
-
-		/// <summary>Returns the y coordinate of a catenary at the given x value</summary>
-		/// <param name="x">The x coordinate to evaluate at</param>
-		/// <param name="a">The a-parameter of the catenary</param>
-		public static float Eval( float x, float a ) => a * Mathfs.Cosh( x / a );
-
-		/// <summary>Evaluates the arc length from the apex of the catenary, to the given x coordinate.
-		/// Note that this is negative when x is less than 0</summary>
-		/// <param name="x">The x coordinate to get the length to</param>
-		/// <param name="a">The a-parameter of the catenary</param>
-		public static float EvalArcLen( float x, float a ) => a * Mathfs.Sinh( x / a );
-
-		/// <summary>Evaluates the x coordinate at the given arc length relative to the apex of the catenary.
-		/// Note that the input arc length can be negative, to get the negative x coordinates</summary>
-		/// <param name="s">The arc length to get the x coordinate of</param>
-		/// <param name="a">The a-parameter of the catenary</param>
-		public static float EvalXByArcLength( float s, float a ) => a * Mathfs.Asinh( s / a );
-
-		/// <summary>Evaluates the n:th 2D derivative at the given arc length relative to the apex of the catenary.
-		/// Note that the input arc length can be negative, to get the tangents on the negative x side</summary>
-		/// <param name="s">The arc length coordinate to get the tangent of</param>
-		/// <param name="a">The a-parameter of the catenary</param>
-		public static Vector2 EvalDerivByArcLength( float s, float a, int n = 1 ) {
-			if( n == 0 ) { // position
-				float x = EvalXByArcLength( s, a );
-				float y = Eval( x, a );
-				return new Vector2( x, y );
-			}
-			float xNum = default;
-			float yNum = default;
-			float aSq = a * a;
-			float sSq = s * s;
-
-			if( n == 1 ) { // velocity
-				xNum = a;
-				yNum = s;
-			} else if( n == 2 ) { // acceleration
-				xNum = -a * s;
-				yNum = aSq;
-			} else if( n == 3 ) { // jerk/jolt
-				xNum = a * ( -aSq + 2 * sSq );
-				yNum = 3 * aSq * s;
-			} else if( n == 4 ) { // 4th derivative
-				xNum = 3 * s * a * ( -3 * aSq + 2 * sSq );
-				yNum = 3 * aSq * ( -aSq + 4 * sSq );
-			} else {
-				throw new NotImplementedException( $"Derivative ({n}) of Catenaries are not implemented" );
-			}
-
-			float den = MathF.Pow( aSq + sSq, ( n * 2 - 1 ) / 2f );
-			return new Vector2( xNum / den, yNum / den );
-		}
-
-		#endregion
-
 		enum Evaluability {
 			Unknown = 0,
 			Catenary,
@@ -125,32 +69,26 @@ namespace Freya {
 
 		/// <summary>Evaluates a position on this catenary curve, given a <c>t</c>-value from 0 to 1</summary>
 		/// <param name="t">A value from 0 to 1 along the whole curve</param>
-		public Vector2 Eval( float t ) => EvalByArcLength( t * s );
+		public Vector2 EvalByTValue( float t ) => Eval( t * s );
 
 		/// <summary>Evaluates a position on this catenary curve at the given arc length of <c>sEval</c></summary>
 		/// <param name="sEval">The arc length along the curve to sample, relative to the first point</param>
-		public Vector2 EvalByArcLength( float sEval ) {
+		/// <param name="nthDerivative">The derivative to sample. 1 = first derivative, 2 = second derivative</param>
+		public Vector2 Eval( float sEval, int nthDerivative = 0 ) {
 			ReadyForEvaluation();
-			return evaluability switch {
-				Evaluability.Catenary       => EvalCatPosByArcLength( sEval ),
-				Evaluability.LineSegment    => EvalStraightLineByArcLength( sEval ),
-				Evaluability.LinearVertical => EvalVerticalLinearApproxByArcLength( sEval ),
-				Evaluability.Unknown or _   => throw new Exception( "Failed to evaluate catenary, couldn't calculate evaluability" )
-			};
-		}
-
-		/// <summary>Evaluates the tangent on this catenary curve at the given arc length of <c>sEval</c></summary>
-		/// <param name="sEval">The arc length along the curve to sample, relative to the first point</param>
-		/// <param name="n">The derivative to sample. 1 = first derivative, 2 = second derivative</param>
-		public Vector2 EvalDerivativeByArcLength( float sEval, int n = 1 ) {
-			if( n == 0 ) // position
-				return EvalByArcLength( sEval );
-			ReadyForEvaluation();
-			return evaluability switch {
-				Evaluability.Catenary       => EvalCatDerivByArcLength( sEval ),
-				Evaluability.LineSegment    => n == 1 ? ( p1 - p0 ).normalized : Vector2.zero,
-				Evaluability.LinearVertical => new Vector2( 0, n == 1 ? ( sEval < -( p.y - s ) / 2 ? -1 : 1 ) : 0 ),
-				Evaluability.Unknown or _   => throw new Exception( "Failed to evaluate catenary, couldn't calculate evaluability" )
+			return nthDerivative switch {
+				0 => evaluability switch {
+					Evaluability.Catenary       => EvalCatPosByArcLength( sEval ),
+					Evaluability.LineSegment    => EvalStraightLineByArcLength( sEval ),
+					Evaluability.LinearVertical => EvalVerticalLinearApproxByArcLength( sEval ),
+					Evaluability.Unknown or _   => throw new Exception( "Failed to evaluate catenary, couldn't calculate evaluability" )
+				},
+				_ => evaluability switch {
+					Evaluability.Catenary       => EvalCatDerivByArcLength( sEval ),
+					Evaluability.LineSegment    => nthDerivative == 1 ? ( p1 - p0 ).normalized : Vector2.zero, // todo: this is incorrect
+					Evaluability.LinearVertical => new Vector2( 0, nthDerivative == 1 ? ( sEval < -( p.y - s ) / 2 ? -1 : 1 ) : 0 ), // todo: this might also be incorrect
+					Evaluability.Unknown or _   => throw new Exception( "Failed to evaluate catenary, couldn't calculate evaluability" )
+				}
 			};
 		}
 
@@ -169,23 +107,23 @@ namespace Freya {
 		// evaluates the position of the catenary at the given arc length, relative to the first point
 		Vector2 EvalCatPosByArcLength( float sEval ) {
 			sEval *= p.x.Sign(); // since we go backwards when p0.x < p1.x
-			float x = Catenary2D.EvalXByArcLength( sEval + arcLenSampleOffset, a ) + delta.x;
+			float x = Catenary.EvalXByArcLength( sEval + arcLenSampleOffset, a ) + delta.x;
 			float y = EvalPassingThrough0( x );
 			return new Vector2( x, y ) + p0;
 		}
 
-		/// <summary>/// Evaluates the n-th derivative of the catenary at the given arc length</summary>
+		/// <summary>Evaluates the n-th derivative of the catenary at the given arc length</summary>
 		/// <param name="sEval">The arc length, relative to the first point</param>
 		/// <param name="n">The derivative to evaluate</param>
-		public Vector2 EvalCatDerivByArcLength( float sEval, int n = 1 ) {
+		Vector2 EvalCatDerivByArcLength( float sEval, int n = 1 ) {
 			if( n == 0 )
 				return EvalCatPosByArcLength( sEval );
 			sEval *= p.x.Sign(); // since we go backwards when p0.x < p1.x
-			return Catenary2D.EvalDerivByArcLength( sEval + arcLenSampleOffset, a, n );
+			return Catenary.EvalDerivByArcLength( sEval + arcLenSampleOffset, a, n );
 		}
 
 		// Evaluate passing through the origin and p
-		float EvalPassingThrough0( float x ) => Catenary2D.Eval( x - delta.x, a ) + delta.y;
+		float EvalPassingThrough0( float x ) => Catenary.Eval( x - delta.x, a ) + delta.y;
 
 		// calculates p, a, delta, arcLenSampleOffset, and which evaluation method to use
 		void ReadyForEvaluation() {
@@ -233,13 +171,13 @@ namespace Freya {
 		}
 
 		// Calculates the arc length offset so that it's relative to the start of the chain when evaluating by arc length
-		static float CalcArcLenSampleOffset( float deltaX, float a ) => Catenary2D.EvalArcLen( -deltaX, a );
+		static float CalcArcLenSampleOffset( float deltaX, float a ) => Catenary.EvalArcLen( -deltaX, a );
 
 		// Calculates the required offset to make a catenary pass through the origin and a point p
 		static Vector2 CalcCatenaryDelta( float a, Vector2 p ) {
 			Vector2 d;
 			d.x = p.x / 2 - a * Mathfs.Asinh( p.y / ( 2 * a * Mathfs.Sinh( p.x / ( 2 * a ) ) ) );
-			d.y = -Catenary2D.Eval( d.x, a ); // technically -d.x but because of symmetry d.x works too
+			d.y = -Catenary.Eval( d.x, a ); // technically -d.x but because of symmetry d.x works too
 			return d;
 		}
 

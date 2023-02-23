@@ -15,11 +15,9 @@ namespace Freya {
 
 		// data
 		Vector3 p1;
-
-		// cached states
-		Catenary2D cat2D; // also data
+		Catenary2D cat2D; // also stores arc length
+		Plane2DIn3D plane; // also stores p0
 		Evaluability evaluability;
-		Plane2DIn3D plane;
 
 		public float Length {
 			get => cat2D.Length;
@@ -51,6 +49,7 @@ namespace Freya {
 		/// <param name="p0">The start of the curve</param>
 		/// <param name="p1">The end of the curve</param>
 		/// <param name="length">The length of the curve. note: has to be equal or longer than the distance between the points</param>
+		/// <param name="slackDirection">The direction of "gravity" for the arc. (0,-1,0) would create a hanging chain like arc</param>
 		public Catenary3D( Vector3 p0, Vector3 p1, float length, Vector3 slackDirection ) {
 			cat2D = new Catenary2D( default, default, length );
 			( plane.origin, plane.axisY, this.p1 ) = ( p0, -slackDirection, p1 );
@@ -64,18 +63,18 @@ namespace Freya {
 		/// <param name="length">The length of the curve. note: has to be equal or longer than the distance between the points</param>
 		public Catenary3D( Vector3 p0, Vector3 p1, float length ) : this( p0, p1, length, Vector3.down ) {}
 
-		/// <inheritdoc cref="Catenary2D.Eval(float)"/>
+		/// <inheritdoc cref="Catenary2D.EvalByTValue"/>
 		public Vector3 Eval( float t ) => EvalDerivativeByArcLength( t * Length, n: 0 );
 
-		/// <inheritdoc cref="Catenary2D.EvalByArcLength(float)"/>
+		/// <inheritdoc cref="Catenary2D.Eval(float,int)"/>
 		public Vector3 EvalByArcLength( float sEval ) => EvalDerivativeByArcLength( sEval, n: 0 );
 
-		/// <inheritdoc cref="Catenary2D.EvalDerivativeByArcLength(float,int)"/>
+		/// <inheritdoc cref="Catenary2D.Eval(float,int)"/>
 		public Vector3 EvalDerivativeByArcLength( float sEval, int n = 1 ) {
 			ReadyForEvaluation();
 			return n switch {
-				0 => plane.TransformPoint( cat2D.EvalByArcLength( sEval ) ),
-				_ => plane.TransformVector( cat2D.EvalCatDerivByArcLength( sEval ) )
+				0 => plane.TransformPoint( cat2D.Eval( sEval, 0 ) ),
+				_ => plane.TransformVector( cat2D.Eval( sEval, n ) )
 			};
 		}
 
@@ -91,25 +90,4 @@ namespace Freya {
 
 	}
 
-}
-
-/// <summary>An oriented 2D plane embedded in 3D space</summary>
-struct Plane2DIn3D {
-	public Vector3 origin;
-	public Vector3 axisX, axisY;
-
-	/// <summary>Rotates this plane around the Y axis, setting the X axis,
-	/// so that the given point <c>p</c> is in the plane where x > 0</summary>
-	/// <param name="p">The point to include in the plane</param>
-	/// <param name="pLocal">The included point in the 2D local space</param>
-	public void RotateAroundYToInclude( Vector3 p, out Vector2 pLocal ) {
-		Vector3 pRel = p - origin;
-		float yProj = Vector3.Dot( axisY, pRel );
-		axisX = ( pRel - axisY * yProj ).normalized;
-		float xProj = Vector3.Dot( axisX, pRel );
-		pLocal = new Vector2( xProj, yProj );
-	}
-
-	public Vector3 TransformPoint( Vector2 pt ) => origin + TransformVector( pt ); // todo: unroll
-	public Vector3 TransformVector( Vector2 pt ) => axisX * pt.x + axisY * pt.y; // todo: unroll
 }
