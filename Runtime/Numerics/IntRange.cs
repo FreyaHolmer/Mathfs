@@ -52,6 +52,16 @@ namespace Freya {
 			return toStrBuilder.ToString();
 		}
 
+		public IntRangeEnumerator GetEnumerator() => new IntRangeEnumerator( this );
+
+		public struct IntRangeEnumerator /*: IEnumerator<int>*/ {
+			readonly IntRange intRange;
+			int currValue;
+			public IntRangeEnumerator( IntRange range ) => ( this.intRange, currValue ) = ( range, range.start - 1 );
+			public bool MoveNext() => ++currValue <= intRange.Last;
+			public int Current => currValue;
+		}
+
 	}
 
 }
