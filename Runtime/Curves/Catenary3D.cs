@@ -51,9 +51,9 @@ namespace Freya {
 		/// <param name="slackDirection">The direction of "gravity" for the arc</param>
 		public Catenary3D( Vector3 p0, Vector3 p1, float length, Vector3 slackDirection ) {
 			cat2D = new CatenaryToPoint( p1 - p0, length );
+			space.axisX = default; // set on first evaluation by RotateAroundYToInclude
 			( space.origin, space.axisY, this.p1 ) = ( p0, -slackDirection, p1 );
 			evaluability = Evaluability.NotReady;
-			space = default;
 		}
 
 		/// <inheritdoc cref="CatenaryToPoint.Eval(float,int)"/>
