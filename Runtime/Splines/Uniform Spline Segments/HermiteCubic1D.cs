@@ -86,7 +86,7 @@ namespace Freya {
 		/// <param name="b">The second spline segment</param>
 		/// <param name="t">A value from 0 to 1 to blend between <c>a</c> and <c>b</c></param>
 		public static HermiteCubic1D Lerp( HermiteCubic1D a, HermiteCubic1D b, float t ) =>
-			new(
+			new HermiteCubic1D(
 				Mathfs.Lerp( a.P0, b.P0, t ),
 				Mathfs.Lerp( a.V0, b.V0, t ),
 				Mathfs.Lerp( a.P1, b.P1, t ),

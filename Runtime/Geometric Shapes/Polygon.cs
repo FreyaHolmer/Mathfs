@@ -28,7 +28,7 @@ namespace Freya {
 		public bool IsClockwise => SignedArea > 0;
 
 		/// <summary>Returns the area of this polygon</summary>
-		public float Area => MathF.Abs( SignedArea );
+		public float Area => Mathf.Abs( SignedArea );
 
 		/// <summary>Returns the signed area of this polygon</summary>
 		public float SignedArea {
@@ -55,7 +55,7 @@ namespace Freya {
 					Vector2 b = points[( i + 1 ) % count];
 					float dx = a.x - b.x;
 					float dy = a.y - b.y;
-					totalDist += MathF.Sqrt( dx * dx + dy * dy ); // unrolled for speed
+					totalDist += Mathf.Sqrt( dx * dx + dy * dy ); // unrolled for speed
 				}
 
 				return totalDist;
@@ -70,10 +70,10 @@ namespace Freya {
 				float xMin = p.x, xMax = p.x, yMin = p.y, yMax = p.y;
 				for( int i = 1; i < count; i++ ) {
 					p = points[i];
-					xMin = MathF.Min( xMin, p.x );
-					xMax = MathF.Max( xMax, p.x );
-					yMin = MathF.Min( yMin, p.y );
-					yMax = MathF.Max( yMax, p.y );
+					xMin = Mathf.Min( xMin, p.x );
+					xMax = Mathf.Max( xMax, p.x );
+					yMin = Mathf.Min( yMin, p.y );
+					yMax = Mathf.Max( yMax, p.y );
 				}
 
 				return new Rect( xMin, yMin, xMax - xMin, yMax - yMin );
@@ -129,7 +129,7 @@ namespace Freya {
 				if( line.Intersect( line2, out Vector2 pt ) )
 					miterPts.Add( pt );
 				else {
-					Debug.LogError( $"{line.origin},{line.dir}\n{line2.origin},{line2.dir}\nPoints:{string.Join( '\n', points )}" );
+					Debug.LogError( $"{line.origin},{line.dir}\n{line2.origin},{line2.dir}\nPoints:{string.Join( "\n", points )}" );
 					throw new Exception( "Line intersection failed" );
 				}
 				// prev = line;

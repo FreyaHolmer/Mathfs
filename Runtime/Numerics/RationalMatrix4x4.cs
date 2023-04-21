@@ -116,13 +116,13 @@ namespace Freya {
 		}
 
 		public static RationalMatrix4x4 operator *( RationalMatrix4x4 c, Rational v ) =>
-			new(c.m00 * v, c.m01 * v, c.m02 * v, c.m03 * v,
+			new RationalMatrix4x4(c.m00 * v, c.m01 * v, c.m02 * v, c.m03 * v,
 				c.m10 * v, c.m11 * v, c.m12 * v, c.m13 * v,
 				c.m20 * v, c.m21 * v, c.m22 * v, c.m23 * v,
 				c.m30 * v, c.m31 * v, c.m32 * v, c.m33 * v);
 
 		public static explicit operator RationalMatrix4x4( RationalMatrix3x3 c ) =>
-			new(c.m00, c.m01, c.m02, 0,
+			new RationalMatrix4x4(c.m00, c.m01, c.m02, 0,
 				c.m10, c.m11, c.m12, 0,
 				c.m20, c.m21, c.m22, 0,
 				0, 0, 0, 1);
@@ -145,19 +145,19 @@ namespace Freya {
 		/// <param name="c">The left hand side 4x4 matrix</param>
 		/// <param name="m">The right hand side 4x1 matrix</param>
 		public static Matrix4x1 operator *( RationalMatrix4x4 c, Matrix4x1 m ) =>
-			new(m.m0 * c.m00 + m.m1 * c.m01 + m.m2 * c.m02 + m.m3 * c.m03,
+			new Matrix4x1(m.m0 * c.m00 + m.m1 * c.m01 + m.m2 * c.m02 + m.m3 * c.m03,
 				m.m0 * c.m10 + m.m1 * c.m11 + m.m2 * c.m12 + m.m3 * c.m13,
 				m.m0 * c.m20 + m.m1 * c.m21 + m.m2 * c.m22 + m.m3 * c.m23,
 				m.m0 * c.m30 + m.m1 * c.m31 + m.m2 * c.m32 + m.m3 * c.m33);
 
 		/// <inheritdoc cref="operator*(RationalMatrix4x4,Matrix4x1)"/>
-		public static Vector2Matrix4x1 operator *( RationalMatrix4x4 c, Vector2Matrix4x1 m ) => new(c * m.X, c * m.Y);
+		public static Vector2Matrix4x1 operator *( RationalMatrix4x4 c, Vector2Matrix4x1 m ) => new Vector2Matrix4x1(c * m.X, c * m.Y);
 
 		/// <inheritdoc cref="operator*(RationalMatrix4x4,Matrix4x1)"/>
-		public static Vector3Matrix4x1 operator *( RationalMatrix4x4 c, Vector3Matrix4x1 m ) => new(c * m.X, c * m.Y, c * m.Z);
+		public static Vector3Matrix4x1 operator *( RationalMatrix4x4 c, Vector3Matrix4x1 m ) => new Vector3Matrix4x1(c * m.X, c * m.Y, c * m.Z);
 
 		/// <inheritdoc cref="operator*(RationalMatrix4x4,Matrix4x1)"/>
-		public static Vector4Matrix4x1 operator *( RationalMatrix4x4 c, Vector4Matrix4x1 m ) => new(c * m.X, c * m.Y, c * m.Z, c * m.W);
+		public static Vector4Matrix4x1 operator *( RationalMatrix4x4 c, Vector4Matrix4x1 m ) => new Vector4Matrix4x1(c * m.X, c * m.Y, c * m.Z, c * m.W);
 
 	}
 

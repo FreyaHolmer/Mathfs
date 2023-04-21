@@ -185,10 +185,30 @@ namespace Freya {
 			int[] compRange = Enumerable.Range( 0, dim ).ToArray();
 			string[] compRangeStr = compRange.Select( c => vCompStr[c].ToString() ).ToArray();
 			string JoinRange( string separator, Func<int, string> elem ) => string.Join( separator, elemRange.Select( elem ) );
-			string typePrefix = dim switch { > 1 => $"Vector{dim}", _ => "" };
-			string lerpName = GetLerpName( dim );
-			string elemType = dim switch { 1 => "float", > 1 => $"Vector{dim}", _ => throw new Exception( "Invalid type" ) };
-			string typeName = $"{typePrefix}Matrix{count}x1";
+            //string typePrefix = dim switch { > 1 => $"Vector{dim}", _ => "" };
+            string typePrefix = string.Empty;
+            if (dim > 1)
+            {
+                typePrefix = $"Vector{dim}";
+            }
+
+            string lerpName = GetLerpName( dim );
+			//string elemType = dim switch { 1 => "float", > 1 => $"Vector{dim}", _ => throw new Exception( "Invalid type" ) };
+            string elemType;
+            if (dim == 1)
+            {
+                elemType = "float";
+            }
+            else if (dim > 1)
+            {
+                elemType = $"Vector{dim}";
+            }
+            else
+            {
+                throw new Exception("Invalid type");
+            }
+
+            string typeName = $"{typePrefix}Matrix{count}x1";
 			string csParams = JoinRange( ", ", i => $"m{i}" );
 			string csParamsThis = JoinRange( ", ", i => $"this.m{i}" );
 			string ctorParams = JoinRange( ", ", i => $"{elemType} m{i}" );
@@ -361,7 +381,7 @@ namespace Freya {
 					code.LineBreak();
 
 					// typecasting
-					if( dim is 2 or 3 && degree is 3 ) {
+					if( dim is 2 || dim is  3 && degree is 3 ) {
 						if( dim == 2 ) {
 							// Typecast to 3D where z = 0
 							string structName3D = $"{type.className}{degShortCapital}3D";
@@ -406,7 +426,7 @@ namespace Freya {
 							using( code.Scope( $"public static explicit operator {targetType}( {structName} s ) =>" ) ) {
 								using( code.Scope( $"new {targetType}(" ) ) {
 									for( int oPt = 0; oPt < 4; oPt++ ) {
-										MathSum sum = new();
+										MathSum sum = new MathSum();
 										for( int iPt = 0; iPt < 4; iPt++ )
 											sum.AddTerm( C[oPt, iPt], $"s.{type.paramNames[iPt].ToUpperInvariant()}" );
 										code.Append( $"{sum}{( oPt < 3 ? "," : "" )}" );
@@ -435,7 +455,7 @@ namespace Freya {
 
 
 					// special case slerps for cubic beziers in 2D and 3D
-					if( dim is 2 or 3 && type == typeBezier ) {
+					if( dim is 2 || dim is 3 && type == typeBezier ) {
 						// todo: hermite slerp
 						string slerpCast = dim == 2 ? "(Vector2)" : "";
 						code.LineBreak();

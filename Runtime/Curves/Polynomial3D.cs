@@ -12,19 +12,19 @@ namespace Freya {
 		public Polynomial z;
 
 		public Vector3 C0 {
-			get => new(x.c0, y.c0, z.c0);
+			get => new Vector3(x.c0, y.c0, z.c0);
 			set => ( x.c0, y.c0, z.c0 ) = ( value.x, value.y, value.z );
 		}
 		public Vector3 C1 {
-			get => new(x.c1, y.c1, z.c1);
+			get => new Vector3(x.c1, y.c1, z.c1);
 			set => ( x.c1, y.c1, z.c1 ) = ( value.x, value.y, value.z );
 		}
 		public Vector3 C2 {
-			get => new(x.c2, y.c2, z.c2);
+			get => new Vector3(x.c2, y.c2, z.c2);
 			set => ( x.c2, y.c2, z.c2 ) = ( value.x, value.y, value.z );
 		}
 		public Vector3 C3 {
-			get => new(x.c3, y.c3, z.c3);
+			get => new Vector3(x.c3, y.c3, z.c3);
 			set => ( x.c3, y.c3, z.c3 ) = ( value.x, value.y, value.z );
 		}
 
@@ -60,16 +60,13 @@ namespace Freya {
 		public Polynomial3D( Vector3Matrix3x1 coefficients ) => ( x, y, z ) = ( new Polynomial( coefficients.X ), new Polynomial( coefficients.Y ), new Polynomial( coefficients.Z ) );
 
 		/// <inheritdoc cref="Polynomial.Eval(float)"/>
-		public Vector3 Eval( float t ) => new(x.Eval( t ), y.Eval( t ), z.Eval( t ));
-
-		/// <inheritdoc cref="Polynomial.Eval(float,int)"/>
-		public Vector3 Eval( float t, int n ) => Differentiate( n ).Eval( t );
+		public Vector3 Eval( float t ) => new Vector3(x.Eval( t ), y.Eval( t ), z.Eval( t ));
 
 		/// <inheritdoc cref="Polynomial.Differentiate(int)"/>
-		public Polynomial3D Differentiate( int n = 1 ) => new(x.Differentiate( n ), y.Differentiate( n ), z.Differentiate( n ));
+		public Polynomial3D Differentiate( int n = 1 ) => new Polynomial3D(x.Differentiate( n ), y.Differentiate( n ), z.Differentiate( n ));
 
 		/// <inheritdoc cref="Polynomial.Compose(float,float)"/>
-		public Polynomial3D Compose( float g0, float g1 ) => new(x.Compose( g0, g1 ), y.Compose( g0, g1 ), z.Compose( g0, g1 ));
+		public Polynomial3D Compose( float g0, float g1 ) => new Polynomial3D(x.Compose( g0, g1 ), y.Compose( g0, g1 ), z.Compose( g0, g1 ));
 
 		/// <inheritdoc cref="Polynomial2D.GetBounds01"/>
 		public Bounds GetBounds01() => FloatRange.ToBounds( x.OutputRange01, y.OutputRange01, z.OutputRange01 );
@@ -84,7 +81,7 @@ namespace Freya {
 
 		#region IParamCurve3Diff interface implementations
 
-		public int Degree => Mathfs.Max( x.Degree, y.Degree, z.Degree );
+		public int Degree => Mathf.Max( (int)x.Degree, (int)y.Degree, (int)z.Degree );
 		public Vector3 EvalDerivative( float t ) => Differentiate().Eval( t );
 		public Vector3 EvalSecondDerivative( float t ) => Differentiate( 2 ).Eval( t );
 		public Vector3 EvalThirdDerivative( float t = 0 ) => Differentiate( 3 ).Eval( 0 );
@@ -174,18 +171,18 @@ namespace Freya {
 
 		#region Typecasting & Operators
 
-		public static Polynomial3D operator /( Polynomial3D p, float v ) => new(p.C0 / v, p.C1 / v, p.C2 / v, p.C3 / v);
-		public static Polynomial3D operator *( Polynomial3D p, float v ) => new(p.C0 * v, p.C1 * v, p.C2 * v, p.C3 * v);
+		public static Polynomial3D operator /( Polynomial3D p, float v ) => new Polynomial3D(p.C0 / v, p.C1 / v, p.C2 / v, p.C3 / v);
+		public static Polynomial3D operator *( Polynomial3D p, float v ) => new Polynomial3D(p.C0 * v, p.C1 * v, p.C2 * v, p.C3 * v);
 		public static Polynomial3D operator *( float v, Polynomial3D p ) => p * v;
 
-		public static explicit operator Polynomial2D( Polynomial3D p ) => new(p.x, p.y);
-		public static explicit operator Vector3Matrix3x1( Polynomial3D poly ) => new(poly.C0, poly.C1, poly.C2);
-		public static explicit operator Vector3Matrix4x1( Polynomial3D poly ) => new(poly.C0, poly.C1, poly.C2, poly.C3);
+		public static explicit operator Polynomial2D( Polynomial3D p ) => new Polynomial2D(p.x, p.y);
+		public static explicit operator Vector3Matrix3x1( Polynomial3D poly ) => new Vector3Matrix3x1(poly.C0, poly.C1, poly.C2);
+		public static explicit operator Vector3Matrix4x1( Polynomial3D poly ) => new Vector3Matrix4x1(poly.C0, poly.C1, poly.C2, poly.C3);
 		public static explicit operator BezierQuad3D( Polynomial3D poly ) => poly.Degree < 3 ? new BezierQuad3D( CharMatrix.quadraticBezierInverse * (Vector3Matrix3x1)poly ) : throw new InvalidCastException( "Cannot cast a cubic polynomial to a quadratic curve" );
-		public static explicit operator BezierCubic3D( Polynomial3D poly ) => new(CharMatrix.cubicBezierInverse * (Vector3Matrix4x1)poly);
-		public static explicit operator CatRomCubic3D( Polynomial3D poly ) => new(CharMatrix.cubicCatmullRomInverse * (Vector3Matrix4x1)poly);
-		public static explicit operator HermiteCubic3D( Polynomial3D poly ) => new(CharMatrix.cubicHermiteInverse * (Vector3Matrix4x1)poly);
-		public static explicit operator UBSCubic3D( Polynomial3D poly ) => new(CharMatrix.cubicUniformBsplineInverse * (Vector3Matrix4x1)poly);
+		public static explicit operator BezierCubic3D( Polynomial3D poly ) => new BezierCubic3D(CharMatrix.cubicBezierInverse * (Vector3Matrix4x1)poly);
+		public static explicit operator CatRomCubic3D( Polynomial3D poly ) => new CatRomCubic3D(CharMatrix.cubicCatmullRomInverse * (Vector3Matrix4x1)poly);
+		public static explicit operator HermiteCubic3D( Polynomial3D poly ) => new HermiteCubic3D(CharMatrix.cubicHermiteInverse * (Vector3Matrix4x1)poly);
+		public static explicit operator UBSCubic3D( Polynomial3D poly ) => new UBSCubic3D(CharMatrix.cubicUniformBsplineInverse * (Vector3Matrix4x1)poly);
 
 		#endregion
 

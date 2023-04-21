@@ -78,7 +78,7 @@ namespace Freya {
 		}
 
 		public static RationalMatrix3x3 operator *( RationalMatrix3x3 c, Rational v ) =>
-			new(c.m00 * v, c.m01 * v, c.m02 * v,
+			new RationalMatrix3x3(c.m00 * v, c.m01 * v, c.m02 * v,
 				c.m10 * v, c.m11 * v, c.m12 * v,
 				c.m20 * v, c.m21 * v, c.m22 * v);
 
@@ -96,18 +96,18 @@ namespace Freya {
 
 		/// <inheritdoc cref="RationalMatrix4x4.operator*(RationalMatrix4x4,Matrix4x1)"/>
 		public static Matrix3x1 operator *( RationalMatrix3x3 c, Matrix3x1 m ) =>
-			new(m.m0 * c.m00 + m.m1 * c.m01 + m.m2 * c.m02,
+			new Matrix3x1(m.m0 * c.m00 + m.m1 * c.m01 + m.m2 * c.m02,
 				m.m0 * c.m10 + m.m1 * c.m11 + m.m2 * c.m12,
 				m.m0 * c.m20 + m.m1 * c.m21 + m.m2 * c.m22);
 
 		/// <inheritdoc cref="RationalMatrix4x4.operator*(RationalMatrix4x4,Matrix4x1)"/>
-		public static Vector2Matrix3x1 operator *( RationalMatrix3x3 c, Vector2Matrix3x1 m ) => new(c * m.X, c * m.Y);
+		public static Vector2Matrix3x1 operator *( RationalMatrix3x3 c, Vector2Matrix3x1 m ) => new Vector2Matrix3x1(c * m.X, c * m.Y);
 
 		/// <inheritdoc cref="RationalMatrix4x4.operator*(RationalMatrix4x4,Matrix4x1)"/>
-		public static Vector3Matrix3x1 operator *( RationalMatrix3x3 c, Vector3Matrix3x1 m ) => new(c * m.X, c * m.Y, c * m.Z);
+		public static Vector3Matrix3x1 operator *( RationalMatrix3x3 c, Vector3Matrix3x1 m ) => new Vector3Matrix3x1(c * m.X, c * m.Y, c * m.Z);
 		
 		/// <inheritdoc cref="RationalMatrix4x4.operator*(RationalMatrix4x4,Matrix4x1)"/>
-		public static Vector4Matrix3x1 operator *( RationalMatrix3x3 c, Vector4Matrix3x1 m ) => new(c * m.X, c * m.Y, c * m.Z, c * m.W);
+		public static Vector4Matrix3x1 operator *( RationalMatrix3x3 c, Vector4Matrix3x1 m ) => new Vector4Matrix3x1(c * m.X, c * m.Y, c * m.Z, c * m.W);
 
 	}
 

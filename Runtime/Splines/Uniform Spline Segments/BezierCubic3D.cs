@@ -89,7 +89,7 @@ namespace Freya {
 		/// <param name="b">The second spline segment</param>
 		/// <param name="t">A value from 0 to 1 to blend between <c>a</c> and <c>b</c></param>
 		public static BezierCubic3D Lerp( BezierCubic3D a, BezierCubic3D b, float t ) =>
-			new(
+			new BezierCubic3D(
 				Vector3.LerpUnclamped( a.P0, b.P0, t ),
 				Vector3.LerpUnclamped( a.P1, b.P1, t ),
 				Vector3.LerpUnclamped( a.P2, b.P2, t ),

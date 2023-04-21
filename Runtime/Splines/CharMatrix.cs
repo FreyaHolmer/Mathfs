@@ -8,14 +8,14 @@ namespace Freya {
 	public static class CharMatrix {
 
 		/// <summary>The characteristic matrix of a quadratic bézier curve</summary>
-		public static readonly RationalMatrix3x3 quadraticBezier = new(
+		public static readonly RationalMatrix3x3 quadraticBezier = new RationalMatrix3x3(
 			1, 0, 0,
 			-2, 2, 0,
 			1, -2, 1
 		);
 
 		/// <summary>The characteristic matrix of a cubic bézier curve</summary>
-		public static readonly RationalMatrix4x4 cubicBezier = new(
+		public static readonly RationalMatrix4x4 cubicBezier = new RationalMatrix4x4(
 			1, 0, 0, 0,
 			-3, 3, 0, 0,
 			3, -6, 3, 0,
@@ -23,7 +23,7 @@ namespace Freya {
 		);
 
 		/// <summary>The characteristic matrix of a uniform cubic hermite curve</summary>
-		public static readonly RationalMatrix4x4 cubicHermite = new(
+		public static readonly RationalMatrix4x4 cubicHermite = new RationalMatrix4x4(
 			1, 0, 0, 0,
 			0, 1, 0, 0,
 			-3, -2, 3, -1,
@@ -67,7 +67,7 @@ namespace Freya {
 		public static RationalMatrix4x4 GetConversionMatrix( RationalMatrix4x4 from, RationalMatrix4x4 to ) => to.Inverse * from;
 
 		public static Matrix4x4 Create( float m00, float m01, float m02, float m03, float m10, float m11, float m12, float m13, float m20, float m21, float m22, float m23, float m30, float m31, float m32, float m33 ) =>
-			new(
+			new Matrix4x4(
 				new Vector4( m00, m10, m20, m30 ),
 				new Vector4( m01, m11, m21, m31 ),
 				new Vector4( m02, m12, m22, m32 ),

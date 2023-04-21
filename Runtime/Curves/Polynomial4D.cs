@@ -13,19 +13,19 @@ namespace Freya {
 		public Polynomial w;
 
 		public Vector4 C0 {
-			get => new(x.c0, y.c0, z.c0, w.c0);
+			get => new Vector4(x.c0, y.c0, z.c0, w.c0);
 			set => ( x.c0, y.c0, z.c0, w.c0 ) = ( value.x, value.y, value.z, value.w );
 		}
 		public Vector4 C1 {
-			get => new(x.c1, y.c1, z.c1, w.c1);
+			get => new Vector4(x.c1, y.c1, z.c1, w.c1);
 			set => ( x.c1, y.c1, z.c1, w.c1 ) = ( value.x, value.y, value.z, value.w );
 		}
 		public Vector4 C2 {
-			get => new(x.c2, y.c2, z.c2, w.c2);
+			get => new Vector4(x.c2, y.c2, z.c2, w.c2);
 			set => ( x.c2, y.c2, z.c2, w.c2 ) = ( value.x, value.y, value.z, value.w );
 		}
 		public Vector4 C3 {
-			get => new(x.c3, y.c3, z.c3, w.c3);
+			get => new Vector4(x.c3, y.c3, z.c3, w.c3);
 			set => ( x.c3, y.c3, z.c3, w.c3 ) = ( value.x, value.y, value.z, value.w );
 		}
 
@@ -56,16 +56,13 @@ namespace Freya {
 		public Polynomial4D( Vector4Matrix3x1 coefficients ) => ( x, y, z, w ) = ( new Polynomial( coefficients.X ), new Polynomial( coefficients.Y ), new Polynomial( coefficients.Z ), new Polynomial( coefficients.W ) );
 
 		/// <inheritdoc cref="Polynomial.Eval(float)"/>
-		public Vector4 Eval( float t ) => new(x.Eval( t ), y.Eval( t ), z.Eval( t ), w.Eval( t ));
-
-		/// <inheritdoc cref="Polynomial.Eval(float,int)"/>
-		public Vector4 Eval( float t, int n ) => Differentiate( n ).Eval( t );
+		public Vector4 Eval( float t ) => new Vector4(x.Eval( t ), y.Eval( t ), z.Eval( t ));
 
 		/// <inheritdoc cref="Polynomial.Differentiate(int)"/>
-		public Polynomial4D Differentiate( int n = 1 ) => new(x.Differentiate( n ), y.Differentiate( n ), z.Differentiate( n ), w.Differentiate( n ));
+		public Polynomial4D Differentiate( int n = 1 ) => new Polynomial4D(x.Differentiate( n ), y.Differentiate( n ), z.Differentiate( n ), w.Differentiate( n ));
 
 		/// <inheritdoc cref="Polynomial.Compose(float,float)"/>
-		public Polynomial4D Compose( float g0, float g1 ) => new(x.Compose( g0, g1 ), y.Compose( g0, g1 ), z.Compose( g0, g1 ), w.Compose( g0, g1 ));
+		public Polynomial4D Compose( float g0, float g1 ) => new Polynomial4D(x.Compose( g0, g1 ), y.Compose( g0, g1 ), z.Compose( g0, g1 ), w.Compose( g0, g1 ));
 
 		/// <inheritdoc cref="Polynomial2D.GetBounds01"/>
 		public (FloatRange x, FloatRange y, FloatRange z, FloatRange w) GetBounds01() => ( x.OutputRange01, y.OutputRange01, z.OutputRange01, w.OutputRange01 );
@@ -81,7 +78,7 @@ namespace Freya {
 
 		#region IParamCurve3Diff interface implementations
 
-		public int Degree => Mathfs.Max( x.Degree, y.Degree, z.Degree, w.Degree );
+		public int Degree => Mathf.Max( x.Degree, y.Degree, z.Degree, w.Degree );
 		public Vector4 EvalDerivative( float t ) => Differentiate().Eval( t );
 		public Vector4 EvalSecondDerivative( float t ) => Differentiate( 2 ).Eval( t );
 		public Vector4 EvalThirdDerivative( float t = 0 ) => Differentiate( 3 ).Eval( 0 );
@@ -171,17 +168,17 @@ namespace Freya {
 
 		#region Typecasting & Operators
 
-		public static Polynomial4D operator /( Polynomial4D p, float v ) => new(p.C0 / v, p.C1 / v, p.C2 / v, p.C3 / v);
-		public static Polynomial4D operator *( Polynomial4D p, float v ) => new(p.C0 * v, p.C1 * v, p.C2 * v, p.C3 * v);
+		public static Polynomial4D operator /( Polynomial4D p, float v ) => new Polynomial4D(p.C0 / v, p.C1 / v, p.C2 / v, p.C3 / v);
+		public static Polynomial4D operator *( Polynomial4D p, float v ) => new Polynomial4D(p.C0 * v, p.C1 * v, p.C2 * v, p.C3 * v);
 		public static Polynomial4D operator *( float v, Polynomial4D p ) => p * v;
 
-		public static explicit operator Vector4Matrix3x1( Polynomial4D poly ) => new(poly.C0, poly.C1, poly.C2);
-		public static explicit operator Vector4Matrix4x1( Polynomial4D poly ) => new(poly.C0, poly.C1, poly.C2, poly.C3);
+		public static explicit operator Vector4Matrix3x1( Polynomial4D poly ) => new Vector4Matrix3x1(poly.C0, poly.C1, poly.C2);
+		public static explicit operator Vector4Matrix4x1( Polynomial4D poly ) => new Vector4Matrix4x1(poly.C0, poly.C1, poly.C2, poly.C3);
 		public static explicit operator BezierQuad4D( Polynomial4D poly ) => poly.Degree < 3 ? new BezierQuad4D( CharMatrix.quadraticBezierInverse * (Vector4Matrix3x1)poly ) : throw new InvalidCastException( "Cannot cast a cubic polynomial to a quadratic curve" );
-		public static explicit operator BezierCubic4D( Polynomial4D poly ) => new(CharMatrix.cubicBezierInverse * (Vector4Matrix4x1)poly);
-		public static explicit operator CatRomCubic4D( Polynomial4D poly ) => new(CharMatrix.cubicCatmullRomInverse * (Vector4Matrix4x1)poly);
-		public static explicit operator HermiteCubic4D( Polynomial4D poly ) => new(CharMatrix.cubicHermiteInverse * (Vector4Matrix4x1)poly);
-		public static explicit operator UBSCubic4D( Polynomial4D poly ) => new(CharMatrix.cubicUniformBsplineInverse * (Vector4Matrix4x1)poly);
+		public static explicit operator BezierCubic4D( Polynomial4D poly ) => new BezierCubic4D(CharMatrix.cubicBezierInverse * (Vector4Matrix4x1)poly);
+		public static explicit operator CatRomCubic4D( Polynomial4D poly ) => new CatRomCubic4D(CharMatrix.cubicCatmullRomInverse * (Vector4Matrix4x1)poly);
+		public static explicit operator HermiteCubic4D( Polynomial4D poly ) => new HermiteCubic4D(CharMatrix.cubicHermiteInverse * (Vector4Matrix4x1)poly);
+		public static explicit operator UBSCubic4D( Polynomial4D poly ) => new UBSCubic4D(CharMatrix.cubicUniformBsplineInverse * (Vector4Matrix4x1)poly);
 
 		#endregion
 

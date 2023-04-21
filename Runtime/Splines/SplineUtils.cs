@@ -42,8 +42,8 @@ namespace Freya {
 				_ => squaredDistance.Pow( 0.5f * alpha )
 			};
 
-		static readonly Matrix4x1 knotsUniformUnit = new(-1, 0, 1, 2);
-		static readonly Matrix4x1 knotsUniform = new(0, 1, 2, 3);
+		static readonly Matrix4x1 knotsUniformUnit = new Matrix4x1(-1, 0, 1, 2);
+		static readonly Matrix4x1 knotsUniform = new Matrix4x1(0, 1, 2, 3);
 
 		static Matrix4x1 GetUniformKnots( bool unitInterval ) => unitInterval ? knotsUniformUnit : knotsUniform;
 
@@ -71,7 +71,7 @@ namespace Freya {
 			float i23 = CalcCatRomKnot( sqMag23, alpha );
 			float k0, k1, k2, k3;
 			if( unitInterval ) {
-				return new(-i01 / i12, 0, 1, 1 + i23 / i12);
+				return new Matrix4x1(-i01 / i12, 0, 1, 1 + i23 / i12);
 			} else {
 				k0 = 0;
 				k1 = k0 + i01;
@@ -79,10 +79,10 @@ namespace Freya {
 				k3 = k2 + i23;
 			}
 
-			return new(k0, k1, k2, k3);
+			return new Matrix4x1(k0, k1, k2, k3);
 		}
 
-		public static Matrix4x4 GetNUCatRomCharMatrix( Matrix4x1 knots ) {
+		static Matrix4x4 GetNUCatRomCharMatrix( Matrix4x1 knots ) {
 			float k0 = knots.m0;
 			float k1 = knots.m1;
 			float k2 = knots.m2;
@@ -141,65 +141,16 @@ namespace Freya {
 			float i12sq = i12 * i12;
 			float i13 = k1 - k3;
 			float i23 = k2 - k3;
-			float p0sc = ( i01 * i02 * i12 );
-			float p1sc = ( i01 * i12sq * i13 );
-			float p2sc = ( i02 * i12sq * i23 );
-			float p3sc = ( i12 * i13 * i23 );
+			float p0sc = 1f / ( i01 * i02 * i12 );
+			float p1sc = 1f / ( i01 * i12sq * i13 );
+			float p2sc = 1f / ( i02 * i12sq * i23 );
+			float p3sc = 1f / ( i12 * i13 * i23 );
 			return CharMatrix.Create(
-				p0u0 / p0sc, p1u0 / p1sc, p2u0 / p2sc, p3u0 / p3sc,
-				p0u1 / p0sc, p1u1 / p1sc, p2u1 / p2sc, p3u1 / p3sc,
-				p0u2 / p0sc, p1u2 / p1sc, p2u2 / p2sc, p3u2 / p3sc,
-				p0u3 / p0sc, p1u3 / p1sc, p2u3 / p2sc, p3u3 / p3sc
+				p0sc * p0u0, p1sc * p1u0, p2sc * p2u0, p3sc * p3u0,
+				p0sc * p0u1, p1sc * p1u1, p2sc * p2u1, p3sc * p3u1,
+				p0sc * p0u2, p1sc * p1u2, p2sc * p2u2, p3sc * p3u2,
+				p0sc * p0u3, p1sc * p1u3, p2sc * p2u3, p3sc * p3u3
 			);
-		}
-
-		public static Vector3 GetNUCatRomCharMatrixC2End( Matrix4x1 knots, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3 ) {
-			float k0 = knots.m0;
-			float k1 = knots.m1;
-			float k2 = knots.m2;
-			float k3 = knots.m3;
-
-			float k1k1 = k1 * k1;
-			float k2k2 = k2 * k2;
-			float k0k1 = k0 * k1;
-			float _2k0k1 = 2 * k0k1;
-			float k0k2 = k0 * k2;
-			float k1k2 = k1 * k2;
-			float k1k3 = k1 * k3;
-			float k2k3 = k2 * k3;
-			float _2k2k3 = 2 * k2k3;
-
-			float common = _2k0k1 + k0k2 - k1k3 - _2k2k3;
-
-			// CHAR matrix COLUMN 0:
-			// CHAR matrix COLUMN 1:
-			// CHAR matrix COLUMN 2:
-			// CHAR matrix COLUMN 3:
-
-			float i01 = k0 - k1;
-			float i02 = k0 - k2;
-			float i12 = k1 - k2;
-			float i12sq = i12 * i12;
-			float i13 = k1 - k3;
-			float i23 = k2 - k3;
-			float p0sc = ( i01 * i02 * i12 );
-			float p1sc = ( i01 * i12sq * i13 );
-			float p2sc = ( i02 * i12sq * i23 );
-			float p3sc = ( i12 * i13 * i23 );
-
-			float m20 = (-k1 - 2 * k2) / p0sc;
-			float m21 = (common - k1k1 + k1k2) / p1sc;
-			float m22 = (-common - k2k2 + k1k2) / p2sc;
-			float m23 = (2 * k1 + k2) / p3sc;
-			float m30 = 1f / p0sc;
-			float m31 = (k3 - k0) / p1sc;
-			float m32 = (k0 - k3) / p2sc;
-			float m33 = -1f / p3sc;
-
-			return p0 * ( ( m20 + 3 * m30 ) / m23 ) +
-				   p1 * ( ( m21 + 3 * m31 - m20 ) / m23 ) +
-				   p2 * ( ( m22 + 3 * m32 - m21 ) / m23 ) +
-				   p3 * ( 1 + ( 3 * m33 - m22 ) / m23 );
 		}
 
 		static Matrix4x4 GetNUCatRomCharMatrixUnitInterval( float k0, float k3 ) {
@@ -225,9 +176,9 @@ namespace Freya {
 
 			return CharMatrix.Create(
 				0, 1, 0, 0,
-				p0sc, -p1u1 / k0k3, p2sc * p2u1, 0,
-				p0sc * -2, -p1u2 / k0k3, p2sc * p2u2, p3sc,
-				p0sc, -p1u3 / k0k3, p2sc * p2u3, -p3sc
+				p0sc, p1sc * p1u1, p2sc * p2u1, 0,
+				p0sc * -2, p1sc * p1u2, p2sc * p2u2, p3sc,
+				p0sc, p1sc * p1u3, p2sc * p2u3, -p3sc
 			);
 		}
 
@@ -237,59 +188,6 @@ namespace Freya {
 
 		internal static Polynomial3D CalculateCatRomCurve( Vector3Matrix4x1 m, Matrix4x1 knots ) {
 			return new Polynomial3D( GetNUCatRomCharMatrix( knots ).MultiplyColumnVector( m ) );
-		}
-
-		internal static Polynomial3D CalculateHermiteCurve( Vector3Matrix4x1 m, float k0, float k1 ) {
-			return new Polynomial3D( GetNUHermiteCharMatrix( k0, k1 ).MultiplyColumnVector( m ) );
-		}
-
-		internal static Polynomial2D CalculateHermiteCurve( Vector2Matrix4x1 m, float k0, float k1 ) {
-			return new Polynomial2D( GetNUHermiteCharMatrix( k0, k1 ).MultiplyColumnVector( m ) );
-		}
-
-		static Matrix4x4 GetNUHermiteCharMatrix( float k0, float k1 ) {
-			float d = k1 - k0;
-			float d2 = d * d;
-			float d3 = d * d * d;
-			float k0_2 = k0 * k0;
-			float k0_3 = k0 * k0 * k0;
-
-			// row 0
-			float m02 = ( 3 * k0_2 ) / d2 + ( 2 * k0_3 ) / d3;
-			float m00 = 1 - m02;
-			float _k02d = k0_2 / d;
-			float _k03d2 = k0_3 / d2;
-			float m03 = -_k02d - _k03d2;
-			float m01 = -k0 - 2 * _k02d - _k03d2;
-
-			// row 1
-			float _2k0d = 2 * k0 / d;
-			float _3k02d2 = 3 * k0_2 / d2;
-			float m13 = _2k0d + _3k02d2;
-			float m11 = 1 + 2 * _2k0d + _3k02d2;
-			float m10 = 6 * ( k0 / d2 + k0_2 / d3 );
-			float m12 = -m10;
-
-			// row 2
-			float m22 = 3 / d2 + ( 6 * k0 ) / d3;
-			float m20 = -m22;
-			float _dRcp = 1 / d;
-			float _3k0d2 = 3 * k0 / d2;
-			float m23 = -_dRcp - _3k0d2;
-			float m21 = m23 - _dRcp;
-
-			// row 3
-			float m30 = 2 / d3;
-			float m31 = 1 / d2;
-			float m32 = -m30;
-			float m33 = m31;
-
-			return CharMatrix.Create(
-				m00, m01, m02, m03,
-				m10, m11, m12, m13,
-				m20, m21, m22, m23,
-				m30, m31, m32, m33
-			);
 		}
 
 	}

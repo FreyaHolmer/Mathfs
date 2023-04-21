@@ -10,9 +10,9 @@ namespace Freya {
 		public List<Vector2> points = new List<Vector2>();
 		public List<float> knots = null;
 		public bool Uniform => knots == null;
-		public FloatRange InternalKnotRange => Uniform ? ( 0, points.Count - 1 ) : ( knots[0], knots[^1] );
+        public FloatRange InternalKnotRange => Uniform ? (0, points.Count - 1) : (knots[0], knots[knots.Count - 1]);
 
-		public Vector2 Eval( float u ) {
+        public Vector2 Eval( float u ) {
 			float l( int j ) {
 				float prod = 1;
 				for( int i = 0; i < points.Count; i++ ) {

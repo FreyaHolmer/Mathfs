@@ -18,10 +18,10 @@ namespace Freya {
 				}
 			}
 		}
-		public Matrix4x1 X => new(m0.x, m1.x, m2.x, m3.x);
-		public Matrix4x1 Y => new(m0.y, m1.y, m2.y, m3.y);
-		public Matrix4x1 Z => new(m0.z, m1.z, m2.z, m3.z);
-		public Matrix4x1 W => new(m0.w, m1.w, m2.w, m3.w);
+		public Matrix4x1 X => new Matrix4x1(m0.x, m1.x, m2.x, m3.x);
+		public Matrix4x1 Y => new Matrix4x1(m0.y, m1.y, m2.y, m3.y);
+		public Matrix4x1 Z => new Matrix4x1(m0.z, m1.z, m2.z, m3.z);
+		public Matrix4x1 W => new Matrix4x1(m0.w, m1.w, m2.w, m3.w);
 		/// <summary>Linearly interpolates between two matrices, based on a value <c>t</c></summary>
 		/// <param name="t">The value to blend by</param>
 		public static Vector4Matrix4x1 Lerp( Vector4Matrix4x1 a, Vector4Matrix4x1 b, float t ) => new Vector4Matrix4x1(Vector4.LerpUnclamped( a.m0, b.m0, t ), Vector4.LerpUnclamped( a.m1, b.m1, t ), Vector4.LerpUnclamped( a.m2, b.m2, t ), Vector4.LerpUnclamped( a.m3, b.m3, t ));
@@ -29,6 +29,18 @@ namespace Freya {
 		public static bool operator !=( Vector4Matrix4x1 a, Vector4Matrix4x1 b ) => !( a == b );
 		public bool Equals( Vector4Matrix4x1 other ) => m0.Equals( other.m0 ) && m1.Equals( other.m1 ) && m2.Equals( other.m2 ) && m3.Equals( other.m3 );
 		public override bool Equals( object obj ) => obj is Vector4Matrix4x1 other && Equals( other );
-		public override int GetHashCode() => HashCode.Combine( m0, m1, m2, m3 );
-	}
+		//public override int GetHashCode() => HashCode.Combine( m0, m1, m2, m3 );
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hashCode = 17;
+                hashCode = hashCode * 23 + m0.GetHashCode();
+                hashCode = hashCode * 23 + m1.GetHashCode();
+                hashCode = hashCode * 23 + m2.GetHashCode();
+                hashCode = hashCode * 23 + m3.GetHashCode();
+                return hashCode;
+            }
+        }
+    }
 }

@@ -6,17 +6,16 @@ using UnityEngine;
 namespace Freya {
 
 	/// <summary>A value range between two values a and b</summary>
-	[Serializable]
-	public struct FloatRange {
+	public readonly struct FloatRange {
 
 		/// <summary>The unit interval of 0 to 1</summary>
 		public static readonly FloatRange unit = new FloatRange( 0, 1 );
 
 		/// <summary>The start of this range</summary>
-		public float a;
+		public readonly float a;
 
 		/// <summary>The end of this range</summary>
-		public float b;
+		public readonly float b;
 
 		/// <summary>Creates a new value range</summary>
 		/// <param name="a">The start of the range</param>
@@ -27,13 +26,13 @@ namespace Freya {
 		public float Center => ( a + b ) / 2;
 
 		/// <summary>The length/span of this value range</summary>
-		public float Length => MathF.Abs( b - a );
+		public float Length => Mathfs.Abs( b - a );
 
 		/// <summary>The minimum value of this range</summary>
-		public float Min => MathF.Min( a, b );
+		public float Min => Mathfs.Min( a, b );
 
 		/// <summary>The maximum value of this range</summary>
-		public float Max => MathF.Max( a, b );
+		public float Max => Mathfs.Max( a, b );
 
 		/// <summary>The direction of this value range. Returns -1 if <c>b</c> is greater than <c>a</c>, otherwise returns 1</summary>
 		public int Direction => b > a ? 1 : -1;
@@ -64,12 +63,12 @@ namespace Freya {
 		/// <param name="value">The range to remap</param>
 		/// <param name="input">The input range</param>
 		/// <param name="output">The output range</param>
-		public static FloatRange Remap( FloatRange value, FloatRange input, FloatRange output ) => new(Remap( value.a, input, output ), Remap( value.b, input, output ));
+		public static FloatRange Remap( FloatRange value, FloatRange input, FloatRange output ) => new FloatRange(Remap( value.a, input, output ), Remap( value.b, input, output ));
 
 		/// <summary>Returns whether or not this range overlaps another range</summary>
 		/// <param name="other">The other range to test overlap with</param>
 		public bool Overlaps( FloatRange other ) {
-			float separation = MathF.Abs( other.Center - Center );
+			float separation = Mathfs.Abs( other.Center - Center );
 			float rTotal = ( other.Length + Length ) / 2;
 			return separation < rTotal;
 		}
@@ -88,14 +87,6 @@ namespace Freya {
 			Direction switch {
 				1 => ( Mathfs.Min( a, value ), Mathfs.Max( b, value ) ), // forward - a is min, b is max
 				_ => ( Mathfs.Min( b, value ), Mathfs.Max( a, value ) ) // reversed - b is min, a is max
-			};
-
-		/// <summary>Expands the minimum or maximum value to contain the given <c>range</c></summary>
-		/// <param name="range">The value range to include</param>
-		public FloatRange Encapsulate( FloatRange range ) =>
-			Direction switch {
-				1 => ( Mathfs.Min( a, range.a ), Mathfs.Max( b, range.b ) ), // forward - a is min, b is max
-				_ => ( Mathfs.Min( b, range.b ), Mathfs.Max( a, range.a ) ) // reversed - b is min, a is max
 			};
 
 		/// <summary>Returns a version of this range, scaled around its start value</summary>
@@ -119,26 +110,34 @@ namespace Freya {
 		/// <param name="rangeY">The range of the Y axis</param>
 		/// <param name="rangeZ">The range of the Z axis</param>
 		public static Bounds ToBounds( FloatRange rangeX, FloatRange rangeY, FloatRange rangeZ ) {
-			Vector3 center = new(rangeX.Center, rangeY.Center, rangeZ.Center);
-			Vector3 size = new(rangeX.Length, rangeY.Length, rangeZ.Length);
+			Vector3 center = new Vector3(rangeX.Center, rangeY.Center, rangeZ.Center);
+			Vector3 size = new Vector3(rangeX.Length, rangeY.Length, rangeZ.Length);
 			return new Bounds( center, size );
 		}
 
-		public static FloatRange operator -( FloatRange range, float v ) => new(range.a - v, range.b - v);
-		public static FloatRange operator +( FloatRange range, float v ) => new(range.a + v, range.b + v);
-		public static FloatRange operator /( FloatRange range, int v ) => new(range.a / v, range.b / v);
-		public static FloatRange operator /( FloatRange range, float v ) => new(range.a / v, range.b / v);
-		public static FloatRange operator *( FloatRange range, int v ) => new(range.a * v, range.b * v);
-		public static FloatRange operator *( FloatRange range, float v ) => new(range.a * v, range.b * v);
+		public static FloatRange operator -( FloatRange range, float v ) => new FloatRange(range.a - v, range.b - v);
+		public static FloatRange operator +( FloatRange range, float v ) => new FloatRange(range.a + v, range.b + v);
 
 		public static implicit operator FloatRange( (float a, float b) tuple ) => new FloatRange( tuple.a, tuple.b );
 		public static bool operator ==( FloatRange a, FloatRange b ) => a.a == b.a && a.b == b.b;
 		public static bool operator !=( FloatRange a, FloatRange b ) => a.a != b.a || a.b != b.b;
 		public bool Equals( FloatRange other ) => a.Equals( other.a ) && b.Equals( other.b );
 		public override bool Equals( object obj ) => obj is FloatRange other && Equals( other );
-		public override int GetHashCode() => HashCode.Combine( a, b );
+		//public override int GetHashCode() => HashCode.Combine( a, b );
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hashCode = 17;
+                hashCode = hashCode * 23 + a.GetHashCode();
+                hashCode = hashCode * 23 + b.GetHashCode();
+                //hashCode = hashCode * 23 + m2.GetHashCode();
+                //hashCode = hashCode * 23 + m3.GetHashCode();
+                return hashCode;
+            }
+        }
 
-		public override string ToString() => $"[{a},{b}]";
+        public override string ToString() => $"[{a},{b}]";
 
 	}
 

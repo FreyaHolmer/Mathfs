@@ -89,7 +89,7 @@ namespace Freya {
 		/// <param name="b">The second spline segment</param>
 		/// <param name="t">A value from 0 to 1 to blend between <c>a</c> and <c>b</c></param>
 		public static CatRomCubic2D Lerp( CatRomCubic2D a, CatRomCubic2D b, float t ) =>
-			new(
+			new CatRomCubic2D(
 				Vector2.LerpUnclamped( a.P0, b.P0, t ),
 				Vector2.LerpUnclamped( a.P1, b.P1, t ),
 				Vector2.LerpUnclamped( a.P2, b.P2, t ),

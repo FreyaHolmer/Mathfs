@@ -91,11 +91,6 @@ namespace Freya {
 		/// <param name="t">The value to sample at</param>
 		public float Eval( float t ) => c3 * ( t * t * t ) + c2 * ( t * t ) + c1 * t + c0;
 
-		/// <summary>Evaluates the <c>n</c>:th derivative of the polynomial at the given value <c>t</c></summary>
-		/// <param name="t">The value to sample at</param>
-		/// <param name="n">The derivative to evaluate</param>
-		public float Eval( float t, int n ) => Differentiate( n ).Eval( t );
-
 		/// <summary>Differentiates this function, returning the n-th derivative of this polynomial</summary>
 		/// <param name="n">The number of times to differentiate this function. 0 returns the function itself, 1 returns the first derivative</param>
 		public Polynomial Differentiate( int n = 1 ) {
@@ -188,21 +183,6 @@ namespace Freya {
 		/// <param name="c1">The linear coefficient <c>a</c> in <c>ax+b</c></param>
 		public static Polynomial Linear( float c0, float c1 ) => new Polynomial( c0, c1, 0, 0 );
 
-		/// <summary>Creates a linear polynomial of the form <c>ax+b</c> from two points a and b</summary>
-		/// <param name="a">The first point</param>
-		/// <param name="b">The second point</param>
-		public static Polynomial Linear( Vector2 a, Vector2 b ) => Linear( a.x, a.y, b.x, b.y );
-
-		/// <summary>Creates a linear polynomial of the form <c>ax+b</c> from two points</summary>
-		/// <param name="x0">The coordinate of the first point</param>
-		/// <param name="y0">The value of the first point</param>
-		/// <param name="x1">The coordinate of the second point</param>
-		/// <param name="y1">The value of the second point</param>
-		public static Polynomial Linear( float x0, float y0, float x1, float y1 ) {
-			float d = ( y1 - y0 ) / ( x1 - x0 );
-			return new Polynomial( y0 - d * x0, d, 0, 0 );
-		}
-
 		/// <summary>Creates a quadratic polynomial</summary>
 		/// <param name="c0">The constant coefficient</param>
 		/// <param name="c1">The linear coefficient</param>
@@ -276,7 +256,7 @@ namespace Freya {
 		/// <param name="b">The second polynomial to blend to</param>
 		/// <param name="t">The blend value, typically from 0 to 1</param>
 		public static Polynomial Lerp( Polynomial a, Polynomial b, float t ) =>
-			new(
+			new Polynomial(
 				t.Lerp( a.c0, b.c0 ),
 				t.Lerp( a.c1, b.c1 ),
 				t.Lerp( a.c2, b.c2 ),
@@ -296,10 +276,10 @@ namespace Freya {
 				return new ResultsMax2<float>( -b / ( 2 * a ) ); // two equivalent solutions at one point
 
 			if( rootContent >= 0 ) {
-				float root = MathF.Sqrt( rootContent );
+				float root = Mathf.Sqrt( rootContent );
 				float r0 = ( -b - root ) / ( 2 * a ); // crosses at two points
 				float r1 = ( -b + root ) / ( 2 * a );
-				return new ResultsMax2<float>( MathF.Min( r0, r1 ), MathF.Max( r0, r1 ) );
+				return new ResultsMax2<float>( Mathf.Min( r0, r1 ), Mathf.Max( r0, r1 ) );
 			}
 
 			return default; // no roots
@@ -331,10 +311,10 @@ namespace Freya {
 				return new ResultsMax3<float>( Mathfs.Cbrt( -q ) );
 			float discriminant = 4 * p * p * p + 27 * q * q;
 			if( discriminant < 0.00001 ) { // two or three roots guaranteed, use trig solution
-				float pre = 2 * MathF.Sqrt( -p / 3 );
-				float acosInner = ( ( 3 * q ) / ( 2 * p ) ) * MathF.Sqrt( -3 / p );
+				float pre = 2 * Mathf.Sqrt( -p / 3 );
+				float acosInner = ( ( 3 * q ) / ( 2 * p ) ) * Mathf.Sqrt( -3 / p );
 
-				float GetRoot( int k ) => pre * MathF.Cos( ( 1f / 3f ) * Mathfs.Acos( acosInner.ClampNeg1to1() ) - ( Mathfs.TAU / 3f ) * k );
+				float GetRoot( int k ) => pre * Mathf.Cos( ( 1f / 3f ) * Mathfs.Acos( acosInner.ClampNeg1to1() ) - ( Mathfs.TAU / 3f ) * k );
 				// if acos hits 0 or TAU/2, the offsets will have the same value,
 				// which means we have a double root plus one regular root on our hands
 				if( acosInner >= 0.9999f )
@@ -345,14 +325,14 @@ namespace Freya {
 			}
 
 			if( discriminant > 0 && p < 0 ) { // one root
-				float coshInner = ( 1f / 3f ) * Mathfs.Acosh( ( -3 * q.Abs() / ( 2 * p ) ) * MathF.Sqrt( -3 / p ) );
-				float r = -2 * Mathfs.Sign( q ) * MathF.Sqrt( -p / 3 ) * Mathfs.Cosh( coshInner );
+				float coshInner = ( 1f / 3f ) * Mathfs.Acosh( ( -3 * q.Abs() / ( 2 * p ) ) * Mathf.Sqrt( -3 / p ) );
+				float r = -2 * Mathfs.Sign( q ) * Mathf.Sqrt( -p / 3 ) * Mathfs.Cosh( coshInner );
 				return new ResultsMax3<float>( r );
 			}
 
 			if( p > 0 ) { // one root
-				float sinhInner = ( 1f / 3f ) * Mathfs.Asinh( ( ( 3 * q ) / ( 2 * p ) ) * MathF.Sqrt( 3 / p ) );
-				float r = ( -2 * MathF.Sqrt( p / 3 ) ) * Mathfs.Sinh( sinhInner );
+				float sinhInner = ( 1f / 3f ) * Mathfs.Asinh( ( ( 3 * q ) / ( 2 * p ) ) * Mathf.Sqrt( 3 / p ) );
+				float r = ( -2 * Mathf.Sqrt( p / 3 ) ) * Mathfs.Sinh( sinhInner );
 				return new ResultsMax3<float>( r );
 			}
 
@@ -366,20 +346,20 @@ namespace Freya {
 
 		#region Typecasting & Operators
 
-		public static Polynomial operator /( Polynomial p, float v ) => new(p.c0 / v, p.c1 / v, p.c2 / v, p.c3 / v);
-		public static Polynomial operator /( float v, Polynomial p ) => new(v / p.c0, v / p.c1, v / p.c2, v / p.c3);
-		public static Polynomial operator *( Polynomial p, float v ) => new(p.c0 * v, p.c1 * v, p.c2 * v, p.c3 * v);
+		public static Polynomial operator /( Polynomial p, float v ) => new Polynomial(p.c0 / v, p.c1 / v, p.c2 / v, p.c3 / v);
+		public static Polynomial operator /( float v, Polynomial p ) => new Polynomial(v / p.c0, v / p.c1, v / p.c2, v / p.c3);
+		public static Polynomial operator *( Polynomial p, float v ) => new Polynomial(p.c0 * v, p.c1 * v, p.c2 * v, p.c3 * v);
 		public static Polynomial operator *( float v, Polynomial p ) => p * v;
-		public static Polynomial operator +( Polynomial a, Polynomial b ) => new(a.c0 + b.c0, a.c1 + b.c1, a.c2 + b.c2, a.c3 + b.c3);
-		public static Polynomial operator -( Polynomial a, Polynomial b ) => new(a.c0 - b.c0, a.c1 - b.c1, a.c2 - b.c2, a.c3 - b.c3);
+		public static Polynomial operator +( Polynomial a, Polynomial b ) => new Polynomial(a.c0 + b.c0, a.c1 + b.c1, a.c2 + b.c2, a.c3 + b.c3);
+		public static Polynomial operator -( Polynomial a, Polynomial b ) => new Polynomial(a.c0 - b.c0, a.c1 - b.c1, a.c2 - b.c2, a.c3 - b.c3);
 
-		public static explicit operator Matrix3x1( Polynomial poly ) => new(poly.c0, poly.c1, poly.c2);
-		public static explicit operator Matrix4x1( Polynomial poly ) => new(poly.c0, poly.c1, poly.c2, poly.c3);
+		public static explicit operator Matrix3x1( Polynomial poly ) => new Matrix3x1(poly.c0, poly.c1, poly.c2);
+		public static explicit operator Matrix4x1( Polynomial poly ) => new Matrix4x1(poly.c0, poly.c1, poly.c2, poly.c3);
 		public static explicit operator BezierQuad1D( Polynomial poly ) => poly.Degree < 3 ? new BezierQuad1D( CharMatrix.quadraticBezierInverse * (Matrix3x1)poly ) : throw new InvalidCastException( "Cannot cast a cubic polynomial to a quadratic curve" );
-		public static explicit operator BezierCubic1D( Polynomial poly ) => new(CharMatrix.cubicBezierInverse * (Matrix4x1)poly);
-		public static explicit operator CatRomCubic1D( Polynomial poly ) => new(CharMatrix.cubicCatmullRomInverse * (Matrix4x1)poly);
-		public static explicit operator HermiteCubic1D( Polynomial poly ) => new(CharMatrix.cubicHermiteInverse * (Matrix4x1)poly);
-		public static explicit operator UBSCubic1D( Polynomial poly ) => new(CharMatrix.cubicUniformBsplineInverse * (Matrix4x1)poly);
+		public static explicit operator BezierCubic1D( Polynomial poly ) => new	BezierCubic1D(CharMatrix.cubicBezierInverse * (Matrix4x1)poly);
+		public static explicit operator CatRomCubic1D( Polynomial poly ) => new CatRomCubic1D(CharMatrix.cubicCatmullRomInverse * (Matrix4x1)poly);
+		public static explicit operator HermiteCubic1D( Polynomial poly ) => new HermiteCubic1D(CharMatrix.cubicHermiteInverse * (Matrix4x1)poly);
+		public static explicit operator UBSCubic1D( Polynomial poly ) => new UBSCubic1D(CharMatrix.cubicUniformBsplineInverse * (Matrix4x1)poly);
 
 		#endregion
 

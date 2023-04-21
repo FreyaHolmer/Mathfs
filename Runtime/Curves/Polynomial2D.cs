@@ -12,19 +12,19 @@ namespace Freya {
 		public Polynomial y;
 
 		public Vector2 C0 {
-			get => new(x.c0, y.c0);
+			get => new Vector2(x.c0, y.c0);
 			set => ( x.c0, y.c0 ) = ( value.x, value.y );
 		}
 		public Vector2 C1 {
-			get => new(x.c1, y.c1);
+			get => new Vector2(x.c1, y.c1);
 			set => ( x.c1, y.c1 ) = ( value.x, value.y );
 		}
 		public Vector2 C2 {
-			get => new(x.c2, y.c2);
+			get => new Vector2(x.c2, y.c2);
 			set => ( x.c2, y.c2 ) = ( value.x, value.y );
 		}
 		public Vector2 C3 {
-			get => new(x.c3, y.c3);
+			get => new Vector2(x.c3, y.c3);
 			set => ( x.c3, y.c3 ) = ( value.x, value.y );
 		}
 
@@ -43,12 +43,6 @@ namespace Freya {
 			this.x = new Polynomial( c0.x, c1.x, c2.x );
 			this.y = new Polynomial( c0.y, c1.y, c2.y );
 		}
-		
-		/// <inheritdoc cref="Polynomial(float,float)"/>
-		public Polynomial2D( Vector2 c0, Vector2 c1 ) {
-			this.x = new Polynomial( c0.x, c1.x, 0, 0 );
-			this.y = new Polynomial( c0.y, c1.y, 0, 0 );
-		}
 
 		/// <inheritdoc cref="Polynomial(Matrix4x1)"/>
 		public Polynomial2D( Vector2Matrix4x1 coefficients ) => ( x, y ) = ( new Polynomial( coefficients.X ), new Polynomial( coefficients.Y ) );
@@ -57,16 +51,13 @@ namespace Freya {
 		public Polynomial2D( Vector2Matrix3x1 coefficients ) => ( x, y ) = ( new Polynomial( coefficients.X ), new Polynomial( coefficients.Y ) );
 
 		/// <inheritdoc cref="Polynomial.Eval(float)"/>
-		public Vector2 Eval( float t ) => new(x.Eval( t ), y.Eval( t ));
-
-		/// <inheritdoc cref="Polynomial.Eval(float,int)"/>
-		public Vector2 Eval( float t, int n ) => Differentiate( n ).Eval( t );
+		public Vector2 Eval( float t ) => new Vector2(x.Eval( t ), y.Eval( t ));
 
 		/// <inheritdoc cref="Polynomial.Differentiate(int)"/>
-		public Polynomial2D Differentiate( int n = 1 ) => new(x.Differentiate( n ), y.Differentiate( n ));
+		public Polynomial2D Differentiate( int n = 1 ) => new Polynomial2D(x.Differentiate( n ), y.Differentiate( n ));
 
 		/// <inheritdoc cref="Polynomial.Compose(float,float)"/>
-		public Polynomial2D Compose( float g0, float g1 ) => new(x.Compose( g0, g1 ), y.Compose( g0, g1 ));
+		public Polynomial2D Compose( float g0, float g1 ) => new Polynomial2D(x.Compose( g0, g1 ), y.Compose( g0, g1 ));
 
 		/// <summary>Returns the tight axis-aligned bounds of the curve in the unit interval</summary>
 		public Rect GetBounds01() => FloatRange.ToRect( x.OutputRange01, y.OutputRange01 );
@@ -80,7 +71,7 @@ namespace Freya {
 
 		#region IParamCurve3Diff interface implementations
 
-		public int Degree => Mathfs.Max( x.Degree, y.Degree );
+		public int Degree => Mathf.Max( (int)x.Degree, (int)y.Degree );
 		public Vector2 EvalDerivative( float t ) => Differentiate().Eval( t );
 		public Vector2 EvalSecondDerivative( float t ) => Differentiate( 2 ).Eval( t );
 		public Vector2 EvalThirdDerivative( float t = 0 ) => Differentiate( 3 ).Eval( 0 );
@@ -295,7 +286,7 @@ namespace Freya {
 		/// <param name="poly">The polynomial to rotate</param>
 		/// <param name="angle">The angle to rotate by (in radians)</param>
 		public static Polynomial2D Rotate( Polynomial2D poly, float angle ) =>
-			new(
+			new Polynomial2D(
 				poly.C0.Rotate( angle ),
 				poly.C1.Rotate( angle ),
 				poly.C2.Rotate( angle ),
@@ -304,17 +295,17 @@ namespace Freya {
 
 		#region Typecasting & Operators
 
-		public static Polynomial2D operator /( Polynomial2D p, float v ) => new(p.C0 / v, p.C1 / v, p.C2 / v, p.C3 / v);
-		public static Polynomial2D operator *( Polynomial2D p, float v ) => new(p.C0 * v, p.C1 * v, p.C2 * v, p.C3 * v);
+		public static Polynomial2D operator /( Polynomial2D p, float v ) => new Polynomial2D(p.C0 / v, p.C1 / v, p.C2 / v, p.C3 / v);
+		public static Polynomial2D operator *( Polynomial2D p, float v ) => new Polynomial2D(p.C0 * v, p.C1 * v, p.C2 * v, p.C3 * v);
 		public static Polynomial2D operator *( float v, Polynomial2D p ) => p * v;
 
-		public static explicit operator Vector2Matrix3x1( Polynomial2D poly ) => new(poly.C0, poly.C1, poly.C2);
-		public static explicit operator Vector2Matrix4x1( Polynomial2D poly ) => new(poly.C0, poly.C1, poly.C2, poly.C3);
+		public static explicit operator Vector2Matrix3x1( Polynomial2D poly ) => new Vector2Matrix3x1(poly.C0, poly.C1, poly.C2);
+		public static explicit operator Vector2Matrix4x1( Polynomial2D poly ) => new Vector2Matrix4x1(poly.C0, poly.C1, poly.C2, poly.C3);
 		public static explicit operator BezierQuad2D( Polynomial2D poly ) => poly.Degree < 3 ? new BezierQuad2D( CharMatrix.quadraticBezierInverse * (Vector2Matrix3x1)poly ) : throw new InvalidCastException( "Cannot cast a cubic polynomial to a quadratic curve" );
-		public static explicit operator BezierCubic2D( Polynomial2D poly ) => new(CharMatrix.cubicBezierInverse * (Vector2Matrix4x1)poly);
-		public static explicit operator CatRomCubic2D( Polynomial2D poly ) => new(CharMatrix.cubicCatmullRomInverse * (Vector2Matrix4x1)poly);
-		public static explicit operator HermiteCubic2D( Polynomial2D poly ) => new(CharMatrix.cubicHermiteInverse * (Vector2Matrix4x1)poly);
-		public static explicit operator UBSCubic2D( Polynomial2D poly ) => new(CharMatrix.cubicUniformBsplineInverse * (Vector2Matrix4x1)poly);
+		public static explicit operator BezierCubic2D( Polynomial2D poly ) => new BezierCubic2D(CharMatrix.cubicBezierInverse * (Vector2Matrix4x1)poly);
+		public static explicit operator CatRomCubic2D( Polynomial2D poly ) => new CatRomCubic2D(CharMatrix.cubicCatmullRomInverse * (Vector2Matrix4x1)poly);
+		public static explicit operator HermiteCubic2D( Polynomial2D poly ) => new HermiteCubic2D(CharMatrix.cubicHermiteInverse * (Vector2Matrix4x1)poly);
+		public static explicit operator UBSCubic2D( Polynomial2D poly ) => new UBSCubic2D(CharMatrix.cubicUniformBsplineInverse * (Vector2Matrix4x1)poly);
 
 		#endregion
 

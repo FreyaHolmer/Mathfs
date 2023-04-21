@@ -1,6 +1,5 @@
 ﻿// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
-using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using static Freya.Mathfs;
@@ -71,7 +70,7 @@ namespace Freya {
 			bool differentPosition = dist > 0.00001f;
 			float maxRad = Max( aRadius, bRadius );
 			float minRad = Min( aRadius, bRadius );
-			bool ringsTouching = MathF.Abs( dist - maxRad ) < minRad;
+			bool ringsTouching = Mathf.Abs( dist - maxRad ) < minRad;
 
 			if( ringsTouching && differentPosition ) {
 				float aRadSq = aRadius * aRadius;
@@ -101,7 +100,7 @@ namespace Freya {
 			float dist = Vector2.Distance( aPos, bPos );
 			float maxRad = Max( aRadius, bRadius );
 			float minRad = Min( aRadius, bRadius );
-			return MathF.Abs( dist - maxRad ) < minRad;
+			return Mathf.Abs( dist - maxRad ) < minRad;
 		}
 
 		/// <summary>Returns whether or not a line passes through a box centered at (0,0)</summary>

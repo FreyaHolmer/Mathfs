@@ -23,6 +23,18 @@ namespace Freya {
 		public static bool operator !=( Matrix4x1 a, Matrix4x1 b ) => !( a == b );
 		public bool Equals( Matrix4x1 other ) => m0.Equals( other.m0 ) && m1.Equals( other.m1 ) && m2.Equals( other.m2 ) && m3.Equals( other.m3 );
 		public override bool Equals( object obj ) => obj is Matrix4x1 other && Equals( other );
-		public override int GetHashCode() => HashCode.Combine( m0, m1, m2, m3 );
-	}
+		//public override int GetHashCode() => HashCode.Combine( m0, m1, m2, m3 );
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hashCode = 17;
+                hashCode = hashCode * 23 + m0.GetHashCode();
+                hashCode = hashCode * 23 + m1.GetHashCode();
+                hashCode = hashCode * 23 + m2.GetHashCode();
+                hashCode = hashCode * 23 + m3.GetHashCode();
+                return hashCode;
+            }
+        }
+    }
 }

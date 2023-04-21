@@ -48,7 +48,7 @@ namespace Freya {
 			Vector2 sum = default;
 
 			float norm = 0;
-			for( int i = 0; i < PointCount; i++ ) { // todo: unnecessary, don't do all points
+			for( int i = 0; i < PointCount; i++ ) {
 				float basis = Basis( i, Order, t );
 				if( weighted ) norm += ( basis *= weights[i] );
 				sum += points[i] * basis;

@@ -24,9 +24,8 @@ namespace Freya {
 			this.knots = knots;
 			this.degree = degree;
 			this.evalBuffer = new Vector2[degree + 1];
-			int expectedKnotCount = SplineUtils.BSplineKnotCount( this.points.Length, this.degree );
-			if( knots.Length != expectedKnotCount )
-				throw new ArgumentException( $"The knots array has to be of length (degree+pointCount+1). Got an array of {knots.Length} knots, expected {expectedKnotCount}", nameof(knots) );
+			if( knots.Length != SplineUtils.BSplineKnotCount( this.points.Length, this.degree ) )
+				throw new ArgumentException( $"The knots array has to be of length (degree+pointCount+1). Got an array of {knots.Length} knots, expected ${KnotCount}", nameof(knots) );
 		}
 
 		/// <summary>Creates a uniform B-spline of the given degree, automatically configuring the knot vector to be uniform</summary>
@@ -89,8 +88,10 @@ namespace Freya {
 
 		/// <summary>Returns the derivative of this B-spline, which is a B-spline in and of itself</summary>
 		public BSpline2D Differentiate() {
-			float[] dKnots = new float[KnotCount];
-			knots.CopyTo( dKnots, 0 );
+			// knots are the same except we remove the two outermost ones
+			float[] dKnots = new float[KnotCount - 2];
+			for( int i = 0; i < dKnots.Length; i++ )
+				dKnots[i] = knots[i + 1];
 
 			// one point less
 			Vector2[] dPts = new Vector2[PointCount - 1];

@@ -1,6 +1,5 @@
 ﻿// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
-using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using static Freya.Mathfs;
@@ -227,10 +226,10 @@ namespace Freya {
 			if( Vector3.Dot( xAxis, startTangent ).Abs() < 0.9999f ) {
 				float h = d / 2;
 				float ang = AngleBetween( xAxis, startTangent );
-				float fh = h * MathF.Tan( ang + TAU / 4 );
+				float fh = h * Mathf.Tan( ang + TAU / 4 );
 				float x2D = h;
 				float y2D = fh;
-				float r = MathF.Sqrt( h * h + fh * fh );
+				float r = Mathf.Sqrt( h * h + fh * fh );
 				Vector3 normal = Vector3.Cross( xAxis, startTangent ).normalized;
 				Vector3 yAxis = Vector3.Cross( normal, xAxis );
 				Vector3 center = startPt + xAxis * x2D + yAxis * y2D;
@@ -315,8 +314,8 @@ namespace Freya {
 
 		/// <inheritdoc cref="Circle2D.GetOsculatingCircle(Vector2,Vector2,Vector2)"/>
 		public static Circle3D GetOsculatingCircle( Vector3 point, Vector3 velocity, Vector3 acceleration ) {
-			Bivector3 curvatureBivector = GetCurvature( velocity, acceleration );
-			( Vector3 axis, float curvature ) = curvatureBivector.GetNormalAndArea();
+			Vector3 curvatureVector = GetCurvature( velocity, acceleration );
+			( Vector3 axis, float curvature ) = curvatureVector.GetDirAndMagnitude();
 			Vector3 normal = Vector3.Cross( velocity, Vector3.Cross( acceleration, velocity ) ).normalized;
 			float signedRadius = 1f / curvature;
 			return new Circle3D( point + normal * signedRadius, axis, Abs( signedRadius ) );
