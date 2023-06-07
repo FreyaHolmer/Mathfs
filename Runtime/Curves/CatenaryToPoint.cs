@@ -66,7 +66,7 @@ namespace Freya {
 					Evaluability.Unknown or _   => throw new Exception( "Failed to evaluate catenary, couldn't calculate evaluability" )
 				},
 				_ => evaluability switch {
-					Evaluability.Catenary       => EvalCatDerivByArcLength( sEval ),
+					Evaluability.Catenary       => EvalCatDerivByArcLength( sEval, nthDerivative ),
 					Evaluability.LineSegment    => nthDerivative == 1 ? p.normalized : Vector2.zero,
 					Evaluability.LinearVertical => new Vector2( 0, nthDerivative == 1 ? ( sEval < -( p.y - s ) / 2 ? -1 : 1 ) : 0 ),
 					Evaluability.Unknown or _   => throw new Exception( "Failed to evaluate catenary, couldn't calculate evaluability" )
