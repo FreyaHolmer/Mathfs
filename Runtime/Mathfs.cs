@@ -1204,12 +1204,53 @@ namespace Freya {
 		}
 
 		/// <summary>Returns the frenet-serret (curvature-based) orientation of a point in a curve with the given velocity and acceleration values, where the Z direction is tangent to the curve.
-		/// The X axis will point to the inner arc of the current curvature</summary>
+		/// The X axis will point to the inner arc of the current curvature, while Y is the axis of rotation</summary>
 		/// <param name="velocity">The first derivative of the point in the curve</param>
 		/// <param name="acceleration">The second derivative of the point in the curve</param>
 		[MethodImpl( INLINE )] public static Quaternion GetArcOrientation( Vector3 velocity, Vector3 acceleration ) {
 			Vector3 binormal = Vector3.Cross( velocity, acceleration );
 			return Quaternion.LookRotation( velocity, binormal );
+		}
+
+		/// <inheritdoc cref="GetArcOrientation(Vector3,Vector3)"/>
+		[MethodImpl( INLINE )] public static Quaternion GetArcOrientation( Vector2 velocity, Vector2 acceleration ) {
+			Vector3 binormal = new Vector3( 0, 0, Sign( Determinant( velocity, acceleration ) ) );
+			return Quaternion.LookRotation( velocity, binormal );
+		}
+
+		/// <summary>Returns the frenet-serret (curvature-based) orientation of a point in a curve with the given velocity and acceleration values, where the X direction is tangent to the curve.
+		/// The Y axis (the normal) will point to the inner arc of the current curvature, while Z is the axis of rotation</summary>
+		/// <param name="velocity">The first derivative of the point in the curve</param>
+		/// <param name="acceleration">The second derivative of the point in the curve</param>
+		[MethodImpl( INLINE )] public static Quaternion GetFrenetSerretOrientation( Vector3 velocity, Vector3 acceleration ) {
+			GetCurvatureOrientationAxes( velocity, acceleration, out _, out Vector3 N, out Vector3 B );
+			return Quaternion.LookRotation( B, N );
+		}
+
+		/// <inheritdoc cref="GetFrenetSerretOrientation(Vector3,Vector3)"/>
+		[MethodImpl( INLINE )] public static Quaternion GetFrenetSerretOrientation( Vector2 velocity, Vector2 acceleration ) {
+			GetCurvatureOrientationAxes( velocity, acceleration, out _, out Vector3 N, out Vector3 B );
+			return Quaternion.LookRotation( B, N );
+		}
+
+		/// <summary>Returns the frenet-serret (curvature-based) orientation axes of a point in a curve with the given velocity and acceleration values</summary>
+		/// <param name="velocity">The first derivative of the point in the curve</param>
+		/// <param name="acceleration">The second derivative of the point in the curve</param>
+		/// <param name="tangent">The axis pointing along the curve</param>
+		/// <param name="normal">The axis pointing to the inside of the curve</param>
+		/// <param name="binormal">The axis of rotation of the curve</param>
+		[MethodImpl( INLINE )] public static void GetCurvatureOrientationAxes( Vector3 velocity, Vector3 acceleration, out Vector3 tangent, out Vector3 normal, out Vector3 binormal ) {
+			tangent = velocity.normalized;
+			binormal = Vector3.Cross( velocity, acceleration ).normalized;
+			normal = Vector3.Cross( binormal, tangent );
+		}
+
+		/// <inheritdoc cref="GetCurvatureOrientationAxes(Vector3,Vector3,out Vector3,out Vector3,out Vector3)"/>
+		[MethodImpl( INLINE )] public static void GetCurvatureOrientationAxes( Vector2 velocity, Vector2 acceleration, out Vector3 tangent, out Vector3 normal, out Vector3 binormal ) {
+			tangent = velocity.normalized;
+			float sign = Sign( Determinant( velocity, acceleration ) );
+			binormal = new Vector3( 0, 0, sign );
+			normal = new Vector3( -sign * tangent.y, sign * tangent.x, 0 );
 		}
 
 		/// <summary>Returns the signed angle between <c>a</c> and <c>b</c>, in the range -tau/2 to tau/2 (-pi to pi)</summary>
