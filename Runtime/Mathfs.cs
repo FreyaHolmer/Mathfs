@@ -1253,6 +1253,19 @@ namespace Freya {
 			normal = new Vector3( -sign * tangent.y, sign * tangent.x, 0 );
 		}
 
+		/// <summary>Returns a 2D look-orientation (X forward), ensuring the returned Y axis is upright with regards to the up vector</summary>
+		/// <param name="forward">The forward direction of the rotation (X axis)</param>
+		/// <param name="up">The reference up direction of the rotation to align to, usually pointing along world up</param>
+		[MethodImpl( INLINE )] public static Quaternion GetLookRotation2D( Vector2 forward, Vector2 up ) {
+			int sign = Determinant( forward, up ) >= 0 ? 1 : -1;
+			Vector2 Y = new(-sign * forward.y, sign * forward.x);
+			Vector3 Z = new(0, 0, sign);
+			return Quaternion.LookRotation( Z, Y );
+		}
+
+		/// <inheritdoc cref="GetLookRotation2D(Vector2,Vector2)"/>
+		[MethodImpl( INLINE )] public static Quaternion GetLookRotation2D( Vector2 forward ) => GetLookRotation2D( forward, Vector2.up );
+
 		/// <summary>Returns the signed angle between <c>a</c> and <c>b</c>, in the range -tau/2 to tau/2 (-pi to pi)</summary>
 		[MethodImpl( INLINE )] public static float SignedAngle( Vector2 a, Vector2 b ) => AngleBetween( a, b ) * MathF.Sign( Determinant( a, b ) ); // -tau/2 to tau/2
 
