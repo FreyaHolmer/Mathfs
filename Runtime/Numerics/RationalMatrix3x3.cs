@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Freya {
 
-	/// <summary>A 4x4 matrix using exact rational number representation</summary>
+	/// <summary>A 3x3 matrix using exact rational number representation</summary>
 	public readonly struct RationalMatrix3x3 {
 
 		public static readonly RationalMatrix3x3 Identity = new RationalMatrix3x3( 1, 0, 0, 0, 1, 0, 0, 0, 1 );
