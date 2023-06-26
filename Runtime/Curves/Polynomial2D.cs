@@ -43,7 +43,7 @@ namespace Freya {
 			this.x = new Polynomial( c0.x, c1.x, c2.x );
 			this.y = new Polynomial( c0.y, c1.y, c2.y );
 		}
-		
+
 		/// <inheritdoc cref="Polynomial(float,float)"/>
 		public Polynomial2D( Vector2 c0, Vector2 c1 ) {
 			this.x = new Polynomial( c0.x, c1.x, 0, 0 );
@@ -67,6 +67,16 @@ namespace Freya {
 
 		/// <inheritdoc cref="Polynomial.Compose(float,float)"/>
 		public Polynomial2D Compose( float g0, float g1 ) => new(x.Compose( g0, g1 ), y.Compose( g0, g1 ));
+
+		/// <inheritdoc cref="Polynomial.ScaleParameterSpace(float)"/>
+		public Polynomial2D ScaleParameterSpace( float factor ) {
+			float factor2 = factor * factor;
+			float factor3 = factor2 * factor;
+			return new Polynomial2D(
+				new Polynomial( x.c0, x.c1 / factor, x.c2 / factor2, x.c3 / factor3 ),
+				new Polynomial( y.c0, y.c1 / factor, y.c2 / factor2, y.c3 / factor3 )
+			);
+		}
 
 		/// <summary>Returns the tight axis-aligned bounds of the curve in the unit interval</summary>
 		public Rect GetBounds01() => FloatRange.ToRect( x.OutputRange01, y.OutputRange01 );

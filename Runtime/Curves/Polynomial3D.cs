@@ -71,6 +71,17 @@ namespace Freya {
 		/// <inheritdoc cref="Polynomial.Compose(float,float)"/>
 		public Polynomial3D Compose( float g0, float g1 ) => new(x.Compose( g0, g1 ), y.Compose( g0, g1 ), z.Compose( g0, g1 ));
 
+		/// <inheritdoc cref="Polynomial.ScaleParameterSpace(float)"/>
+		public Polynomial3D ScaleParameterSpace( float factor ) {
+			float factor2 = factor * factor;
+			float factor3 = factor2 * factor;
+			return new Polynomial3D(
+				new Polynomial( x.c0, x.c1 / factor, x.c2 / factor2, x.c3 / factor3 ),
+				new Polynomial( y.c0, y.c1 / factor, y.c2 / factor2, y.c3 / factor3 ),
+				new Polynomial( z.c0, z.c1 / factor, z.c2 / factor2, z.c3 / factor3 )
+			);
+		}
+
 		/// <inheritdoc cref="Polynomial2D.GetBounds01"/>
 		public Bounds GetBounds01() => FloatRange.ToBounds( x.OutputRange01, y.OutputRange01, z.OutputRange01 );
 

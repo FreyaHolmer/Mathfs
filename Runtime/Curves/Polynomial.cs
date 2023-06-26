@@ -127,6 +127,19 @@ namespace Freya {
 			);
 		}
 
+		/// <summary>Scales the parameter space by a factor. For example, the output in the interval [0 to 1] will now be in the range [0 to factor]</summary>
+		/// <param name="factor">The factor to scale the input parameters by</param>
+		public Polynomial ScaleParameterSpace( float factor ) {
+			float factor2 = factor * factor;
+			float factor3 = factor2 * factor;
+			return new Polynomial(
+				c0,
+				c1 / factor,
+				c2 / factor2,
+				c3 / factor3
+			);
+		}
+
 		/// <summary>Splits the 0-1 range into two distinct polynomials at the given parameter value u, where both new curves cover the same total range with their individual 0-1 ranges</summary>
 		/// <param name="u">The parameter value to split at</param>
 		public (Polynomial pre, Polynomial post) Split01( float u ) {
