@@ -184,12 +184,12 @@ namespace Freya {
 	public partial struct Box2D {
 		/// <summary>Returns whether or not a point is inside this box</summary>
 		/// <param name="point">The point to test if it's inside</param>
-		[MethodImpl( INLINE )] public bool Contains( Vector2 point ) => Abs( point.x ) - extents.x <= 0 && Abs( point.y ) - extents.y <= 0;
+		[MethodImpl( INLINE )] public bool Contains( Vector2 point ) => Abs( point.x - center.x ) - extents.x <= 0 && Abs( point.y - center.y ) - extents.y <= 0;
 	}
 
 	public partial struct Box3D {
 		/// <inheritdoc cref="Box2D.Contains"/>
-		[MethodImpl( INLINE )] public bool Contains( Vector3 point ) => Abs( point.x ) - extents.x <= 0 && Abs( point.y ) - extents.y <= 0 && Abs( point.z ) - extents.z <= 0;
+		[MethodImpl( INLINE )] public bool Contains( Vector3 point ) => Abs( point.x - center.x ) - extents.x <= 0 && Abs( point.y - center.y ) - extents.y <= 0 && Abs( point.z - center.z ) - extents.z <= 0;
 	}
 
 	#endregion
