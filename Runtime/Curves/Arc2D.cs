@@ -4,12 +4,11 @@ using UnityEngine;
 namespace Freya {
 
 	/// <summary>a 2D arc with support for straight lines</summary>
+	[Serializable]
 	public struct Arc2D {
 
 		/// <summary>The starting point of the arc</summary>
-		public Vector2 startPoint;
-		/// <summary>The normalized tangent direction at the start of the arc</summary>
-		public Vector2 startTangent;
+		public Transform2D placement;
 		/// <summary>The signed curvature of the arc, equal to 1/radius (0 = straight line, 1 = turning left, -1 = turning right)</summary>
 		public float curvature;
 		/// <summary>The length of the arc</summary>
@@ -20,7 +19,9 @@ namespace Freya {
 		/// <summary>The center of the circle traced by the arc. Returns infinity if this segment is linear, ie: if curvature is 0</summary>
 		public Vector2 CircleCenter => StartNormal / curvature;
 		/// <summary>The normal direction at the start of the arc</summary>
-		public Vector2 StartNormal => startTangent.Rotate90CCW();
+		public Vector2 StartNormal => placement.AxisY;
+		/// <summary>The tangent direction at the start of the arc</summary>
+		public Vector2 StartTangent => placement.AxisX;
 		/// <summary>The normal direction at the end of the arc</summary>
 		public Vector2 EndNormal => GetNormal( length );
 		/// <summary>The end point of the arc</summary>
@@ -34,7 +35,7 @@ namespace Freya {
 		public Vector2 GetPosition( float s ) => Eval( s, nThDerivative: 0 );
 
 		/// <summary>Evaluates the tangent direction of this arc at the given arc length <c>s</c></summary>
-		public Vector2 GetTangent( float s ) => s == 0 ? startTangent : Eval( s, nThDerivative: 1 ); // no need to normalize, it's already arc-length parameterized
+		public Vector2 GetTangent( float s ) => s == 0 ? StartTangent : Eval( s, nThDerivative: 1 ); // no need to normalize, it's already arc-length parameterized
 
 		/// <summary>Evaluates the normal direction of this arc at the given arc length <c>s</c></summary>
 		public Vector2 GetNormal( float s ) => Eval( s, nThDerivative: 1 ).Rotate90CCW(); // no need to normalize, it's already arc-length parameterized
@@ -48,10 +49,7 @@ namespace Freya {
 				case 0:
 					x = s * Mathfs.Sinc( ang );
 					y = s * Mathfs.Cosinc( ang );
-					return new Vector2(
-						startPoint.x + startTangent.x * x + StartNormal.x * y,
-						startPoint.y + startTangent.y * x + StartNormal.y * y
-					);
+					return placement.TransformPoint( x, y );
 				case 1:
 					x = MathF.Cos( ang );
 					y = MathF.Sin( ang );
@@ -88,10 +86,7 @@ namespace Freya {
 			}
 
 			// space transformation
-			return new Vector2(
-				startTangent.x * x + StartNormal.x * y,
-				startTangent.y * x + StartNormal.y * y
-			);
+			return placement.TransformVector( x, y );
 		}
 
 	}
