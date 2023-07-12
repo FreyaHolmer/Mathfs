@@ -22,6 +22,18 @@ namespace Freya {
 			( this.m20, this.m21, this.m22 ) = ( m20, m21, m22 );
 		}
 
+		public Matrix3x3( Vector3 col0, Vector3 col1, Vector3 col2 ) {
+			m00 = col0.x;
+			m10 = col0.y;
+			m20 = col0.z;
+			m01 = col1.x;
+			m11 = col1.y;
+			m21 = col1.z;
+			m02 = col2.x;
+			m12 = col2.y;
+			m22 = col2.z;
+		}
+
 		public Matrix3x3( Matrix4x4 m ) {
 			( this.m00, this.m01, this.m02 ) = ( m.m00, m.m01, m.m02 );
 			( this.m10, this.m11, this.m12 ) = ( m.m10, m.m11, m.m12 );
