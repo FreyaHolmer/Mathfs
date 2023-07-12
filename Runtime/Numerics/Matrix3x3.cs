@@ -163,6 +163,14 @@ namespace Freya {
 
 		public static Vector4Matrix3x1 operator *( Matrix3x3 c, Vector4Matrix3x1 m ) => new(c * m.X, c * m.Y, c * m.Z, c * m.W);
 
+		public float AverageScale() {
+			return (
+				MathF.Sqrt( m00 * m00 + m10 * m10 + m20 * m20 ) +
+				MathF.Sqrt( m01 * m01 + m11 * m11 + m21 * m21 ) +
+				MathF.Sqrt( m02 * m02 + m12 * m12 + m22 * m22 )
+			) / 3;
+		}
+
 	}
 
 }
