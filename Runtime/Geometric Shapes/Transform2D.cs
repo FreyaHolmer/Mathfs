@@ -1,8 +1,10 @@
+using System;
 using UnityEngine;
 
 namespace Freya {
 
 	/// <summary>An orthonormal affine 2D transformation</summary>
+	[Serializable]
 	public struct Transform2D {
 
 		public float origin_x, origin_y;
@@ -40,12 +42,28 @@ namespace Freya {
 			);
 		}
 
+		/// <inheritdoc cref="TransformPoint(Vector2)"/>
+		public Vector2 TransformPoint( float x, float y ) {
+			return new( // unrolled for performance
+				origin_x + axisX_x * x + AxisY_x * y,
+				origin_y + axisX_y * x + AxisY_y * y
+			);
+		}
+
 		/// <summary>Transforms a local vector to a world space vector, not taking position into account</summary>
 		/// <param name="vec">The local space vector to transform</param>
 		public Vector2 TransformVector( Vector2 vec ) {
 			return new( // unrolled for performance
 				axisX_x * vec.x + AxisY_x * vec.y,
 				axisX_y * vec.x + AxisY_y * vec.y
+			);
+		}
+
+		/// <inheritdoc cref="TransformVector(Vector2)"/>
+		public Vector2 TransformVector( float x, float y ) {
+			return new( // unrolled for performance
+				axisX_x * x + AxisY_x * y,
+				axisX_y * x + AxisY_y * y
 			);
 		}
 
@@ -66,6 +84,13 @@ namespace Freya {
 			return new(
 				axisX_x * vec.x + axisX_y * vec.y,
 				AxisY_x * vec.x + AxisY_y * vec.y
+			);
+		}
+
+		public static Transform2D operator *( Transform2D a, Transform2D b ) {
+			return new Transform2D(
+				a.TransformPoint( b.origin_x, b.origin_y ),
+				a.TransformVector( b.axisX_x, b.axisX_y )
 			);
 		}
 
