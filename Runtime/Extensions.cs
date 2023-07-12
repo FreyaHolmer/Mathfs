@@ -542,6 +542,14 @@ namespace Freya {
 
 		#region Matrix extensions
 
+		public static float AverageScale( this Matrix4x4 m ) {
+			return (
+				( (Vector3)m.GetColumn( 0 ) ).magnitude +
+				( (Vector3)m.GetColumn( 1 ) ).magnitude +
+				( (Vector3)m.GetColumn( 2 ) ).magnitude
+			) / 3;
+		}
+
 		public static Matrix4x1 MultiplyColumnVector( this Matrix4x4 m, Matrix4x1 v ) =>
 			new Matrix4x1(
 				m.m00 * v.m0 + m.m01 * v.m1 + m.m02 * v.m2 + m.m03 * v.m3,
