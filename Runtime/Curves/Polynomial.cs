@@ -308,10 +308,10 @@ namespace Freya {
 			if( ValueAlmost0( rootContent ) )
 				return new ResultsMax2<float>( -b / ( 2 * a ) ); // two equivalent solutions at one point
 
-			if( rootContent >= 0 ) {
-				float root = MathF.Sqrt( rootContent );
-				float r0 = ( -b - root ) / ( 2 * a ); // crosses at two points
-				float r1 = ( -b + root ) / ( 2 * a );
+			if( rootContent >= 0 ) { // crosses at two points
+				float u = -b * -( b < 0 ? -1 : 1 ) * MathF.Sqrt( rootContent );
+				float r0 = u / ( 2 * a ); 
+				float r1 = ( 2 * c ) / u;
 				return new ResultsMax2<float>( MathF.Min( r0, r1 ), MathF.Max( r0, r1 ) );
 			}
 
