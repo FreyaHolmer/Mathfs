@@ -309,6 +309,9 @@ namespace Freya {
 			return new Circle2D( point + normal * signedRadius, Abs( signedRadius ) );
 		}
 
+		public static Circle2D operator *( Circle2D circle, float value ) => new(circle.center * value, circle.radius * value);
+		public static Circle2D operator *( float value, Circle2D circle ) => new(circle.center * value, circle.radius * value);
+
 	}
 
 	public partial struct Circle3D {
