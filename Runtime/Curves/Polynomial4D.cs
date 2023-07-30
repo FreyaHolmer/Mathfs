@@ -7,6 +7,9 @@ namespace Freya {
 
 	public struct Polynomial4D : IParamCurve3Diff<Vector4> {
 
+		/// <inheritdoc cref="Polynomial.NaN"/>
+		public static readonly Polynomial4D NaN = new Polynomial4D { x = Polynomial.NaN, y = Polynomial.NaN, z = Polynomial.NaN, w = Polynomial.NaN };
+
 		public Polynomial x;
 		public Polynomial y;
 		public Polynomial z;

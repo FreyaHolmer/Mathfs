@@ -8,6 +8,9 @@ namespace Freya {
 	[Serializable]
 	public struct Polynomial2D : IParamCurve3Diff<Vector2> {
 
+		/// <inheritdoc cref="Polynomial.NaN"/>
+		public static readonly Polynomial2D NaN = new Polynomial2D { x = Polynomial.NaN, y = Polynomial.NaN };
+
 		public Polynomial x;
 		public Polynomial y;
 

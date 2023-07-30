@@ -15,6 +15,9 @@ namespace Freya {
 
 		/// <summary>A polynomial with all 0 coefficients. f(x) = 0</summary>
 		public static readonly Polynomial zero = new Polynomial( 0, 0, 0, 0 );
+		
+		/// <summary>A polynomial with all NaN coefficients</summary>
+		public static readonly Polynomial NaN = new Polynomial( float.NaN, float.NaN, float.NaN, float.NaN );
 
 		/// <summary>The cubic coefficient</summary>
 		[FormerlySerializedAs( "fCubic" )] public float c3;
