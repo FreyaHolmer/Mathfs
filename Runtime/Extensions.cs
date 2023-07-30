@@ -107,9 +107,14 @@ namespace Freya {
 		/// Equivalent to <c>v.normalized*mag</c></summary>
 		[MethodImpl( INLINE )] public static Vector2 WithMagnitude( this Vector2 v, float mag ) => v.normalized * mag;
 
-		/// <summary>Returns a vector with the same direction, but with the given magnitude.
-		/// Equivalent to <c>v.normalized*mag</c></summary>
+		/// <inheritdoc cref="WithMagnitude(Vector2,float)"/>
 		[MethodImpl( INLINE )] public static Vector3 WithMagnitude( this Vector3 v, float mag ) => v.normalized * mag;
+
+		/// <summary>Returns a vector with the same direction, but extending the magnitude by the given amount</summary>
+		[MethodImpl( INLINE )] public static Vector2 AddMagnitude( this Vector2 v, float extraMagnitude ) => v * ( 1 + extraMagnitude / v.magnitude );
+
+		/// <inheritdoc cref="AddMagnitude(Vector2,float)"/>
+		[MethodImpl( INLINE )] public static Vector3 AddMagnitude( this Vector3 v, float extraMagnitude ) => v * ( 1 + extraMagnitude / v.magnitude );
 
 		/// <summary>Returns the vector going from one position to another, also known as the displacement.
 		/// Equivalent to <c>target-v</c></summary>
