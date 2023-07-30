@@ -46,9 +46,9 @@ namespace Freya {
 		/// <param name="v">The value to get the normalized position of</param>
 		public float InverseLerp( float v ) => Mathfs.InverseLerp( a, b, v );
 
-		/// <summary>Returns whether or not this range contains the value <c>v</c></summary>
+		/// <summary>Returns whether or not this range contains the value <c>v</c> (inclusive)</summary>
 		/// <param name="v">The value to see if it's inside</param>
-		public bool Contains( float v ) => v >= Min && v <= Max;
+		public bool Contains( float v ) => v >= MathF.Min( a, b ) && v <= MathF.Max( a, b );
 
 		/// <summary>Returns whether or not this range contains the range <c>r</c></summary>
 		/// <param name="r">The range to see if it's inside</param>
