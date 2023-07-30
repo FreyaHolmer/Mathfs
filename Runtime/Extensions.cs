@@ -51,6 +51,13 @@ namespace Freya {
 		/// <param name="q">The quaternion to get the components of</param>
 		[MethodImpl( INLINE )] public static Vector4 ToVector4( this Quaternion q ) => new Vector4( q.x, q.y, q.z, q.w );
 
+		/// <summary>Converts to a rotation vector (axis-angle where the angle is embedded in the magnitude, in radians)</summary>
+		/// <param name="q">The quaternion to get the rotation vector of</param>
+		[MethodImpl( INLINE )] public static Vector3 ToRotationVector( this Quaternion q ) {
+			q.ToAngleAxis( out float angDeg, out Vector3 axis );
+			return axis * ( angDeg * Mathf.Deg2Rad );
+		}
+
 		#endregion
 
 		#region Swizzling
