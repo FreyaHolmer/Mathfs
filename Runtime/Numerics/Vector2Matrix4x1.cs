@@ -28,5 +28,6 @@ namespace Freya {
 		public bool Equals( Vector2Matrix4x1 other ) => m0.Equals( other.m0 ) && m1.Equals( other.m1 ) && m2.Equals( other.m2 ) && m3.Equals( other.m3 );
 		public override bool Equals( object obj ) => obj is Vector2Matrix4x1 other && Equals( other );
 		public override int GetHashCode() => HashCode.Combine( m0, m1, m2, m3 );
+		public override string ToString() => $"[{m0}]\n[{m1}]\n[{m2}]\n[{m3}]";
 	}
 }

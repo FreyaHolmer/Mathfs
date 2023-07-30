@@ -251,6 +251,8 @@ namespace Freya {
 					code.Append( $"public bool Equals( {typeName} other ) => {equalsCompare};" );
 					code.Append( $"public override bool Equals( object obj ) => obj is {typeName} other && Equals( other );" );
 					code.Append( $"public override int GetHashCode() => HashCode.Combine( {csParams} );" );
+					string stringPrint = JoinRange( "\\n", i => $"[{{m{i}}}]" );
+					code.Append( $"public override string ToString() => $\"{stringPrint}\";" );
 				}
 			}
 
