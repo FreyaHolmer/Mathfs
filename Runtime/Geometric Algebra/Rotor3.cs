@@ -76,6 +76,16 @@ namespace Freya {
 			);
 		}
 
+		public static Rotor3 operator *( Rotor3 a, Bivector3 b ) {
+			return new Rotor3(
+				a.yz * b.yz + a.zx * b.zx + a.xy * b.xy,
+				a.r * b.yz - a.zx * b.xy + a.xy * b.zx,
+				a.r * b.zx + a.yz * b.xy + -a.xy * b.yz,
+				a.r * b.xy - a.yz * b.zx + a.zx * b.yz
+			);
+		}
+
+
 		public static Rotor3 operator /( Rotor3 a, float b ) {
 			return new Rotor3( a.r / b, a.yz / b, a.zx / b, a.xy / b );
 		}
