@@ -73,6 +73,9 @@ namespace Freya {
 
 		/// <inheritdoc cref="Polynomial.ScaleParameterSpace(float)"/>
 		public Polynomial2D ScaleParameterSpace( float factor ) {
+			// ReSharper disable once CompareOfFloatsByEqualityOperator
+			if( factor == 1f )
+				return this;
 			float factor2 = factor * factor;
 			float factor3 = factor2 * factor;
 			return new Polynomial2D(

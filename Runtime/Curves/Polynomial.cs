@@ -133,6 +133,9 @@ namespace Freya {
 		/// <summary>Scales the parameter space by a factor. For example, the output in the interval [0 to 1] will now be in the range [0 to factor]</summary>
 		/// <param name="factor">The factor to scale the input parameters by</param>
 		public Polynomial ScaleParameterSpace( float factor ) {
+			// ReSharper disable once CompareOfFloatsByEqualityOperator
+			if( factor == 1f )
+				return this;
 			float factor2 = factor * factor;
 			float factor3 = factor2 * factor;
 			return new Polynomial(
@@ -313,7 +316,7 @@ namespace Freya {
 
 			if( rootContent >= 0 ) { // crosses at two points
 				float u = -b * -( b < 0 ? -1 : 1 ) * MathF.Sqrt( rootContent );
-				float r0 = u / ( 2 * a ); 
+				float r0 = u / ( 2 * a );
 				float r1 = ( 2 * c ) / u;
 				return new ResultsMax2<float>( MathF.Min( r0, r1 ), MathF.Max( r0, r1 ) );
 			}

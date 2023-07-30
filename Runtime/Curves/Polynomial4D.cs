@@ -77,9 +77,12 @@ namespace Freya {
 
 		/// <inheritdoc cref="Polynomial.Compose(float,float)"/>
 		public Polynomial4D Compose( float g0, float g1 ) => new(x.Compose( g0, g1 ), y.Compose( g0, g1 ), z.Compose( g0, g1 ), w.Compose( g0, g1 ));
-		
+
 		/// <inheritdoc cref="Polynomial.ScaleParameterSpace(float)"/>
 		public Polynomial4D ScaleParameterSpace( float factor ) {
+			// ReSharper disable once CompareOfFloatsByEqualityOperator
+			if( factor == 1f )
+				return this;
 			float factor2 = factor * factor;
 			float factor3 = factor2 * factor;
 			return new Polynomial4D(
