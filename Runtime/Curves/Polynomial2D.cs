@@ -71,6 +71,49 @@ namespace Freya {
 		/// <inheritdoc cref="Polynomial.Compose(float,float)"/>
 		public Polynomial2D Compose( float g0, float g1 ) => new(x.Compose( g0, g1 ), y.Compose( g0, g1 ));
 
+		/// <inheritdoc cref="Polynomial.FitCubicFrom0(float,float,float,float,float,float,float)"/>
+		public static Polynomial2D FitCubicFrom0( float x1, float x2, float x3, Vector2 y0, Vector2 y1, Vector2 y2, Vector2 y3 ) {
+			// precalcs
+			float i12 = x2 - x1;
+			float i13 = x3 - x1;
+			float i23 = x3 - x2;
+			float x1x2 = x1 * x2;
+			float x1x3 = x1 * x3;
+			float x2x3 = x2 * x3;
+			float x1x2x3 = x1 * x2x3;
+			float x0plusx1plusx2 = x1 + x2;
+			float x0plusx1plusx3 = x1 + x3;
+			float x2plusx3 = x2 + x3;
+			float x1plusx2plusx3 = x1 + x2plusx3;
+			float x1x2plusx1x3plusx2x3 = ( x1x2 + x1x3 + x2x3 );
+
+			// scale factors
+			Vector2 scl0 = y0 / -( x1 * x2 * x3 );
+			Vector2 scl1 = y1 / +( x1 * i12 * i13 );
+			Vector2 scl2 = y2 / -( x2 * i12 * i23 );
+			Vector2 scl3 = y3 / +( x3 * i13 * i23 );
+
+			// polynomial form
+			Vector2 c0 = new(
+				-( scl0.x * x1x2x3 ),
+				-( scl0.y * x1x2x3 )
+			);
+			Vector2 c1 = new(
+				scl0.x * x1x2plusx1x3plusx2x3 + scl1.x * x2x3 + scl2.x * x1x3 + scl3.x * x1x2,
+				scl0.y * x1x2plusx1x3plusx2x3 + scl1.y * x2x3 + scl2.y * x1x3 + scl3.y * x1x2
+			);
+			Vector2 c2 = new(
+				-( scl0.x * x1plusx2plusx3 + scl1.x * x2plusx3 + scl2.x * x0plusx1plusx3 + scl3.x * x0plusx1plusx2 ),
+				-( scl0.y * x1plusx2plusx3 + scl1.y * x2plusx3 + scl2.y * x0plusx1plusx3 + scl3.y * x0plusx1plusx2 )
+			);
+			Vector2 c3 = new(
+				scl0.x + scl1.x + scl2.x + scl3.x,
+				scl0.y + scl1.y + scl2.y + scl3.y
+			);
+
+			return new Polynomial2D( c0, c1, c2, c3 );
+		}
+
 		/// <inheritdoc cref="Polynomial.ScaleParameterSpace(float)"/>
 		public Polynomial2D ScaleParameterSpace( float factor ) {
 			// ReSharper disable once CompareOfFloatsByEqualityOperator

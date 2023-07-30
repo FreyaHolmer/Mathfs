@@ -130,6 +130,78 @@ namespace Freya {
 			);
 		}
 
+		/// <summary>Fits a cubic polynomial to pass through the given coordinates</summary>
+		public static Polynomial FitCubic( float x0, float x1, float x2, float x3, float y0, float y1, float y2, float y3 ) {
+			// precalcs
+			float i01 = x1 - x0;
+			float i02 = x2 - x0;
+			float i03 = x3 - x0;
+			float i12 = x2 - x1;
+			float i13 = x3 - x1;
+			float i23 = x3 - x2;
+			float x0x1 = x0 * x1;
+			float x0x2 = x0 * x2;
+			float x0x3 = x0 * x3;
+			float x1x2 = x1 * x2;
+			float x1x3 = x1 * x3;
+			float x2x3 = x2 * x3;
+			float x1x2x3 = x1 * x2x3;
+			float x0x2x3 = x0 * x2x3;
+			float x0x1x3 = x0 * x1x3;
+			float x0x1x2 = x0 * x1x2;
+			float x0plusx1 = x0 + x1;
+			float x0plusx1plusx2 = x0plusx1 + x2;
+			float x0plusx1plusx3 = x0plusx1 + x3;
+			float x2plusx3 = x2 + x3;
+			float x0plusx2plusx3 = x0 + x2plusx3;
+			float x1plusx2plusx3 = x1 + x2plusx3;
+			float x1x2plusx1x3plusx2x3 = ( x1x2 + x1x3 + x2x3 );
+			float x0x2plusx0x3plusx2x3 = ( x0x2 + x0x3 + x2x3 );
+			float x0x1plusx0x3plusx1x3 = ( x0x1 + x0x3 + x1x3 );
+			float x0x1plusx0x2plusx1x2 = ( x0x1 + x0x2 + x1x2 );
+
+			// scale factors
+			float scl0 = -( y0 / ( i01 * i02 * i03 ) );
+			float scl1 = +( y1 / ( i01 * i12 * i13 ) );
+			float scl2 = -( y2 / ( i02 * i12 * i23 ) );
+			float scl3 = +( y3 / ( i03 * i13 * i23 ) );
+
+			// polynomial form
+			float c0 = -( scl0 * x1x2x3 + scl1 * x0x2x3 + scl2 * x0x1x3 + scl3 * x0x1x2 );
+			float c1 = scl0 * x1x2plusx1x3plusx2x3 + scl1 * x0x2plusx0x3plusx2x3 + scl2 * x0x1plusx0x3plusx1x3 + scl3 * x0x1plusx0x2plusx1x2;
+			float c2 = -( scl0 * x1plusx2plusx3 + scl1 * x0plusx2plusx3 + scl2 * x0plusx1plusx3 + scl3 * x0plusx1plusx2 );
+			float c3 = scl0 + scl1 + scl2 + scl3;
+
+			return new Polynomial( (float)c0, (float)c1, (float)c2, (float)c3 );
+		}
+
+		/// <summary>Fits a cubic polynomial to pass through the given coordinates, assuming x0 = 0</summary>
+		public static Polynomial FitCubicFrom0( float x1, float x2, float x3, float y0, float y1, float y2, float y3 ) {
+			// precalcs
+			float i12 = x2 - x1;
+			float i13 = x3 - x1;
+			float i23 = x3 - x2;
+			float x1x2 = x1 * x2;
+			float x1x3 = x1 * x3;
+			float x2x3 = x2 * x3;
+			float x1x2x3 = x1 * x2x3;
+			float x2plusx3 = x2 + x3;
+
+			// scale factors
+			float scl0 = -( y0 / ( x1 * x2 * x3 ) );
+			float scl1 = +( y1 / ( x1 * i12 * i13 ) );
+			float scl2 = -( y2 / ( x2 * i12 * i23 ) );
+			float scl3 = +( y3 / ( x3 * i13 * i23 ) );
+
+			// polynomial form
+			float c0 = -( scl0 * x1x2x3 );
+			float c1 = scl0 * ( x1x2 + x1x3 + x2x3 ) + scl1 * x2x3 + scl2 * x1x3 + scl3 * x1x2;
+			float c2 = -( scl0 * ( x2plusx3 + x1 ) + scl1 * ( x2plusx3 ) + scl2 * ( x1 + x3 ) + scl3 * ( x1 + x2 ) );
+			float c3 = scl0 + scl1 + scl2 + scl3;
+
+			return new Polynomial( c0, c1, c2, c3 );
+		}
+
 		/// <summary>Scales the parameter space by a factor. For example, the output in the interval [0 to 1] will now be in the range [0 to factor]</summary>
 		/// <param name="factor">The factor to scale the input parameters by</param>
 		public Polynomial ScaleParameterSpace( float factor ) {

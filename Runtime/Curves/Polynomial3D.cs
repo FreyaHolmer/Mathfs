@@ -74,6 +74,53 @@ namespace Freya {
 		/// <inheritdoc cref="Polynomial.Compose(float,float)"/>
 		public Polynomial3D Compose( float g0, float g1 ) => new(x.Compose( g0, g1 ), y.Compose( g0, g1 ), z.Compose( g0, g1 ));
 
+		/// <inheritdoc cref="Polynomial.FitCubicFrom0(float,float,float,float,float,float,float)"/>
+		public static Polynomial3D FitCubicFrom0( float x1, float x2, float x3, Vector3 y0, Vector3 y1, Vector3 y2, Vector3 y3 ) {
+			// precalcs
+			float i12 = x2 - x1;
+			float i13 = x3 - x1;
+			float i23 = x3 - x2;
+			float x1x2 = x1 * x2;
+			float x1x3 = x1 * x3;
+			float x2x3 = x2 * x3;
+			float x1x2x3 = x1 * x2x3;
+			float x0plusx1plusx2 = x1 + x2;
+			float x0plusx1plusx3 = x1 + x3;
+			float x2plusx3 = x2 + x3;
+			float x1plusx2plusx3 = x1 + x2plusx3;
+			float x1x2plusx1x3plusx2x3 = ( x1x2 + x1x3 + x2x3 );
+
+			// scale factors
+			Vector3 scl0 = y0 / -( x1 * x2 * x3 );
+			Vector3 scl1 = y1 / +( x1 * i12 * i13 );
+			Vector3 scl2 = y2 / -( x2 * i12 * i23 );
+			Vector3 scl3 = y3 / +( x3 * i13 * i23 );
+
+			// polynomial form
+			Vector3 c0 = new(
+				-( scl0.x * x1x2x3 ),
+				-( scl0.y * x1x2x3 ),
+				-( scl0.z * x1x2x3 )
+			);
+			Vector3 c1 = new(
+				scl0.x * x1x2plusx1x3plusx2x3 + scl1.x * x2x3 + scl2.x * x1x3 + scl3.x * x1x2,
+				scl0.y * x1x2plusx1x3plusx2x3 + scl1.y * x2x3 + scl2.y * x1x3 + scl3.y * x1x2,
+				scl0.z * x1x2plusx1x3plusx2x3 + scl1.z * x2x3 + scl2.z * x1x3 + scl3.z * x1x2
+			);
+			Vector3 c2 = new(
+				-( scl0.x * x1plusx2plusx3 + scl1.x * x2plusx3 + scl2.x * x0plusx1plusx3 + scl3.x * x0plusx1plusx2 ),
+				-( scl0.y * x1plusx2plusx3 + scl1.y * x2plusx3 + scl2.y * x0plusx1plusx3 + scl3.y * x0plusx1plusx2 ),
+				-( scl0.z * x1plusx2plusx3 + scl1.z * x2plusx3 + scl2.z * x0plusx1plusx3 + scl3.z * x0plusx1plusx2 )
+			);
+			Vector3 c3 = new(
+				scl0.x + scl1.x + scl2.x + scl3.x,
+				scl0.y + scl1.y + scl2.y + scl3.y,
+				scl0.z + scl1.z + scl2.z + scl3.z
+			);
+
+			return new Polynomial3D( c0, c1, c2, c3 );
+		}
+
 		/// <inheritdoc cref="Polynomial.ScaleParameterSpace(float)"/>
 		public Polynomial3D ScaleParameterSpace( float factor ) {
 			// ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -194,6 +241,14 @@ namespace Freya {
 		public static Polynomial3D operator /( Polynomial3D p, float v ) => new(p.C0 / v, p.C1 / v, p.C2 / v, p.C3 / v);
 		public static Polynomial3D operator *( Polynomial3D p, float v ) => new(p.C0 * v, p.C1 * v, p.C2 * v, p.C3 * v);
 		public static Polynomial3D operator *( float v, Polynomial3D p ) => p * v;
+
+		public override string ToString() {
+			string s = "";
+			s += x + "\n";
+			s += y + "\n";
+			s += z;
+			return s;
+		}
 
 		public static explicit operator Polynomial2D( Polynomial3D p ) => new(p.x, p.y);
 		public static explicit operator Vector3Matrix3x1( Polynomial3D poly ) => new(poly.C0, poly.C1, poly.C2);
