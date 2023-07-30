@@ -572,6 +572,7 @@ namespace Freya {
 
 		public static Vector2Matrix4x1 MultiplyColumnVector( this Matrix4x4 m, Vector2Matrix4x1 v ) => new(m.MultiplyColumnVector( v.X ), m.MultiplyColumnVector( v.Y ));
 		public static Vector3Matrix4x1 MultiplyColumnVector( this Matrix4x4 m, Vector3Matrix4x1 v ) => new(m.MultiplyColumnVector( v.X ), m.MultiplyColumnVector( v.Y ), m.MultiplyColumnVector( v.Z ));
+		public static Vector4Matrix4x1 MultiplyColumnVector( this Matrix4x4 m, Vector4Matrix4x1 v ) => new(m.MultiplyColumnVector( v.X ), m.MultiplyColumnVector( v.Y ), m.MultiplyColumnVector( v.Z ), m.MultiplyColumnVector( v.W ));
 
 		#endregion
 
