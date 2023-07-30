@@ -36,10 +36,10 @@ namespace Freya {
 
 		public static float CalcCatRomKnot( float squaredDistance, float alpha ) =>
 			alpha switch {
-				0 => 1, // uniform
-				1 => squaredDistance.Sqrt(), // chordal
-				2 => squaredDistance, // centripetal
-				_ => squaredDistance.Pow( 0.5f * alpha )
+				0    => 1, // uniform
+				0.5f => squaredDistance, // centripetal
+				1    => squaredDistance.Sqrt(), // chordal
+				_    => squaredDistance.Pow( 0.5f * alpha )
 			};
 
 		static readonly Matrix4x1 knotsUniformUnit = new(-1, 0, 1, 2);
@@ -187,13 +187,13 @@ namespace Freya {
 			float p2sc = ( i02 * i12sq * i23 );
 			float p3sc = ( i12 * i13 * i23 );
 
-			float m20 = (-k1 - 2 * k2) / p0sc;
-			float m21 = (common - k1k1 + k1k2) / p1sc;
-			float m22 = (-common - k2k2 + k1k2) / p2sc;
-			float m23 = (2 * k1 + k2) / p3sc;
+			float m20 = ( -k1 - 2 * k2 ) / p0sc;
+			float m21 = ( common - k1k1 + k1k2 ) / p1sc;
+			float m22 = ( -common - k2k2 + k1k2 ) / p2sc;
+			float m23 = ( 2 * k1 + k2 ) / p3sc;
 			float m30 = 1f / p0sc;
-			float m31 = (k3 - k0) / p1sc;
-			float m32 = (k0 - k3) / p2sc;
+			float m31 = ( k3 - k0 ) / p1sc;
+			float m32 = ( k0 - k3 ) / p2sc;
 			float m33 = -1f / p3sc;
 
 			return p0 * ( ( m20 + 3 * m30 ) / m23 ) +
