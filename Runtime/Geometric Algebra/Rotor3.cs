@@ -28,42 +28,55 @@ namespace Freya {
 			this.b = b;
 		}
 
+		public Rotor3( Vector3 a, Vector3 b ) {
+			// constructs a rotor by multiplying two vectors
+			this.r = Vector3.Dot( a, b );
+			this.b = Mathfs.Wedge( a, b );
+		}
+
 		public float Magnitude => MathF.Sqrt( SqrMagnitude );
 		public float SqrMagnitude => r * r + b.SqrMagnitude;
 
 		public Rotor3 Normalized() => this / Magnitude;
 
+		public Quaternion ToQuaternion() => new(yz, zx, xy, r);
+
 		/// <summary>Negates the bivector, which is equivalent to reversing the rotation,
 		/// if this is normalized an interpreted as a rotation</summary>
 		public Rotor3 Conjugate => new Rotor3( r, -b );
 
-		/// <summary>Sandwich product, equivalent to RvR* (where R* is the conjugate of R).
+		/// <summary>Sandwich product, equivalent to (R*v*R*)* (where R* is the conjugate of R and v* is the hodge dual of v).
 		/// Commonly used to rotate vectors with unit rotors</summary>
 		/// <param name="v">The vector to multiply (or rotate)</param>
 		public Vector3 SandwichConjugate( Vector3 v ) {
-			// todo: untested
-			float r2 = r * r;
-			float yz2 = yz * yz;
-			float zx2 = zx * zx;
-			float xy2 = xy * xy;
-			float yzzx = yz * zx;
-			float zxxy = zx * xy;
-			float xyyz = xy * yz;
-			float rxy = r * xy;
-			float rzx = r * zx;
-			float ryz = r * yz;
 
-			return new Vector3(
-				v.x * ( r2 + yz2 - zx2 - xy2 )
-				+ 2 * v.y * ( yzzx + rxy )
-				+ 2 * v.z * ( xyyz - rzx ),
-				v.y * ( r2 - yz2 + zx2 - xy2 )
-				+ 2 * v.x * ( yzzx - rxy )
-				+ 2 * v.z * ( ryz + zxxy ),
-				v.z * ( r2 - yz2 - zx2 + xy2 )
-				+ 2 * v.x * ( rzx + xyyz )
-				+ 2 * v.y * ( zxxy - ryz )
-			);
+			Bivector3 vHodge = new( v.x, v.y, v.z );
+			Rotor3 bivecPost = this.Conjugate * vHodge * this;
+			return bivecPost.b.Normal;
+
+			// // todo: does not work - this does R v* R* instead of R* v* R
+			// float r2 = r * r;
+			// float yz2 = yz * yz;
+			// float zx2 = zx * zx;
+			// float xy2 = xy * xy;
+			// float yzzx = yz * zx;
+			// float zxxy = zx * xy;
+			// float xyyz = xy * yz;
+			// float rxy = r * xy;
+			// float rzx = r * zx;
+			// float ryz = r * yz;
+			//
+			// return new Vector3(
+			// 	v.x * ( r2 + yz2 - zx2 - xy2 )
+			// 	+ 2 * v.y * ( yzzx + rxy )
+			// 	+ 2 * v.z * ( xyyz - rzx ),
+			// 	v.y * ( r2 - yz2 + zx2 - xy2 )
+			// 	+ 2 * v.x * ( yzzx - rxy )
+			// 	+ 2 * v.z * ( ryz + zxxy ),
+			// 	v.z * ( r2 - yz2 - zx2 + xy2 )
+			// 	+ 2 * v.x * ( rzx + xyyz )
+			// 	+ 2 * v.y * ( zxxy - ryz )
+			// );
 		}
 
 		// multiplication

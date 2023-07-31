@@ -26,7 +26,7 @@ namespace Freya {
 
 		public float Magnitude => MathF.Sqrt( SqrMagnitude );
 		public Bivector3 Normalized => new Bivector3( yz, zx, xy ) / Magnitude;
-		public Vector3 Normal => new Vector3( yz, zx, xy ) / Magnitude;
+		public Vector3 Normal => new Vector3( yz, zx, xy ) / Magnitude; // todo: rename to hodge dual?
 		public float SqrMagnitude => yz * yz + zx * zx + xy * xy;
 
 		/// <inheritdoc cref="Dot(Bivector3,Bivector3)"/>
