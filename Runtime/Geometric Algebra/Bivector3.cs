@@ -26,7 +26,8 @@ namespace Freya {
 
 		public float Magnitude => MathF.Sqrt( SqrMagnitude );
 		public Bivector3 Normalized => new Bivector3( yz, zx, xy ) / Magnitude;
-		public Vector3 Normal => new Vector3( yz, zx, xy ) / Magnitude; // todo: rename to hodge dual?
+		public Vector3 Normal => HodgeDual.normalized;
+		public Vector3 HodgeDual => new Vector3( yz, zx, xy );
 		public float SqrMagnitude => yz * yz + zx * zx + xy * xy;
 
 		/// <inheritdoc cref="Dot(Bivector3,Bivector3)"/>
@@ -46,7 +47,7 @@ namespace Freya {
 				xy: a.zx * b.yz - a.yz * b.zx );
 
 		/// <summary>Returns the normal of this bivector plane and its area</summary>
-		public (Vector3 normal, float area) GetNormalAndArea() => ( (Vector3)this ).GetDirAndMagnitude();
+		public (Vector3 normal, float area) GetNormalAndArea() => HodgeDual.GetDirAndMagnitude();
 
 		// Multiplication
 		public static Bivector3 operator -( Bivector3 b ) => new Bivector3( -b.yz, -b.zx, -b.xy );
@@ -57,6 +58,14 @@ namespace Freya {
 			new(
 				r: Dot( a, b ),
 				b: Wedge( a, b )
+			);
+
+		public Rotor3 Square() =>
+			new(
+				-yz * yz - zx * zx - xy * xy,
+				yz: xy * zx - zx * xy,
+				zx: yz * xy - xy * yz,
+				xy: zx * yz - yz * zx
 			);
 
 		public static Multivector3 operator *( Bivector3 a, Vector3 b ) {

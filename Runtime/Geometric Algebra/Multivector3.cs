@@ -77,6 +77,19 @@ namespace Freya {
 			);
 		}
 
+		public static Multivector3 operator *( Multivector3 m, Rotor3 r ) {
+			return new Multivector3(
+				m.r * r.r + m.yz * r.yz + m.zx * r.zx + m.xy * r.xy,
+				m.x * r.r - m.y * r.xy + m.z * r.zx - m.xyz * r.yz,
+				+m.x * r.xy + m.y * r.r - m.z * r.yz - m.xyz * r.zx,
+				-m.x * r.zx + m.y * r.yz + m.z * r.r - m.xyz * r.xy,
+				m.r * r.yz + m.yz * r.r - m.zx * r.xy + m.xy * r.zx,
+				m.r * r.zx + m.yz * r.xy + m.zx * r.r - m.xy * r.yz,
+				m.r * r.xy - m.yz * r.zx + m.zx * r.yz + m.xy * r.r,
+				m.x * r.yz + m.y * r.zx + m.z * r.xy + m.xyz * r.r
+			);
+		}
+
 		public static Bivector3 Wedge( Multivector3 a, Multivector3 b ) =>
 			new Bivector3(
 				a.r * b.yz + a.x * b.xyz + a.y * b.z - a.z * b.y + a.yz * b.r - a.zx * b.xy + a.xy * b.zx + a.xyz * b.x,
