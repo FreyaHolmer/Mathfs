@@ -366,7 +366,7 @@ namespace Freya {
 		}
 
 		/// <summary>Returns the natural logarithm of a quaternion</summary>
-		public static Quaternion Log( this Quaternion q ) {
+		public static Quaternion Ln( this Quaternion q ) {
 			double vMagSq = (double)q.x * q.x + (double)q.y * q.y + (double)q.z * q.z;
 			double vMag = Math.Sqrt( vMagSq );
 			double qMag = Math.Sqrt( vMagSq + (double)q.w * q.w );
@@ -389,10 +389,40 @@ namespace Freya {
 			return new Quaternion( (float)( scV * v.x ), (float)( scV * v.y ), (float)( scV * v.z ), (float)( sc * Math.Cos( vMag ) ) );
 		}
 
+		/// <summary>Returns the quaternion raised to a real power</summary>
+		public static Quaternion Pow( this Quaternion q, float x ) {
+			double vSqMag = q.x * q.x + q.y * q.y + q.z * q.z;
+			double rSqMag = q.w * q.w;
+			double vMag = Math.Sqrt( vSqMag );
+			double qMag = Math.Sqrt( rSqMag + vSqMag );
+			double nx = q.x / vMag;
+			double ny = q.y / vMag;
+			double nz = q.z / vMag;
+			double ang = Math.Acos( ( q.w / qMag ).ClampNeg1to1() );
+			double theta = ang * x;
+			double magPow = Math.Pow( qMag, x );
+			double cos = magPow * Math.Cos( theta );
+			double sin = magPow * Math.Sin( theta );
+			return new Quaternion( (float)( sin * nx ), (float)( sin * ny ), (float)( sin * nz ), (float)cos );
+		}
+
+		/// <summary>Returns the squared magnitude of this quaternion</summary>
+		public static float SqrMagnitude( this Quaternion q ) => (float)( (double)q.w * q.w + (double)q.x * q.x + (double)q.y * q.y + (double)q.z * q.z );
+
+		/// <summary>Returns the magnitude of this quaternion</summary>
+		public static float Magnitude( this Quaternion q ) => MathF.Sqrt( q.SqrMagnitude() );
+
 		/// <summary>Multiplies a quaternion by a scalar</summary>
 		/// <param name="q">The quaternion to multiply</param>
 		/// <param name="c">The scalar value to multiply with</param>
 		public static Quaternion Mul( this Quaternion q, float c ) => new Quaternion( c * q.x, c * q.y, c * q.z, c * q.w );
+
+		/// <summary>Adds a quaternion to an existing quaternion</summary>
+		public static Quaternion Add( this Quaternion a, Quaternion b ) => new Quaternion( a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w );
+
+		/// <summary>The conjugate of a quaternion</summary>
+		/// <param name="q">The quaternion to conjugate</param>
+		public static Quaternion Conjugate( this Quaternion q ) => new Quaternion( -q.x, -q.y, -q.z, q.w );
 
 		/// <inheritdoc cref="Quaternion.Inverse(Quaternion)"/>
 		public static Quaternion Inverse( this Quaternion q ) => Quaternion.Inverse( q );
