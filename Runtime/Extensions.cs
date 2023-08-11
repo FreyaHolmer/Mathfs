@@ -680,6 +680,9 @@ namespace Freya {
 		/// <inheritdoc cref="Mathfs.ClampNeg1to1(float)"/>
 		[MethodImpl( INLINE )] public static float ClampNeg1to1( this float value ) => Mathfs.ClampNeg1to1( value );
 
+		/// <inheritdoc cref="Mathfs.ClampNeg1to1(float)"/>
+		[MethodImpl( INLINE )] public static double ClampNeg1to1( this double value ) => Mathfs.ClampNeg1to1( value );
+
 		/// <inheritdoc cref="Mathfs.ClampNeg1to1(Vector2)"/>
 		[MethodImpl( INLINE )] public static Vector2 ClampNeg1to1( this Vector2 v ) => Mathfs.ClampNeg1to1( v );
 

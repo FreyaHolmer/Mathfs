@@ -415,6 +415,9 @@ namespace Freya {
 			);
 
 		/// <summary>Clamps the value between -1 and 1</summary>
+		public static double ClampNeg1to1( double value ) => value < -1.0 ? -1.0 : value > 1.0 ? 1.0 : value;
+		
+		/// <summary>Clamps the value between -1 and 1</summary>
 		public static float ClampNeg1to1( float value ) => value < -1f ? -1f : value > 1f ? 1f : value;
 
 		/// <summary>Clamps each component between -1 and 1</summary>
