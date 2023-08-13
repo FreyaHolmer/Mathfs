@@ -420,6 +420,9 @@ namespace Freya {
 		/// <summary>Adds a quaternion to an existing quaternion</summary>
 		public static Quaternion Add( this Quaternion a, Quaternion b ) => new Quaternion( a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w );
 
+		/// <summary>Subtracts a quaternion from an existing quaternion</summary>
+		public static Quaternion Sub( this Quaternion a, Quaternion b ) => new Quaternion( a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w );
+
 		/// <summary>The conjugate of a quaternion</summary>
 		/// <param name="q">The quaternion to conjugate</param>
 		public static Quaternion Conjugate( this Quaternion q ) => new Quaternion( -q.x, -q.y, -q.z, q.w );
