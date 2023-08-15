@@ -1,37 +1,19 @@
 // by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
 using System;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace Freya {
 
-	public struct Polynomial3D : IParamCurve3Diff<Vector3> {
+	public struct Polynomial3D : IPolynomialCubic<Polynomial3D, Vector3>, IParamCurve3Diff<Vector3> {
+
+		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 
 		/// <inheritdoc cref="Polynomial.NaN"/>
 		public static readonly Polynomial3D NaN = new Polynomial3D { x = Polynomial.NaN, y = Polynomial.NaN, z = Polynomial.NaN };
 
-		public Polynomial x;
-		public Polynomial y;
-		public Polynomial z;
-
-		public Vector3 C0 {
-			get => new(x.c0, y.c0, z.c0);
-			set => ( x.c0, y.c0, z.c0 ) = ( value.x, value.y, value.z );
-		}
-		public Vector3 C1 {
-			get => new(x.c1, y.c1, z.c1);
-			set => ( x.c1, y.c1, z.c1 ) = ( value.x, value.y, value.z );
-		}
-		public Vector3 C2 {
-			get => new(x.c2, y.c2, z.c2);
-			set => ( x.c2, y.c2, z.c2 ) = ( value.x, value.y, value.z );
-		}
-		public Vector3 C3 {
-			get => new(x.c3, y.c3, z.c3);
-			set => ( x.c3, y.c3, z.c3 ) = ( value.x, value.y, value.z );
-		}
-
-		public Polynomial this[ int i ] => i switch { 0 => x, 1 => y, 2 => z, _ => throw new IndexOutOfRangeException( "Polynomial3D component index has to be either 0, 1, or 2" ) };
+		public Polynomial x, y, z;
 
 		public Polynomial3D( Polynomial x, Polynomial y, Polynomial z ) => ( this.x, this.y, this.z ) = ( x, y, z );
 
@@ -62,17 +44,79 @@ namespace Freya {
 		/// <inheritdoc cref="Polynomial(Matrix4x1)"/>
 		public Polynomial3D( Vector3Matrix3x1 coefficients ) => ( x, y, z ) = ( new Polynomial( coefficients.X ), new Polynomial( coefficients.Y ), new Polynomial( coefficients.Z ) );
 
-		/// <inheritdoc cref="Polynomial.Eval(float)"/>
-		public Vector3 Eval( float t ) => new(x.Eval( t ), y.Eval( t ), z.Eval( t ));
+		#region IPolynomialCubic
 
-		/// <inheritdoc cref="Polynomial.Eval(float,int)"/>
-		public Vector3 Eval( float t, int n ) => Differentiate( n ).Eval( t );
+		public Vector3 C0 {
+			[MethodImpl( INLINE )] get => new(x.c0, y.c0, z.c0);
+			[MethodImpl( INLINE )] set => ( x.c0, y.c0, z.c0 ) = ( value.x, value.y, value.z );
+		}
+		public Vector3 C1 {
+			[MethodImpl( INLINE )] get => new(x.c1, y.c1, z.c1);
+			[MethodImpl( INLINE )] set => ( x.c1, y.c1, z.c1 ) = ( value.x, value.y, value.z );
+		}
+		public Vector3 C2 {
+			[MethodImpl( INLINE )] get => new(x.c2, y.c2, z.c2);
+			[MethodImpl( INLINE )] set => ( x.c2, y.c2, z.c2 ) = ( value.x, value.y, value.z );
+		}
+		public Vector3 C3 {
+			[MethodImpl( INLINE )] get => new(x.c3, y.c3, z.c3);
+			[MethodImpl( INLINE )] set => ( x.c3, y.c3, z.c3 ) = ( value.x, value.y, value.z );
+		}
 
-		/// <inheritdoc cref="Polynomial.Differentiate(int)"/>
-		public Polynomial3D Differentiate( int n = 1 ) => new(x.Differentiate( n ), y.Differentiate( n ), z.Differentiate( n ));
+		public Polynomial this[ int i ] {
+			get { return i switch { 0 => x, 1         => y, 2         => z, _         => throw new IndexOutOfRangeException( "Polynomial3D component index has to be either 0, 1, or 2" ) }; }
+			set => _ = i switch { 0   => x = value, 1 => y = value, 2 => z = value, _ => throw new IndexOutOfRangeException() };
+		}
 
-		/// <inheritdoc cref="Polynomial.Compose(float,float)"/>
+		[MethodImpl( INLINE )] public Vector3 GetCoefficient( int degree ) =>
+			degree switch {
+				0 => C0,
+				1 => C1,
+				2 => C2,
+				3 => C3,
+				_ => throw new IndexOutOfRangeException( "Polynomial coefficient degree/index has to be between 0 and 3" )
+			};
+
+		[MethodImpl( INLINE )] public void SetCoefficient( int degree, Vector3 value ) {
+			_ = degree switch {
+				0 => C0 = value,
+				1 => C1 = value,
+				2 => C2 = value,
+				3 => C3 = value,
+				_ => throw new IndexOutOfRangeException( "Polynomial coefficient degree/index has to be between 0 and 3" )
+			};
+		}
+
+		public Vector3 Eval( float t ) {
+			float t2 = t * t;
+			float t3 = t2 * t;
+			return new Vector3(
+				x.c3 * t3 + x.c2 * t2 + x.c1 * t + x.c0,
+				y.c3 * t3 + y.c2 * t2 + y.c1 * t + y.c0,
+				z.c3 * t3 + z.c2 * t2 + z.c1 * t + z.c0
+			);
+		}
+
+		[MethodImpl( INLINE )] public Vector3 Eval( float t, int n ) => Differentiate( n ).Eval( t );
+
+		[MethodImpl( INLINE )] public Polynomial3D Differentiate( int n = 1 ) => new(x.Differentiate( n ), y.Differentiate( n ), z.Differentiate( n ));
+
+		public Polynomial3D ScaleParameterSpace( float factor ) {
+			// ReSharper disable once CompareOfFloatsByEqualityOperator
+			if( factor == 1f )
+				return this;
+			float factor2 = factor * factor;
+			float factor3 = factor2 * factor;
+			return new Polynomial3D(
+				new Polynomial( x.c0, x.c1 / factor, x.c2 / factor2, x.c3 / factor3 ),
+				new Polynomial( y.c0, y.c1 / factor, y.c2 / factor2, y.c3 / factor3 ),
+				new Polynomial( z.c0, z.c1 / factor, z.c2 / factor2, z.c3 / factor3 )
+			);
+		}
+
 		public Polynomial3D Compose( float g0, float g1 ) => new(x.Compose( g0, g1 ), y.Compose( g0, g1 ), z.Compose( g0, g1 ));
+
+		#endregion
 
 		/// <inheritdoc cref="Polynomial.FitCubicFrom0(float,float,float,float,float,float,float)"/>
 		public static Polynomial3D FitCubicFrom0( float x1, float x2, float x3, Vector3 y0, Vector3 y1, Vector3 y2, Vector3 y3 ) {
@@ -121,19 +165,6 @@ namespace Freya {
 			return new Polynomial3D( c0, c1, c2, c3 );
 		}
 
-		/// <inheritdoc cref="Polynomial.ScaleParameterSpace(float)"/>
-		public Polynomial3D ScaleParameterSpace( float factor ) {
-			// ReSharper disable once CompareOfFloatsByEqualityOperator
-			if( factor == 1f )
-				return this;
-			float factor2 = factor * factor;
-			float factor3 = factor2 * factor;
-			return new Polynomial3D(
-				new Polynomial( x.c0, x.c1 / factor, x.c2 / factor2, x.c3 / factor3 ),
-				new Polynomial( y.c0, y.c1 / factor, y.c2 / factor2, y.c3 / factor3 ),
-				new Polynomial( z.c0, z.c1 / factor, z.c2 / factor2, z.c3 / factor3 )
-			);
-		}
 
 		/// <inheritdoc cref="Polynomial2D.GetBounds01"/>
 		public Bounds GetBounds01() => FloatRange.ToBounds( x.OutputRange01, y.OutputRange01, z.OutputRange01 );

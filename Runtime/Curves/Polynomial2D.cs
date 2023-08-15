@@ -1,37 +1,20 @@
 // by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
 using System;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace Freya {
 
 	[Serializable]
-	public struct Polynomial2D : IParamCurve3Diff<Vector2> {
+	public struct Polynomial2D : IPolynomialCubic<Polynomial2D, Vector2>, IParamCurve3Diff<Vector2> {
+
+		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 
 		/// <inheritdoc cref="Polynomial.NaN"/>
 		public static readonly Polynomial2D NaN = new Polynomial2D { x = Polynomial.NaN, y = Polynomial.NaN };
 
-		public Polynomial x;
-		public Polynomial y;
-
-		public Vector2 C0 {
-			get => new(x.c0, y.c0);
-			set => ( x.c0, y.c0 ) = ( value.x, value.y );
-		}
-		public Vector2 C1 {
-			get => new(x.c1, y.c1);
-			set => ( x.c1, y.c1 ) = ( value.x, value.y );
-		}
-		public Vector2 C2 {
-			get => new(x.c2, y.c2);
-			set => ( x.c2, y.c2 ) = ( value.x, value.y );
-		}
-		public Vector2 C3 {
-			get => new(x.c3, y.c3);
-			set => ( x.c3, y.c3 ) = ( value.x, value.y );
-		}
-
-		public Polynomial this[ int i ] => i switch { 0 => x, 1 => y, _ => throw new IndexOutOfRangeException( "Polynomial2D component index has to be either 0 or 1" ) };
+		public Polynomial x, y;
 
 		public Polynomial2D( Polynomial x, Polynomial y ) => ( this.x, this.y ) = ( x, y );
 
@@ -59,17 +42,77 @@ namespace Freya {
 		/// <inheritdoc cref="Polynomial(Matrix4x1)"/>
 		public Polynomial2D( Vector2Matrix3x1 coefficients ) => ( x, y ) = ( new Polynomial( coefficients.X ), new Polynomial( coefficients.Y ) );
 
-		/// <inheritdoc cref="Polynomial.Eval(float)"/>
-		public Vector2 Eval( float t ) => new(x.Eval( t ), y.Eval( t ));
+		#region IPolynomialCubic
 
-		/// <inheritdoc cref="Polynomial.Eval(float,int)"/>
-		public Vector2 Eval( float t, int n ) => Differentiate( n ).Eval( t );
+		public Vector2 C0 {
+			[MethodImpl( INLINE )] get => new(x.c0, y.c0);
+			[MethodImpl( INLINE )] set => ( x.c0, y.c0 ) = ( value.x, value.y );
+		}
+		public Vector2 C1 {
+			[MethodImpl( INLINE )] get => new(x.c1, y.c1);
+			[MethodImpl( INLINE )] set => ( x.c1, y.c1 ) = ( value.x, value.y );
+		}
+		public Vector2 C2 {
+			[MethodImpl( INLINE )] get => new(x.c2, y.c2);
+			[MethodImpl( INLINE )] set => ( x.c2, y.c2 ) = ( value.x, value.y );
+		}
+		public Vector2 C3 {
+			[MethodImpl( INLINE )] get => new(x.c3, y.c3);
+			[MethodImpl( INLINE )] set => ( x.c3, y.c3 ) = ( value.x, value.y );
+		}
 
-		/// <inheritdoc cref="Polynomial.Differentiate(int)"/>
-		public Polynomial2D Differentiate( int n = 1 ) => new(x.Differentiate( n ), y.Differentiate( n ));
+		public Polynomial this[ int i ] {
+			get { return i switch { 0 => x, 1         => y, _         => throw new IndexOutOfRangeException( "Polynomial2D component index has to be either 0 or 1" ) }; }
+			set => _ = i switch { 0   => x = value, 1 => y = value, _ => throw new IndexOutOfRangeException() };
+		}
 
-		/// <inheritdoc cref="Polynomial.Compose(float,float)"/>
+		[MethodImpl( INLINE )] public Vector2 GetCoefficient( int degree ) =>
+			degree switch {
+				0 => C0,
+				1 => C1,
+				2 => C2,
+				3 => C3,
+				_ => throw new IndexOutOfRangeException( "Polynomial coefficient degree/index has to be between 0 and 3" )
+			};
+
+		[MethodImpl( INLINE )] public void SetCoefficient( int degree, Vector2 value ) {
+			_ = degree switch {
+				0 => C0 = value,
+				1 => C1 = value,
+				2 => C2 = value,
+				3 => C3 = value,
+				_ => throw new IndexOutOfRangeException( "Polynomial coefficient degree/index has to be between 0 and 3" )
+			};
+		}
+
+		public Vector2 Eval( float t ) {
+			float t2 = t * t;
+			float t3 = t2 * t;
+			return new Vector2(
+				x.c3 * t3 + x.c2 * t2 + x.c1 * t + x.c0,
+				y.c3 * t3 + y.c2 * t2 + y.c1 * t + y.c0
+			);
+		}
+
+		[MethodImpl( INLINE )] public Vector2 Eval( float t, int n ) => Differentiate( n ).Eval( t );
+
+		[MethodImpl( INLINE )] public Polynomial2D Differentiate( int n = 1 ) => new(x.Differentiate( n ), y.Differentiate( n ));
+
+		public Polynomial2D ScaleParameterSpace( float factor ) {
+			// ReSharper disable once CompareOfFloatsByEqualityOperator
+			if( factor == 1f )
+				return this;
+			float factor2 = factor * factor;
+			float factor3 = factor2 * factor;
+			return new Polynomial2D(
+				new Polynomial( x.c0, x.c1 / factor, x.c2 / factor2, x.c3 / factor3 ),
+				new Polynomial( y.c0, y.c1 / factor, y.c2 / factor2, y.c3 / factor3 )
+			);
+		}
+
 		public Polynomial2D Compose( float g0, float g1 ) => new(x.Compose( g0, g1 ), y.Compose( g0, g1 ));
+
+		#endregion
 
 		/// <inheritdoc cref="Polynomial.FitCubicFrom0(float,float,float,float,float,float,float)"/>
 		public static Polynomial2D FitCubicFrom0( float x1, float x2, float x3, Vector2 y0, Vector2 y1, Vector2 y2, Vector2 y3 ) {
@@ -114,18 +157,6 @@ namespace Freya {
 			return new Polynomial2D( c0, c1, c2, c3 );
 		}
 
-		/// <inheritdoc cref="Polynomial.ScaleParameterSpace(float)"/>
-		public Polynomial2D ScaleParameterSpace( float factor ) {
-			// ReSharper disable once CompareOfFloatsByEqualityOperator
-			if( factor == 1f )
-				return this;
-			float factor2 = factor * factor;
-			float factor3 = factor2 * factor;
-			return new Polynomial2D(
-				new Polynomial( x.c0, x.c1 / factor, x.c2 / factor2, x.c3 / factor3 ),
-				new Polynomial( y.c0, y.c1 / factor, y.c2 / factor2, y.c3 / factor3 )
-			);
-		}
 
 		/// <summary>Returns the tight axis-aligned bounds of the curve in the unit interval</summary>
 		public Rect GetBounds01() => FloatRange.ToRect( x.OutputRange01, y.OutputRange01 );
