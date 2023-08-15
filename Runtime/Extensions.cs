@@ -505,6 +505,10 @@ namespace Freya {
 		/// <summary>The y axis range of this rectangle</summary>
 		/// <param name="rect">The rectangle to get the y range of</param>
 		public static FloatRange RangeY( this Rect rect ) => ( rect.yMin, rect.yMax );
+		
+		/// <summary>Places the center of this rectangle at its position,
+		/// useful together with the constructor to define it by center instead of by corner</summary>
+		public static Rect ByCenter( this Rect r ) => new Rect( r ) { center = r.position };
 
 		#endregion
 
