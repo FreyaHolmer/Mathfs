@@ -380,17 +380,41 @@ namespace Freya {
 			);
 		}
 
+		/// <summary>Returns the natural logarithm of a unit quaternion</summary>
+		public static Quaternion LnUnit( this Quaternion q ) {
+			double vMagSq = (double)q.x * q.x + (double)q.y * q.y + (double)q.z * q.z;
+			double vMag = Math.Sqrt( vMagSq );
+			double theta = Math.Atan2( vMag, q.w );
+			double scV = vMag < 0.01f ? Mathfs.SincRcp( theta ) : theta / vMag;
+			return new Quaternion(
+				(float)( scV * q.x ),
+				(float)( scV * q.y ),
+				(float)( scV * q.z ),
+				0f
+			);
+		}
+
 		/// <summary>Returns the natural exponent of a quaternion</summary>
 		public static Quaternion Exp( this Quaternion q ) {
-			Vector3 v = new(q.x, q.y, q.z);
-			double vMag = Math.Sqrt( (double)v.x * v.x + (double)v.y * v.y + (double)v.z * v.z );
+			double vMag = Math.Sqrt( (double)q.x * q.x + (double)q.y * q.y + (double)q.z * q.z );
 			double sc = Math.Exp( q.w );
 			double scV = sc * Mathfs.Sinc( vMag );
-			return new Quaternion( (float)( scV * v.x ), (float)( scV * v.y ), (float)( scV * v.z ), (float)( sc * Math.Cos( vMag ) ) );
+			return new Quaternion( (float)( scV * q.x ), (float)( scV * q.y ), (float)( scV * q.z ), (float)( sc * Math.Cos( vMag ) ) );
+		}
+
+		/// <summary>Returns the natural exponent of a pure imaginary quaternion</summary>
+		public static Quaternion ExpPureIm( this Quaternion q ) {
+			double vMag = Math.Sqrt( (double)q.x * q.x + (double)q.y * q.y + (double)q.z * q.z );
+			double scV = Mathfs.Sinc( vMag );
+			return new Quaternion( (float)( scV * q.x ), (float)( scV * q.y ), (float)( scV * q.z ), (float)Math.Cos( vMag ) );
 		}
 
 		/// <summary>Returns the quaternion raised to a real power</summary>
 		public static Quaternion Pow( this Quaternion q, float x ) {
+			switch( x ) {
+				case 0f: return new Quaternion( 0, 0, 0, 1 );
+				case 1f: return q;
+			}
 			double vSqMag = q.x * q.x + q.y * q.y + q.z * q.z;
 			double rSqMag = q.w * q.w;
 			double vMag = Math.Sqrt( vSqMag );
@@ -403,6 +427,24 @@ namespace Freya {
 			double magPow = Math.Pow( qMag, x );
 			double cos = magPow * Math.Cos( theta );
 			double sin = magPow * Math.Sin( theta );
+			return new Quaternion( (float)( sin * nx ), (float)( sin * ny ), (float)( sin * nz ), (float)cos );
+		}
+
+		/// <summary>Returns the unit quaternion raised to a real power</summary>
+		public static Quaternion PowUnit( this Quaternion q, float x ) {
+			switch( x ) {
+				case 0f: return new Quaternion( 0, 0, 0, 1 );
+				case 1f: return q;
+			}
+			double vSqMag = q.x * q.x + q.y * q.y + q.z * q.z;
+			double vMag = Math.Sqrt( vSqMag );
+			double nx = q.x / vMag;
+			double ny = q.y / vMag;
+			double nz = q.z / vMag;
+			double ang = Math.Acos( q.w.ClampNeg1to1() );
+			double theta = ang * x;
+			double cos = Math.Cos( theta );
+			double sin = Math.Sin( theta );
 			return new Quaternion( (float)( sin * nx ), (float)( sin * ny ), (float)( sin * nz ), (float)cos );
 		}
 
@@ -505,7 +547,7 @@ namespace Freya {
 		/// <summary>The y axis range of this rectangle</summary>
 		/// <param name="rect">The rectangle to get the y range of</param>
 		public static FloatRange RangeY( this Rect rect ) => ( rect.yMin, rect.yMax );
-		
+
 		/// <summary>Places the center of this rectangle at its position,
 		/// useful together with the constructor to define it by center instead of by corner</summary>
 		public static Rect ByCenter( this Rect r ) => new Rect( r ) { center = r.position };
