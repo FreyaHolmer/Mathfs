@@ -130,14 +130,13 @@ namespace Freya {
 			// Now we've got a catenary on our hands unless something explodes.
 			float c = MathF.Sqrt( s * s - p.y * p.y );
 			float pAbsX = p.x.Abs(); // solve only in x > 0
-			float R( float a ) => 2 * a * Mathfs.Sinh( pAbsX / ( 2 * a ) ) - c; // set up root solve function
 
 			// find bounds of the root
 			float xRoot = ( p.x * p.x ) / ( 2 * s ); // intial guess based on freya's flawless heuristics
-			if( TryFindRootBounds( R, xRoot, out FloatRange xRange ) ) {
+			if( TryFindRootBounds( pAbsX, c, xRoot, out FloatRange xRange ) ) {
 				// refine range, if necessary (which is very likely)
 				if( Mathfs.Approximately( xRange.Length, 0 ) == false )
-					RootFindBisections( R, ref xRange, BISECT_REFINE_COUNT ); // Catenary seems valid, with roots inside, refine the range
+					RootFindBisections( pAbsX, c, ref xRange, BISECT_REFINE_COUNT ); // Catenary seems valid, with roots inside, refine the range
 				a = xRange.Center; // set a to the middle of the latest range
 				delta = CalcCatenaryDelta( a, p ); // find delta to pass through both points
 				arcLenSampleOffset = CalcArcLenSampleOffset( delta.x, a );
@@ -148,6 +147,9 @@ namespace Freya {
 				evaluability = Evaluability.LineSegment;
 			}
 		}
+
+		// root solve function
+		static float R( float a, float pAbsX, float c ) => 2 * a * Mathfs.Sinh( pAbsX / ( 2 * a ) ) - c;
 
 		// Calculates the arc length offset so that it's relative to the start of the chain when evaluating by arc length
 		static float CalcArcLenSampleOffset( float deltaX, float a ) => Catenary.EvalArcLen( -deltaX, a );
@@ -162,8 +164,8 @@ namespace Freya {
 
 		// presumes a decreasing function with one root in x > 0
 		// g = initial guess
-		static bool TryFindRootBounds( Func<float, float> R, float g, out FloatRange xRange ) {
-			float y = R( g );
+		static bool TryFindRootBounds( float pAbsX, float c, float g, out FloatRange xRange ) {
+			float y = R( pAbsX, c, g );
 			xRange = new FloatRange( g, g );
 			if( Mathfs.Approximately( y, 0 ) ) // somehow landed *on* our root in our initial guess
 				return true;
@@ -176,7 +178,7 @@ namespace Freya {
 					// exponentially search for upper bound
 					xRange.a = xRange.b;
 					xRange.b = g * MathF.Pow( 2, n );
-					y = R( xRange.b );
+					y = R( xRange.b, pAbsX, c );
 					if( y < 0 )
 						return true; // upper bound found!
 				} else {
@@ -184,7 +186,7 @@ namespace Freya {
 					// exponentially search for lower bound
 					xRange.b = xRange.a;
 					xRange.a = g * MathF.Pow( 2, -n );
-					y = R( xRange.a );
+					y = R( xRange.a, pAbsX, c );
 					if( y > 0 )
 						return true; // lower bound found!
 				}
@@ -193,14 +195,14 @@ namespace Freya {
 			return false; // no root found
 		}
 
-		static void RootFindBisections( Func<float, float> F, ref FloatRange xRange, int iterationCount ) {
+		static void RootFindBisections( float pAbsX, float c, ref FloatRange xRange, int iterationCount ) {
 			for( int i = 0; i < iterationCount; i++ )
-				RootFindBisection( F, ref xRange );
+				RootFindBisection( pAbsX, c, ref xRange );
 		}
 
-		static void RootFindBisection( Func<float, float> F, ref FloatRange xRange ) {
+		static void RootFindBisection( float pAbsX, float c, ref FloatRange xRange ) {
 			float xInter = xRange.Center; // bisection
-			float yInter = F( xInter );
+			float yInter = R( xInter, pAbsX, c );
 			if( yInter > 0 )
 				xRange.a = xInter; // adjust left bound
 			else
