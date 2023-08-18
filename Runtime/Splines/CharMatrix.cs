@@ -38,6 +38,13 @@ namespace Freya {
 			-1, 3, -3, 1
 		) / 2;
 
+		public static readonly Polynomial[] cubicCatmullRomBasisFunctions = {
+			GetBasisFunction( cubicCatmullRom, 0 ),
+			GetBasisFunction( cubicCatmullRom, 1 ),
+			GetBasisFunction( cubicCatmullRom, 2 ),
+			GetBasisFunction( cubicCatmullRom, 3 )
+		};
+
 		/// <summary>The characteristic matrix of a uniform cubic B-spline curve</summary>
 		public static readonly RationalMatrix4x4 cubicUniformBspline = new RationalMatrix4x4(
 			1, 4, 1, 0,
@@ -100,7 +107,7 @@ namespace Freya {
 				_ => throw new IndexOutOfRangeException( "Basis index needs to be between 0 and 3" )
 			};
 		}
-		
+
 		/// <inheritdoc cref="GetBasisFunction(RationalMatrix4x4,int)"/>
 		public static Polynomial GetBasisFunction( Matrix4x4 c, int i ) {
 			return i switch {
