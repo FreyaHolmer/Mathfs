@@ -115,6 +115,15 @@ namespace Freya {
 			};
 		}
 
+		public static explicit operator Matrix4x4( RationalMatrix4x4 c ) {
+			return CharMatrix.Create(
+				(float)c.m00, (float)c.m01, (float)c.m02, (float)c.m03,
+				(float)c.m10, (float)c.m11, (float)c.m12, (float)c.m13,
+				(float)c.m20, (float)c.m21, (float)c.m22, (float)c.m23,
+				(float)c.m30, (float)c.m31, (float)c.m32, (float)c.m33
+			);
+		}
+
 		public static RationalMatrix4x4 operator *( RationalMatrix4x4 c, Rational v ) =>
 			new(c.m00 * v, c.m01 * v, c.m02 * v, c.m03 * v,
 				c.m10 * v, c.m11 * v, c.m12 * v, c.m13 * v,
