@@ -235,7 +235,7 @@ namespace Freya {
 				// todo: by caching distances and only recalculating the necessary ones
 				for( int i = 1; i < ControlPointCount; i++ ) {
 					float sqDist = Vector2.SqrMagnitude( nodes[i - 1].pos - nodes[i].pos );
-					SetKnotInternal( i, SplineUtils.CalcCatRomKnot( nodes[i - 1].knot, sqDist, alpha ) );
+					SetKnotInternal( i, SplineUtils.CalcCatRomKnot( nodes[i - 1].knot, sqDist, alpha, true ) );
 				}
 			}
 		}

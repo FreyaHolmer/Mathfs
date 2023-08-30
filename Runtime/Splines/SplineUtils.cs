@@ -30,16 +30,16 @@ namespace Freya {
 
 		internal static int BSplineKnotCount( int pointCount, int degree ) => degree + pointCount + 1;
 
-		public static float CalcCatRomKnot( float kPrev, float sqDist, float alpha ) {
-			return kPrev + CalcCatRomKnot( sqDist, alpha ).AtLeast( 0.00001f ); // ensure there are no duplicate knots
+		public static float CalcCatRomKnot( float kPrev, float sqDist, float alpha, bool isSquaredDist ) {
+			return kPrev + CalcCatRomKnot( sqDist, alpha, isSquaredDist ).AtLeast( 0.00001f ); // ensure there are no duplicate knots
 		}
 
-		public static float CalcCatRomKnot( float squaredDistance, float alpha ) =>
+		public static float CalcCatRomKnot( float dist, float alpha, bool isSquaredDist ) =>
 			alpha switch {
 				0    => 1, // uniform
-				0.5f => squaredDistance, // centripetal
-				1    => squaredDistance.Sqrt(), // chordal
-				_    => squaredDistance.Pow( 0.5f * alpha )
+				0.5f => isSquaredDist ? dist.Pow( 0.25f ) : Mathf.Sqrt( dist ), // centripetal
+				1    => isSquaredDist ? Mathf.Sqrt( dist ) : dist, // chordal
+				_    => isSquaredDist ? dist.Pow( 0.5f * alpha ) : dist.Pow( alpha )
 			};
 
 		static readonly Matrix4x1 knotsUniformUnit = new(-1, 0, 1, 2);
@@ -53,7 +53,7 @@ namespace Freya {
 			float sqMag01 = Vector2.SqrMagnitude( m.m0 - m.m1 );
 			float sqMag12 = Vector2.SqrMagnitude( m.m1 - m.m2 );
 			float sqMag23 = Vector2.SqrMagnitude( m.m2 - m.m3 );
-			return CalcCatRomKnots( sqMag01, sqMag12, sqMag23, alpha, unitInterval );
+			return CalcCatRomKnots( sqMag01, sqMag12, sqMag23, alpha, unitInterval, isSquaredDist:true );
 		}
 
 		public static Matrix4x1 CalcCatRomKnots( Vector3Matrix4x1 m, float alpha, bool unitInterval ) {
@@ -62,13 +62,13 @@ namespace Freya {
 			float sqMag01 = Vector3.SqrMagnitude( m.m0 - m.m1 );
 			float sqMag12 = Vector3.SqrMagnitude( m.m1 - m.m2 );
 			float sqMag23 = Vector3.SqrMagnitude( m.m2 - m.m3 );
-			return CalcCatRomKnots( sqMag01, sqMag12, sqMag23, alpha, unitInterval );
+			return CalcCatRomKnots( sqMag01, sqMag12, sqMag23, alpha, unitInterval, isSquaredDist:true );
 		}
 
-		static Matrix4x1 CalcCatRomKnots( float sqMag01, float sqMag12, float sqMag23, float alpha, bool unitInterval ) {
-			float i01 = CalcCatRomKnot( sqMag01, alpha );
-			float i12 = CalcCatRomKnot( sqMag12, alpha );
-			float i23 = CalcCatRomKnot( sqMag23, alpha );
+		static Matrix4x1 CalcCatRomKnots( float dist01, float dist12, float dist23, float alpha, bool unitInterval, bool isSquaredDist ) {
+			float i01 = CalcCatRomKnot( dist01, alpha, isSquaredDist );
+			float i12 = CalcCatRomKnot( dist12, alpha, isSquaredDist );
+			float i23 = CalcCatRomKnot( dist23, alpha, isSquaredDist );
 			float k0, k1, k2, k3;
 			if( unitInterval ) {
 				return new(-i01 / i12, 0, 1, 1 + i23 / i12);
