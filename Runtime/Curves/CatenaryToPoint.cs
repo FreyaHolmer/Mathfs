@@ -165,7 +165,7 @@ namespace Freya {
 		// presumes a decreasing function with one root in x > 0
 		// g = initial guess
 		static bool TryFindRootBounds( float pAbsX, float c, float g, out FloatRange xRange ) {
-			float y = R( pAbsX, c, g );
+			float y = R( g, pAbsX, c );
 			xRange = new FloatRange( g, g );
 			if( Mathfs.Approximately( y, 0 ) ) // somehow landed *on* our root in our initial guess
 				return true;
