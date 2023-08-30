@@ -29,6 +29,14 @@ namespace Freya {
 			-3, -2, 3, -1,
 			2, 1, -2, 1
 		);
+		public static readonly Polynomial[] cubicHermitePositionBasisFunctions = {
+			GetBasisFunction( cubicHermite, 0 ),
+			GetBasisFunction( cubicHermite, 2 )
+		};
+		public static readonly Polynomial[] cubicHermiteVelocityBasisFunctions = {
+			GetBasisFunction( cubicHermite, 1 ),
+			GetBasisFunction( cubicHermite, 3 )
+		};
 
 		/// <summary>The characteristic matrix of a uniform cubic catmull-rom curve</summary>
 		public static readonly RationalMatrix4x4 cubicCatmullRom = new RationalMatrix4x4(
