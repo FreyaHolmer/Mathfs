@@ -371,7 +371,7 @@ namespace Freya {
 			double vMag = Math.Sqrt( vMagSq );
 			double qMag = Math.Sqrt( vMagSq + (double)q.w * q.w );
 			double theta = Math.Atan2( vMag, q.w );
-			double scV = vMag < 0.01f ? Mathfs.SincRcp( theta ) / qMag : theta / vMag;
+			double scV = vMag < 0.001 ? Mathfs.SincRcp( theta ) / qMag : theta / vMag;
 			return new Quaternion(
 				(float)( scV * q.x ),
 				(float)( scV * q.y ),
@@ -385,7 +385,7 @@ namespace Freya {
 			double vMagSq = (double)q.x * q.x + (double)q.y * q.y + (double)q.z * q.z;
 			double vMag = Math.Sqrt( vMagSq );
 			double theta = Math.Atan2( vMag, q.w );
-			double scV = vMag < 0.01f ? Mathfs.SincRcp( theta ) : theta / vMag;
+			double scV = vMag < 0.001 ? Mathfs.SincRcp( theta ) : theta / vMag;
 			return new Quaternion(
 				(float)( scV * q.x ),
 				(float)( scV * q.y ),
@@ -411,42 +411,24 @@ namespace Freya {
 
 		/// <summary>Returns the quaternion raised to a real power</summary>
 		public static Quaternion Pow( this Quaternion q, float x ) {
-			switch( x ) {
-				case 0f: return new Quaternion( 0, 0, 0, 1 );
-				case 1f: return q;
-			}
-			double vSqMag = q.x * q.x + q.y * q.y + q.z * q.z;
-			double rSqMag = q.w * q.w;
-			double vMag = Math.Sqrt( vSqMag );
-			double qMag = Math.Sqrt( rSqMag + vSqMag );
-			double nx = q.x / vMag;
-			double ny = q.y / vMag;
-			double nz = q.z / vMag;
-			double ang = Math.Acos( ( q.w / qMag ).ClampNeg1to1() );
-			double theta = ang * x;
-			double magPow = Math.Pow( qMag, x );
-			double cos = magPow * Math.Cos( theta );
-			double sin = magPow * Math.Sin( theta );
-			return new Quaternion( (float)( sin * nx ), (float)( sin * ny ), (float)( sin * nz ), (float)cos );
+			return x switch {
+				0f => new Quaternion( 0, 0, 0, 1 ),
+				1f => q,
+				_  => q.Ln().Mul( x ).Exp()
+			};
 		}
 
 		/// <summary>Returns the unit quaternion raised to a real power</summary>
 		public static Quaternion PowUnit( this Quaternion q, float x ) {
-			switch( x ) {
-				case 0f: return new Quaternion( 0, 0, 0, 1 );
-				case 1f: return q;
-			}
-			double vSqMag = q.x * q.x + q.y * q.y + q.z * q.z;
-			double vMag = Math.Sqrt( vSqMag );
-			double nx = q.x / vMag;
-			double ny = q.y / vMag;
-			double nz = q.z / vMag;
-			double ang = Math.Acos( q.w.ClampNeg1to1() );
-			double theta = ang * x;
-			double cos = Math.Cos( theta );
-			double sin = Math.Sin( theta );
-			return new Quaternion( (float)( sin * nx ), (float)( sin * ny ), (float)( sin * nz ), (float)cos );
+			return x switch {
+				0f => new Quaternion( 0, 0, 0, 1 ),
+				1f => q,
+				_  => q.LnUnit().Mul( x ).ExpPureIm()
+			};
 		}
+		
+		/// <summary>Returns the imaginary part of a quaternion as a vector</summary>
+		public static Vector3 Imag( this Quaternion q ) => new Vector3( q.x, q.y, q.z );
 
 		/// <summary>Returns the squared magnitude of this quaternion</summary>
 		public static float SqrMagnitude( this Quaternion q ) => (float)( (double)q.w * q.w + (double)q.x * q.x + (double)q.y * q.y + (double)q.z * q.z );
@@ -471,6 +453,20 @@ namespace Freya {
 
 		/// <inheritdoc cref="Quaternion.Inverse(Quaternion)"/>
 		public static Quaternion Inverse( this Quaternion q ) => Quaternion.Inverse( q );
+
+		/// <summary>The inverse of a unit quaternion, equivalent to the quaternion conjugate</summary>
+		public static Quaternion InverseUnit( this Quaternion q ) {
+			return new Quaternion( -q.x, -q.y, -q.z, q.w );
+		}
+
+		/// <summary>The inverse of a pure imaginary unit quaternion, where w is assumed to be 0</summary>
+		public static Quaternion InversePureIm( this Quaternion q ) {
+			float sqMag = q.x * q.x + q.y * q.y + q.z * q.z;
+			return new Quaternion( -q.x / sqMag, -q.y / sqMag, -q.z / sqMag, 0 );
+		}
+
+		/// <summary>Add to the magnitude of this quaternion</summary>
+		public static Quaternion AddMagnitude( this Quaternion q, float amount ) => amount == 0f ? q : q.Mul( 1 + amount / q.Magnitude() );
 
 		#endregion
 
