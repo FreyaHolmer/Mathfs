@@ -9,7 +9,6 @@ namespace Freya {
 
 		[MethodImpl( INLINE )] public static float SqMag<V, VM>( this VM vm, V v ) where VM : struct, IVectorMath<V> => vm.Dot( v, v );
 		[MethodImpl( INLINE )] public static float SqDist<V, VM>( this VM vm, V a, V b ) where VM : struct, IVectorMath<V> => vm.SqMag( vm.Sub( b, a ) );
-		[MethodImpl( INLINE )] public static float Dist<V, VM>( this VM vm, V a, V b ) where VM : struct, IVectorMath<V> => MathF.Sqrt( vm.SqDist( b, a ) );
 		[MethodImpl( INLINE )] public static V VecProject<V, VM>( this VM vm, V p, V to ) where VM : struct, IVectorMath<V> => vm.Mul( to, vm.BasisProject( p, to ) );
 		[MethodImpl( INLINE )] public static V VecReject<V, VM>( this VM vm, V p, V to ) where VM : struct, IVectorMath<V> => vm.Sub( p, vm.VecProject( p, to ) );
 		[MethodImpl( INLINE )] public static float BasisProject<V, VM>( this VM vm, V p, V to ) where VM : struct, IVectorMath<V> => vm.Dot( p, to ) / vm.Dot( to, to );
@@ -74,6 +73,7 @@ namespace Freya {
 		[MethodImpl( INLINE )] V Div( V v, float c );
 		[MethodImpl( INLINE )] float Dot( V a, V b );
 		[MethodImpl( INLINE )] float Mag( V v );
+		[MethodImpl( INLINE )] float Dist( V a, V b );
 		[MethodImpl( INLINE )] V Normalize( V v );
 		[MethodImpl( INLINE )] V Lerp( V a, V b, float t );
 	}
@@ -86,6 +86,7 @@ namespace Freya {
 		[MethodImpl( INLINE )] public float Div( float v, float c ) => v / c;
 		[MethodImpl( INLINE )] public float Dot( float a, float b ) => a * b;
 		[MethodImpl( INLINE )] public float Mag( float v ) => MathF.Abs( v );
+		[MethodImpl( INLINE )] public float Dist( float a, float b ) => MathF.Abs( b - a );
 		[MethodImpl( INLINE )] public float Normalize( float v ) => v < 0 ? -1 : 1;
 
 		// shared implementations
@@ -101,6 +102,7 @@ namespace Freya {
 		[MethodImpl( INLINE )] public Vector2 Div( Vector2 v, float c ) => new(v.x / c, v.y / c);
 		[MethodImpl( INLINE )] public float Dot( Vector2 a, Vector2 b ) => a.x * b.x + a.y * b.y;
 		[MethodImpl( INLINE )] public float Mag( Vector2 v ) => MathF.Sqrt( Dot( v, v ) );
+		[MethodImpl( INLINE )] public float Dist( Vector2 a, Vector2 b ) => Mag( Sub( b, a ) );
 		[MethodImpl( INLINE )] public Vector2 Normalize( Vector2 v ) => Div( v, Mag( v ) );
 
 		// shared implementations
@@ -120,6 +122,7 @@ namespace Freya {
 		[MethodImpl( INLINE )] public Vector3 Div( Vector3 v, float c ) => new(v.x / c, v.y / c, v.z / c);
 		[MethodImpl( INLINE )] public float Dot( Vector3 a, Vector3 b ) => a.x * b.x + a.y * b.y + a.z * b.z;
 		[MethodImpl( INLINE )] public float Mag( Vector3 v ) => MathF.Sqrt( Dot( v, v ) );
+		[MethodImpl( INLINE )] public float Dist( Vector3 a, Vector3 b ) => Mag( Sub( b, a ) );
 		[MethodImpl( INLINE )] public Vector3 Normalize( Vector3 v ) => Div( v, Mag( v ) );
 
 		// shared implementations
@@ -138,12 +141,33 @@ namespace Freya {
 		[MethodImpl( INLINE )] public Vector4 Div( Vector4 v, float c ) => new(v.x / c, v.y / c, v.z / c, v.w / c);
 		[MethodImpl( INLINE )] public float Dot( Vector4 a, Vector4 b ) => a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
 		[MethodImpl( INLINE )] public float Mag( Vector4 v ) => MathF.Sqrt( Dot( v, v ) );
+		[MethodImpl( INLINE )] public float Dist( Vector4 a, Vector4 b ) => Mag( Sub( b, a ) );
 		[MethodImpl( INLINE )] public Vector4 Normalize( Vector4 v ) => Div( v, Mag( v ) );
 
 		// shared implementations
 		[MethodImpl( INLINE )] public Vector4 Lerp( Vector4 a, Vector4 b, float t ) {
 			float omt = 1f - t;
 			return new Vector4( omt * a.x + t * b.x, omt * a.y + t * b.y, omt * a.z + t * b.z, omt * a.w + t * b.w );
+		}
+	}
+
+	// todo: quaternions, as a treat. this is untested and unported basically lol
+	public struct VectorMathQuat : IVectorMath<Quaternion> {
+		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
+		[MethodImpl( INLINE )] public Quaternion Add( Quaternion a, Quaternion b ) => new(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
+		[MethodImpl( INLINE )] public Quaternion Sub( Quaternion a, Quaternion b ) => new(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
+		[MethodImpl( INLINE )] public Quaternion Mul( Quaternion v, float c ) => new(v.x * c, v.y * c, v.z * c, v.w * c);
+		[MethodImpl( INLINE )] public Quaternion Mul( float c, Quaternion v ) => new(v.x * c, v.y * c, v.z * c, v.w * c);
+		[MethodImpl( INLINE )] public Quaternion Div( Quaternion v, float c ) => new(v.x / c, v.y / c, v.z / c, v.w / c);
+		[MethodImpl( INLINE )] public float Dot( Quaternion a, Quaternion b ) => a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
+		[MethodImpl( INLINE )] public float Mag( Quaternion v ) => MathF.Sqrt( Dot( v, v ) );
+		[MethodImpl( INLINE )] public float Dist( Quaternion a, Quaternion b ) => Mathfs.Angle( a, b );
+		[MethodImpl( INLINE )] public Quaternion Normalize( Quaternion v ) => Div( v, Mag( v ) );
+
+		// shared implementations
+		[MethodImpl( INLINE )] public Quaternion Lerp( Quaternion a, Quaternion b, float t ) {
+			float omt = 1f - t;
+			return new Quaternion( omt * a.x + t * b.x, omt * a.y + t * b.y, omt * a.z + t * b.z, omt * a.w + t * b.w );
 		}
 	}
 

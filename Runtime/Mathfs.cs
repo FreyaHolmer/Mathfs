@@ -416,7 +416,7 @@ namespace Freya {
 
 		/// <summary>Clamps the value between -1 and 1</summary>
 		public static double ClampNeg1to1( double value ) => value < -1.0 ? -1.0 : value > 1.0 ? 1.0 : value;
-		
+
 		/// <summary>Clamps the value between -1 and 1</summary>
 		public static float ClampNeg1to1( float value ) => value < -1f ? -1f : value > 1f ? 1f : value;
 
@@ -1124,6 +1124,12 @@ namespace Freya {
 			v.x += 1;
 			v.Normalize();
 			return new Quaternion( 0, 0, v.y, v.x );
+		}
+
+		/// <summary>The angle between two quaternions, in radians</summary>
+		public static float Angle( Quaternion a, Quaternion b ) {
+			float num = Mathf.Min( Mathf.Abs( Quaternion.Dot( a, b ) ), 1f );
+			return num > 0.999998986721039 ? 0.0f : (float)( MathF.Acos( num ) * 2.0 );
 		}
 
 		/// <summary>Returns a 2D Pose from a point and a vector, representing the X axis</summary>
