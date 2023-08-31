@@ -1,6 +1,7 @@
 // by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
 using System;
+using UnityEngine;
 
 namespace Freya {
 
@@ -13,10 +14,10 @@ namespace Freya {
 		public static readonly Rational MinValue = new(int.MinValue, 1);
 
 		/// <summary>The numerator of this number</summary>
-		public readonly int n;
+		[SerializeField] public int n;
 
 		/// <summary>The denominator of this number</summary>
-		public readonly int d;
+		[SerializeField] [NonZeroInteger] public int d;
 
 		/// <summary>Creates an exact representation of a rational number</summary>
 		/// <param name="num">The numerator of this number</param>
