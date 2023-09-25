@@ -199,6 +199,36 @@ namespace Freya {
 		/// <summary>Rotates 180° around its local Z axis</summary>
 		[MethodImpl( INLINE )] public static Quaternion Rotate180AroundSelfZ( this Quaternion q ) => new(q.y, -q.x, q.w, -q.z);
 
+		/// <summary>Rotates this quaternion 180° so that its Y and Z axes are swapped</summary>
+		[MethodImpl( INLINE )] public static Quaternion SwapYZ( this Quaternion q ) {
+			return new Quaternion(
+				Mathfs.RSQRT2 * ( q.y - q.z ),
+				Mathfs.RSQRT2 * ( q.w - q.x ),
+				Mathfs.RSQRT2 * ( q.w + q.x ),
+				Mathfs.RSQRT2 * ( -q.y - q.z )
+			);
+		}
+
+		/// <summary>Rotates this quaternion 180° so that its Z and X axes are swapped</summary>
+		[MethodImpl( INLINE )] public static Quaternion SwapZX( this Quaternion q ) {
+			return new Quaternion(
+				Mathfs.RSQRT2 * ( q.w + q.y ),
+				Mathfs.RSQRT2 * ( q.z - q.x ),
+				Mathfs.RSQRT2 * ( q.w - q.y ),
+				Mathfs.RSQRT2 * ( -q.x - q.z )
+			);
+		}
+
+		/// <summary>Rotates this quaternion 180° so that its X and Y axes are swapped</summary>
+		[MethodImpl( INLINE )] public static Quaternion SwapXY( this Quaternion q ) {
+			return new Quaternion(
+				Mathfs.RSQRT2 * ( q.w - q.z ),
+				Mathfs.RSQRT2 * ( q.w + q.z ),
+				Mathfs.RSQRT2 * ( q.x - q.y ),
+				Mathfs.RSQRT2 * ( -q.x - q.y )
+			);
+		}
+
 		/// <summary>Returns an 180° rotated version of this quaternion around the given axis</summary>
 		/// <param name="q">The quaternion to rotate</param>
 		/// <param name="axis">The axis to rotate around</param>
@@ -426,7 +456,7 @@ namespace Freya {
 				_  => q.LnUnit().Mul( x ).ExpPureIm()
 			};
 		}
-		
+
 		/// <summary>Returns the imaginary part of a quaternion as a vector</summary>
 		public static Vector3 Imag( this Quaternion q ) => new Vector3( q.x, q.y, q.z );
 
