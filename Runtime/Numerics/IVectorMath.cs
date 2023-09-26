@@ -66,6 +66,7 @@ namespace Freya {
 
 	public interface IVectorMath<V> {
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
+		[MethodImpl( INLINE )] V Zero();
 		[MethodImpl( INLINE )] V Add( V a, V b );
 		[MethodImpl( INLINE )] V Sub( V a, V b );
 		[MethodImpl( INLINE )] V Mul( V v, float c );
@@ -80,6 +81,7 @@ namespace Freya {
 
 	public struct VectorMath1D : IVectorMath<float> {
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
+		[MethodImpl( INLINE )] public float Zero() => 0;
 		[MethodImpl( INLINE )] public float Add( float a, float b ) => a + b;
 		[MethodImpl( INLINE )] public float Sub( float a, float b ) => a - b;
 		[MethodImpl( INLINE )] public float Mul( float v, float c ) => v * c;
@@ -95,6 +97,7 @@ namespace Freya {
 
 	public struct VectorMath2D : IVectorMath<Vector2> {
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
+		[MethodImpl( INLINE )] public Vector2 Zero() => new(0, 0);
 		[MethodImpl( INLINE )] public Vector2 Add( Vector2 a, Vector2 b ) => new(a.x + b.x, a.y + b.y);
 		[MethodImpl( INLINE )] public Vector2 Sub( Vector2 a, Vector2 b ) => new(a.x - b.x, a.y - b.y);
 		[MethodImpl( INLINE )] public Vector2 Mul( Vector2 v, float c ) => new(v.x * c, v.y * c);
@@ -115,6 +118,7 @@ namespace Freya {
 
 	public struct VectorMath3D : IVectorMath<Vector3> {
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
+		[MethodImpl( INLINE )] public Vector3 Zero() => new(0, 0, 0);
 		[MethodImpl( INLINE )] public Vector3 Add( Vector3 a, Vector3 b ) => new(a.x + b.x, a.y + b.y, a.z + b.z);
 		[MethodImpl( INLINE )] public Vector3 Sub( Vector3 a, Vector3 b ) => new(a.x - b.x, a.y - b.y, a.z - b.z);
 		[MethodImpl( INLINE )] public Vector3 Mul( Vector3 v, float c ) => new(v.x * c, v.y * c, v.z * c);
@@ -134,6 +138,7 @@ namespace Freya {
 
 	public struct VectorMath4D : IVectorMath<Vector4> {
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
+		[MethodImpl( INLINE )] public Vector4 Zero() => new(0, 0, 0, 0);
 		[MethodImpl( INLINE )] public Vector4 Add( Vector4 a, Vector4 b ) => new(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
 		[MethodImpl( INLINE )] public Vector4 Sub( Vector4 a, Vector4 b ) => new(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
 		[MethodImpl( INLINE )] public Vector4 Mul( Vector4 v, float c ) => new(v.x * c, v.y * c, v.z * c, v.w * c);
@@ -154,6 +159,7 @@ namespace Freya {
 	// todo: quaternions, as a treat. this is untested and unported basically lol
 	public struct VectorMathQuat : IVectorMath<Quaternion> {
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
+		[MethodImpl( INLINE )] public Quaternion Zero() => new(0, 0, 0, 0);
 		[MethodImpl( INLINE )] public Quaternion Add( Quaternion a, Quaternion b ) => new(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
 		[MethodImpl( INLINE )] public Quaternion Sub( Quaternion a, Quaternion b ) => new(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
 		[MethodImpl( INLINE )] public Quaternion Mul( Quaternion v, float c ) => new(v.x * c, v.y * c, v.z * c, v.w * c);
