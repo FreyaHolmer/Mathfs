@@ -1103,6 +1103,25 @@ namespace Freya {
 		/// <inheritdoc cref="DistanceSquared(Vector2,Vector2)"/>
 		[MethodImpl( INLINE )] public static float DistanceSquared( Vector4 a, Vector4 b ) => ( a.x - b.x ).Square() + ( a.y - b.y ).Square() + ( a.z - b.z ).Square() + ( a.w - b.w ).Square();
 
+		/// <summary>Calculates a rotation minimizing normal direction, given start and end conditions. This is usually used when evaluating rotation minimizing frames on curves.</summary>
+		/// <param name="posA">The start position</param>
+		/// <param name="tangentA">The start tangent direction</param>
+		/// <param name="normalA">The start normal direction</param>
+		/// <param name="posB">The end position</param>
+		/// <param name="tangentB">The end tangent direction</param>
+		public static Vector3 GetRotationMinimizingNormal( Vector3 posA, Vector3 tangentA, Vector3 normalA, Vector3 posB, Vector3 tangentB ) {
+			// source: https://www.microsoft.com/en-us/research/wp-content/uploads/2016/12/Computation-of-rotation-minimizing-frames.pdf
+			Vector3 v1 = posB - posA;
+			float v1_dot_v1_half = Vector3.Dot( v1, v1 ) / 2;
+			float r1 = Vector3.Dot( v1, normalA ) / v1_dot_v1_half;
+			float r2 = Vector3.Dot( v1, tangentA ) / v1_dot_v1_half;
+			Vector3 nL = normalA - r1 * v1;
+			Vector3 tL = tangentA - r2 * v1;
+			Vector3 v2 = tangentB - tL;
+			float r3 = Vector3.Dot( v2, nL ) / Vector3.Dot( v2, v2 );
+			return ( nL - 2 * r3 * v2 ).normalized;
+		}
+
 		#endregion
 
 		#region Angles & Rotation
