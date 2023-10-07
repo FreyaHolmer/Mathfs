@@ -32,6 +32,9 @@ namespace Freya {
 		/// <param name="value">The value to check if it's inside, or equal to the start or end</param>
 		public bool Contains( int value ) => value >= start && value <= Last;
 
+		/// <summary>Returns a copy of this range, without the last element (ie: count is reduced by 1)</summary>
+		public IntRange WithoutLast() => new(start, count - 1);
+
 		/// <summary>Create an integer range from start to end (inclusive)</summary>
 		/// <param name="first">The first integer</param>
 		/// <param name="last">The last integer</param>
