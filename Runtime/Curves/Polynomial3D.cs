@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace Freya {
 
+	[Serializable]
 	public struct Polynomial3D : IPolynomialCubic<Polynomial3D, Vector3>, IParamCurve3Diff<Vector3> {
 
 		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;

@@ -1,16 +1,17 @@
 // by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
+using System;
 using System.Text;
 
 namespace Freya {
 
 	/// <summary>An integer range</summary>
-	public readonly struct IntRange {
+	[Serializable] public struct IntRange {
 
-		public static readonly IntRange empty = new IntRange( 0, 0 );
+		public static IntRange empty = new IntRange( 0, 0 );
 
-		public readonly int start;
-		public readonly int count;
+		public int start;
+		public int count;
 
 		public int this[ int i ] => start + i;
 
@@ -40,7 +41,7 @@ namespace Freya {
 		/// <param name="last">The last integer</param>
 		public static IntRange FirstToLast( int first, int last ) => new IntRange( first, last - first + 1 );
 
-		static readonly StringBuilder toStrBuilder = new StringBuilder();
+		static StringBuilder toStrBuilder = new StringBuilder();
 
 		public override string ToString() {
 			toStrBuilder.Clear();
@@ -58,7 +59,7 @@ namespace Freya {
 		public IntRangeEnumerator GetEnumerator() => new IntRangeEnumerator( this );
 
 		public struct IntRangeEnumerator /*: IEnumerator<int>*/ {
-			readonly IntRange intRange;
+			IntRange intRange;
 			int currValue;
 			public IntRangeEnumerator( IntRange range ) => ( this.intRange, currValue ) = ( range, range.start - 1 );
 			public bool MoveNext() => ++currValue <= intRange.Last;
