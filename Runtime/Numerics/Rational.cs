@@ -80,6 +80,22 @@ namespace Freya {
 		public static Rational Lerp( Rational a, Rational b, Rational t ) => a + t * ( b - a );
 		public static Rational InverseLerp( Rational a, Rational b, Rational v ) => ( v - a ) / ( b - a );
 
+		public static Rational Floor( Rational r ) {
+			if( r.n < 0 )
+				return ( r.n - r.d + 1 ) / r.d;
+			return r.n / r.d;
+		}
+
+		public static Rational Ceil( Rational r ) {
+			if( r.n > 0 )
+				return ( r.n + r.d - 1 ) / r.d;
+			return r.n / r.d;
+		}
+
+		public static Rational Round( Rational r ) {
+			return r.n < 0 == r.d < 0 ? ( r.n + r.d / 2 ) / r.d : ( r.n - r.d / 2 ) / r.d;
+		}
+
 		// type casting
 		public static implicit operator Rational( int n ) => new(n, 1);
 		public static explicit operator int( Rational r ) => r.IsInteger ? r.n : throw new ArithmeticException( $"Rational value {r} can't be cast to an integer" );
