@@ -689,6 +689,11 @@ namespace Freya {
 		public static Vector3Matrix4x1 MultiplyColumnVector( this Matrix4x4 m, Vector3Matrix4x1 v ) => new(m.MultiplyColumnVector( v.X ), m.MultiplyColumnVector( v.Y ), m.MultiplyColumnVector( v.Z ));
 		public static Vector4Matrix4x1 MultiplyColumnVector( this Matrix4x4 m, Vector4Matrix4x1 v ) => new(m.MultiplyColumnVector( v.X ), m.MultiplyColumnVector( v.Y ), m.MultiplyColumnVector( v.Z ), m.MultiplyColumnVector( v.W ));
 
+		/// <summary>Transforms a ray by this matrix</summary>
+		/// <param name="mtx">The matrix to use</param>
+		/// <param name="ray">The ray to transform</param>
+		public static Ray MultiplyRay( this Matrix4x4 mtx, Ray ray ) => new(mtx.MultiplyPoint3x4( ray.origin ), mtx.MultiplyVector( ray.direction ));
+
 		#endregion
 
 		#region Extension method counterparts of the static Mathfs functions - lots of boilerplate in here
