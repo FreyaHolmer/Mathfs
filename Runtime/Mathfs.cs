@@ -388,7 +388,10 @@ namespace Freya {
 		public static int Clamp( int value, int min, int max ) => value < min ? min : value > max ? max : value;
 
 		/// <summary>Returns the value clamped between 0 and 1</summary>
-		public static float Clamp01( float value ) => value < 0f ? 0f : value > 1f ? 1f : value;
+		public static float Clamp01( float value ) => value < 0 ? 0 : value > 1 ? 1 : value;
+
+		/// <inheritdoc cref="Clamp01(float)"/>
+		public static double Clamp01( double value ) => value < 0 ? 0 : value > 1 ? 1 : value;
 
 		/// <summary>Clamps each component between 0 and 1</summary>
 		public static Vector2 Clamp01( Vector2 v ) =>
@@ -796,6 +799,9 @@ namespace Freya {
 		/// <param name="b">The end of the range, where it would return 1</param>
 		/// <param name="value">A value between a and b</param>
 		[MethodImpl( INLINE )] public static float InverseLerpClamped( float a, float b, float value ) => Clamp01( ( value - a ) / ( b - a ) );
+
+		/// <inheritdoc cref="InverseLerpClamped(float,float,float)"/>
+		[MethodImpl( INLINE )] public static double InverseLerpClamped( double a, double b, double value ) => Clamp01( ( value - a ) / ( b - a ) );
 
 		/// <summary>Given a value between a and b, returns its normalized location in that range, as a t-value (interpolant) from 0 to 1, with cubic smoothing applied.
 		/// Equivalent to "smoothstep" in shader code</summary>
