@@ -77,7 +77,7 @@ namespace Freya {
 		/// <summary>Wraps/repeats the input value to stay within this range</summary>
 		/// <param name="value">The value to wrap/repeat in this interval</param>
 		public float Wrap( float value ) {
-			if( value >= a && value < b )
+			if( value >= a && value <= b )
 				return value;
 			return a + Mathfs.Repeat( value - a, b - a );
 		}
