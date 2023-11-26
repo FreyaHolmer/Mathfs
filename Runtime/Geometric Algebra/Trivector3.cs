@@ -12,8 +12,8 @@ namespace Freya {
 
 		public static Bivector3 operator *( Trivector3 a, Vector3 b ) => new Bivector3( a.xyz * b.x, a.xyz * b.y, a.xyz * b.z );
 		public static Bivector3 operator *( Vector3 a, Trivector3 b ) => new Bivector3( a.x * b.xyz, a.y * b.xyz, a.z * b.xyz );
-		public static Bivector3 operator *( Bivector3 a, Trivector3 b ) => new Bivector3( -a.yz * b.xyz, -a.zx * b.xyz, -a.xy * b.xyz );
-		public static Bivector3 operator *( Trivector3 a, Bivector3 b ) => new Bivector3( -a.xyz * b.yz, -a.xyz * b.zx, -a.xyz * b.xy );
+		public static Vector3 operator *( Bivector3 a, Trivector3 b ) => new Vector3( -a.yz * b.xyz, -a.zx * b.xyz, -a.xy * b.xyz );
+		public static Vector3 operator *( Trivector3 a, Bivector3 b ) => new Vector3( -a.xyz * b.yz, -a.xyz * b.zx, -a.xyz * b.xy );
 
 		public static float operator *( Trivector3 a, Trivector3 b ) => -a.xyz * b.xyz;
 
