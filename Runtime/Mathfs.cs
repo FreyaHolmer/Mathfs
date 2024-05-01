@@ -5,6 +5,7 @@
 // Collected and expanded upon to by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Uei = UnityEngine.Internal;
 using System.Linq; // used for arbitrary count min/max functions, so it's safe and won't allocate garbage don't worry~
@@ -1109,6 +1110,14 @@ namespace Freya {
 		/// <inheritdoc cref="DistanceSquared(Vector2,Vector2)"/>
 		[MethodImpl( INLINE )] public static float DistanceSquared( Vector4 a, Vector4 b ) => ( a.x - b.x ).Square() + ( a.y - b.y ).Square() + ( a.z - b.z ).Square() + ( a.w - b.w ).Square();
 
+		/// <summary>The t-value (fraction) where a projected along b would be</summary>
+		/// <param name="a">The vector to project</param>
+		/// <param name="b">The vector to project onto</param>
+		public static float ProjectionTValue( Vector3 a, Vector3 b ) => Vector3.Dot( a, b ) / Vector3.Dot( b, b );
+
+		/// <inheritdoc cref="ProjectionTValue(Vector3,Vector3)"/>
+		public static float ProjectionTValue( Vector2 a, Vector2 b ) => Vector2.Dot( a, b ) / Vector2.Dot( b, b );
+
 		/// <summary>Calculates a rotation minimizing normal direction, given start and end conditions. This is usually used when evaluating rotation minimizing frames on curves.</summary>
 		/// <param name="posA">The start position</param>
 		/// <param name="tangentA">The start tangent direction</param>
@@ -1306,8 +1315,14 @@ namespace Freya {
 		/// <summary>Returns the shortest angle between <c>a</c> and <c>b</c>, in the range 0 to tau/2 (0 to pi)</summary>
 		[MethodImpl( INLINE )] public static float AngleBetween( Vector2 a, Vector2 b ) => MathF.Acos( Vector2.Dot( a.normalized, b.normalized ).ClampNeg1to1() );
 
+		/// <summary>Returns the shortest angle between two normalized vectors <c>a</c> and <c>b</c>, in the range 0 to tau/2 (0 to pi)</summary>
+		[MethodImpl( INLINE )] public static float AngleBetweenPreNormalized( Vector2 a, Vector2 b ) => MathF.Acos( Vector2.Dot( a, b ).ClampNeg1to1() );
+
 		/// <inheritdoc cref="AngleBetween(Vector2,Vector2)"/>
 		[MethodImpl( INLINE )] public static float AngleBetween( Vector3 a, Vector3 b ) => MathF.Acos( Vector3.Dot( a.normalized, b.normalized ).ClampNeg1to1() );
+
+		/// <inheritdoc cref="AngleBetweenPreNormalized(Vector2,Vector2)"/>
+		[MethodImpl( INLINE )] public static float AngleBetweenPreNormalized( Vector3 a, Vector3 b ) => MathF.Acos( Vector3.Dot( a, b ).ClampNeg1to1() );
 
 		/// <summary>Returns the clockwise angle between <c>from</c> and <c>to</c>, in the range 0 to tau (0 to 2*pi)</summary>
 		[MethodImpl( INLINE )] public static float AngleFromToCW( Vector2 from, Vector2 to ) => Determinant( from, to ) < 0 ? AngleBetween( from, to ) : TAU - AngleBetween( from, to );
@@ -1339,6 +1354,25 @@ namespace Freya {
 			float h = a + angBetween * 0.5f; // halfway angle
 			v = h + DeltaAngle( h, v ); // get offset from h, and offset by h
 			return InverseLerpClamped( a, b, v );
+		}
+
+		/// <summary>An enumerable sequence of <c>count</c> number of vectors
+		/// on a circle with the given radius, starting from the X axis</summary>
+		/// <param name="count">The number of vectors to arrange on the circle.
+		/// A negative count will enumerate in the negative direction</param>
+		/// <param name="radius">The radius of the circle</param>
+		public static IEnumerable<Vector2> PointsInCircle( int count, float radius = 1 ) {
+			if( count == 0 )
+				yield break;
+			yield return new Vector2( radius, 0 );
+			int absCount = Math.Abs( count );
+			for( int i = 1; i < absCount; i++ ) {
+				float angle = ( TAU * i ) / count;
+				yield return new Vector2(
+					MathF.Cos( angle ) * radius,
+					MathF.Sin( angle ) * radius
+				);
+			}
 		}
 
 		#endregion

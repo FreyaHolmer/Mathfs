@@ -177,6 +177,26 @@ namespace Freya {
 		/// <inheritdoc cref="ScaleAround(Vector2,Vector2,Vector2)"/>
 		[MethodImpl( INLINE )] public static Vector3 ScaleAround( this Vector3 p, Vector3 pivot, Vector3 scale ) => new(pivot.x + ( p.x - pivot.x ) * scale.x, pivot.y + ( p.y - pivot.y ) * scale.y, pivot.z + ( p.z - pivot.z ) * scale.z);
 
+		/// <summary>Projects the vector perpendicularly onto the other vector B</summary>
+		/// <param name="a">The vector to project with</param>
+		/// <param name="b">The vector to project perpendicularly against. The resulting vector is along this vector</param>
+		public static Vector3 Project( this Vector3 a, Vector3 b ) {
+			float denom = Vector3.Dot( b, b );
+			if( Mathfs.Approximately( denom, 0 ) )
+				throw new DivideByZeroException( "Can't project to a vector with 0 length" );
+			return b * ( Vector3.Dot( a, b ) / denom );
+		}
+
+		/// <summary>Projects the vector perpendicularly *from* the initial vector, onto the other vector B</summary>
+		/// <param name="a">The vector to project perpendicularly from</param>
+		/// <param name="b">The vector to project against. The resulting vector is along this vector</param>
+		public static Vector3 ProjectPerpFrom( this Vector3 a, Vector3 b ) {
+			float denom = Vector3.Dot( a, b );
+			if( Mathfs.Approximately( denom, 0 ) )
+				throw new DivideByZeroException( "Can't project to a vector with 0 length" );
+			return b * ( Vector3.Dot( a, a ) / denom );
+		}
+
 		#endregion
 
 		#region Quaternions
