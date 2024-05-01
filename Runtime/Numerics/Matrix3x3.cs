@@ -127,6 +127,20 @@ namespace Freya {
 
 		public static explicit operator Matrix3x3( Matrix4x4 m ) => new(m.m00, m.m01, m.m02, m.m10, m.m11, m.m12, m.m20, m.m21, m.m22);
 
+		public static explicit operator Matrix4x4( Matrix3x3 m ) =>
+			new() {
+				m00 = m.m00,
+				m01 = m.m01,
+				m02 = m.m02,
+				m10 = m.m10,
+				m11 = m.m11,
+				m12 = m.m12,
+				m20 = m.m20,
+				m21 = m.m21,
+				m22 = m.m22,
+				m33 = 1 // to match identity matrix
+			};
+
 		public static Matrix3x3 operator *( Matrix3x3 c, float v ) =>
 			new(c.m00 * v, c.m01 * v, c.m02 * v,
 				c.m10 * v, c.m11 * v, c.m12 * v,
