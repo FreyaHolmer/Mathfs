@@ -101,6 +101,32 @@ namespace Freya {
 			}
 		}
 
+		public float Minor( int r, int c ) {
+			// forming a 2x2 by deleting row r and column c
+			int r0 = r == 0 ? 1 : 0;
+			int r1 = r == 2 ? 1 : 2;
+			int c0 = c == 0 ? 1 : 0;
+			int c1 = c == 2 ? 1 : 2;
+			float mn00 = this[r0, c0];
+			float mn01 = this[r0, c1];
+			float mn10 = this[r1, c0];
+			float mn11 = this[r1, c1];
+			return mn00 * mn11 - mn01 * mn10; // 2x2 determinant
+		}
+
+		public float Cofactor( int r, int c ) {
+			// https://en.wikipedia.org/wiki/Minor_(linear_algebra)
+			int sign = ( r + c ) % 2 == 0 ? 1 : -1; // (-1)^(r+c)
+			return sign * Minor( r, c );
+		}
+
+		public Matrix3x3 CofactorMatrix =>
+			new(
+				Cofactor( 0, 0 ), Cofactor( 0, 1 ), Cofactor( 0, 2 ),
+				Cofactor( 1, 0 ), Cofactor( 1, 1 ), Cofactor( 1, 2 ),
+				Cofactor( 2, 0 ), Cofactor( 2, 1 ), Cofactor( 2, 2 )
+			);
+
 		/// <summary>Returns the determinant of this matrix</summary>
 		public float Determinant {
 			get {
@@ -170,6 +196,11 @@ namespace Freya {
 			new(v.x * c.m00 + v.y * c.m01 + v.z * c.m02,
 				v.x * c.m10 + v.y * c.m11 + v.z * c.m12,
 				v.x * c.m20 + v.y * c.m21 + v.z * c.m22);
+
+		public static Bivector3 operator *( Matrix3x3 c, Bivector3 v ) =>
+			new(v.yz * c.m00 + v.zx * c.m01 + v.xy * c.m02,
+				v.yz * c.m10 + v.zx * c.m11 + v.xy * c.m12,
+				v.yz * c.m20 + v.zx * c.m21 + v.xy * c.m22);
 
 		public static Vector2Matrix3x1 operator *( Matrix3x3 c, Vector2Matrix3x1 m ) => new(c * m.X, c * m.Y);
 

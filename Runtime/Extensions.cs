@@ -527,6 +527,16 @@ namespace Freya {
 		/// <param name="quat">The local space rotation</param>
 		public static Quaternion TransformRotation( this Transform tf, Quaternion quat ) => tf.rotation * quat;
 
+		/// <summary>Transforms a bivector from local space to world space</summary>
+		/// <param name="tf">The transform to use</param>
+		/// <param name="b">The local space bivector</param>
+		public static Bivector3 TransformBivector( this Transform tf, Bivector3 b ) => new Matrix3x3( tf.localToWorldMatrix ).CofactorMatrix * b;
+
+		/// <summary>Transforms a bivector from local space to world space</summary>
+		/// <param name="tf">The transform to use</param>
+		/// <param name="b">The local space bivector</param>
+		public static float TransformBivector( this Transform tf, float b ) => new Matrix3x3( tf.localToWorldMatrix ).Determinant * b;
+
 		/// <summary>Transforms a rotation from world space to local space</summary>
 		/// <param name="tf">The transform to use</param>
 		/// <param name="quat">The world space rotation</param>
