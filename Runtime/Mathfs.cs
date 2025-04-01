@@ -1361,17 +1361,30 @@ namespace Freya {
 		/// <param name="count">The number of vectors to arrange on the circle.
 		/// A negative count will enumerate in the negative direction</param>
 		/// <param name="radius">The radius of the circle</param>
-		public static IEnumerable<Vector2> PointsInCircle( int count, float radius = 1 ) {
+		public static IEnumerable<Vector2> PointsInCircle( int count, float radius = 1, float startAngle = 0f ) {
 			if( count == 0 )
 				yield break;
-			yield return new Vector2( radius, 0 );
 			int absCount = Math.Abs( count );
-			for( int i = 1; i < absCount; i++ ) {
-				float angle = ( TAU * i ) / count;
+			for( int i = 0; i < absCount; i++ ) {
+				float angle = ( TAU * i ) / count + startAngle;
 				yield return new Vector2(
 					MathF.Cos( angle ) * radius,
 					MathF.Sin( angle ) * radius
 				);
+			}
+		}
+
+		/// <inheritdoc cref="PointsInCircle"/>
+		public static IEnumerable<(Vector2 p, int i)> PointsInCircleIdx( int count, float radius = 1, int startOffset = 0 ) {
+			if( count == 0 )
+				yield break;
+			int absCount = Math.Abs( count );
+			for( int i = 0; i < absCount; i++ ) {
+				float angle = ( TAU * ( i + startOffset ) ) / count;
+				yield return ( new Vector2(
+					MathF.Cos( angle ) * radius,
+					MathF.Sin( angle ) * radius
+				), i );
 			}
 		}
 

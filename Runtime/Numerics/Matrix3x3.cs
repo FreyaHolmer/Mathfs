@@ -125,6 +125,12 @@ namespace Freya {
 			};
 		}
 
+		public Matrix4x4 ToMatrix4x4( Vector3 pos, float m33 = 1 ) {
+			Matrix4x4 m4 = (Matrix4x4)this;
+			m4.SetColumn( 3, new Vector4( pos.x, pos.y, pos.z, m33 ) );
+			return m4;
+		}
+
 		public static explicit operator Matrix3x3( Matrix4x4 m ) => new(m.m00, m.m01, m.m02, m.m10, m.m11, m.m12, m.m20, m.m21, m.m22);
 
 		public static explicit operator Matrix4x4( Matrix3x3 m ) =>
