@@ -60,6 +60,12 @@ namespace Freya {
 		/// <param name="output">The output range</param>
 		public static float Remap( float value, FloatRange input, FloatRange output ) => output.Lerp( input.InverseLerp( value ) );
 
+		/// <summary>Remaps the input value from the <c>input</c> range to the <c>output</c> range, and contains it within</summary>
+		/// <param name="value">The value to remap</param>
+		/// <param name="input">The input range</param>
+		/// <param name="output">The output range</param>
+		public static float RemapClamped( float value, FloatRange input, FloatRange output ) => output.Lerp( input.InverseLerp( value ).Clamp01() );
+
 		/// <summary>Remaps a range from the <c>input</c> range to the <c>output</c> range</summary>
 		/// <param name="value">The range to remap</param>
 		/// <param name="input">The input range</param>

@@ -71,6 +71,9 @@ namespace Freya {
 		/// <summary>Returns e to the power of the given value</summary>
 		[MethodImpl( INLINE )] public static float Exp( float power ) => MathF.Exp( power );
 
+		/// <summary>Returns 2 to the power of the given value</summary>
+		[MethodImpl( INLINE )] public static float Exp2( float power ) => MathF.Exp( power * 0.69314718056f );
+
 		/// <summary>Returns the logarithm of a value, with the given base</summary>
 		[MethodImpl( INLINE )] public static float Log( float value, float @base ) => MathF.Log( value, @base );
 
@@ -879,14 +882,32 @@ namespace Freya {
 			t switch {
 				0f => a,
 				1f => b,
-				_  => MathF.Pow( a, 1 - t ) * MathF.Pow( b, t )
+				_  => a * MathF.Exp( MathF.Log( b / a ) * t ) // same as exp( lerp(ln a, ln b, t) ), but without numeric issues!
+			};
+
+		/// <inheritdoc cref="Eerp(float,float,float)"/>
+		[MethodImpl( INLINE )] public static Vector3 Eerp( Vector3 a, Vector3 b, float t ) =>
+			t switch {
+				0f => a,
+				1f => b,
+				_ => new Vector3(
+					Eerp( a.x, b.x, t ),
+					Eerp( a.y, b.y, t ),
+					Eerp( a.z, b.z, t )
+				)
 			};
 
 		/// <summary>Inverse exponential interpolation, the multiplicative version of InverseLerp, useful for values such as scaling or zooming</summary>
 		/// <param name="a">The start value</param>
 		/// <param name="b">The end value</param>
 		/// <param name="v">A value between a and b. Note: values outside this range are still valid, and will be extrapolated</param>
-		[MethodImpl( INLINE )] public static float InverseEerp( float a, float b, float v ) => MathF.Log( a / v ) / MathF.Log( a / b );
+		[MethodImpl( INLINE )] public static float InverseEerp( float a, float b, float v ) {
+			if( v == a )
+				return 0f;
+			if( v == b )
+				return 1f;
+			return MathF.Log( v / a ) / MathF.Log( b / a );
+		}
 
 		#endregion
 
