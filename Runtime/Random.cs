@@ -23,7 +23,7 @@ namespace Freya {
 		/// <param name="min">The minimum value [inclusive] </param>
 		/// <param name="max">The maximum value [inclusive]</param>
 		public static float Range( float min, float max ) => UnityRandom.Range( min, max );
-		
+
 		/// <summary>Randomly returns a value between <c>min</c> [inclusive] and <c>max</c> [exclusive]</summary>
 		/// <param name="min">The minimum value [inclusive]</param>
 		/// <param name="max">The maximum value [exclusive]</param>
