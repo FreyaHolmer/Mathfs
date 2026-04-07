@@ -11,19 +11,19 @@ namespace Freya {
 		public static readonly RationalMatrix4x4 Identity = new RationalMatrix4x4( 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 );
 		public static readonly RationalMatrix4x4 Zero = new RationalMatrix4x4( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 
-		public readonly Rational m00, m01, m02, m03;
-		public readonly Rational m10, m11, m12, m13;
-		public readonly Rational m20, m21, m22, m23;
-		public readonly Rational m30, m31, m32, m33;
+		public readonly rat m00, m01, m02, m03;
+		public readonly rat m10, m11, m12, m13;
+		public readonly rat m20, m21, m22, m23;
+		public readonly rat m30, m31, m32, m33;
 
-		public RationalMatrix4x4( Rational m00, Rational m01, Rational m02, Rational m03, Rational m10, Rational m11, Rational m12, Rational m13, Rational m20, Rational m21, Rational m22, Rational m23, Rational m30, Rational m31, Rational m32, Rational m33 ) {
+		public RationalMatrix4x4( rat m00, rat m01, rat m02, rat m03, rat m10, rat m11, rat m12, rat m13, rat m20, rat m21, rat m22, rat m23, rat m30, rat m31, rat m32, rat m33 ) {
 			( this.m00, this.m01, this.m02, this.m03 ) = ( m00, m01, m02, m03 );
 			( this.m10, this.m11, this.m12, this.m13 ) = ( m10, m11, m12, m13 );
 			( this.m20, this.m21, this.m22, this.m23 ) = ( m20, m21, m22, m23 );
 			( this.m30, this.m31, this.m32, this.m33 ) = ( m30, m31, m32, m33 );
 		}
 
-		public Rational this[ int row, int column ] {
+		public rat this[ int row, int column ] {
 			get {
 				return ( row, column ) switch {
 					(0, 0) => m00,
@@ -51,32 +51,32 @@ namespace Freya {
 		public RationalMatrix4x4 Inverse {
 			get {
 				// source: https://stackoverflow.com/questions/1148309/inverting-a-4x4-matrix
-				Rational A2323 = m22 * m33 - m23 * m32;
-				Rational A1323 = m21 * m33 - m23 * m31;
-				Rational A1223 = m21 * m32 - m22 * m31;
-				Rational A0323 = m20 * m33 - m23 * m30;
-				Rational A0223 = m20 * m32 - m22 * m30;
-				Rational A0123 = m20 * m31 - m21 * m30;
-				Rational det = m00 * ( m11 * A2323 - m12 * A1323 + m13 * A1223 )
+				rat A2323 = m22 * m33 - m23 * m32;
+				rat A1323 = m21 * m33 - m23 * m31;
+				rat A1223 = m21 * m32 - m22 * m31;
+				rat A0323 = m20 * m33 - m23 * m30;
+				rat A0223 = m20 * m32 - m22 * m30;
+				rat A0123 = m20 * m31 - m21 * m30;
+				rat det = m00 * ( m11 * A2323 - m12 * A1323 + m13 * A1223 )
 							   - m01 * ( m10 * A2323 - m12 * A0323 + m13 * A0223 )
 							   + m02 * ( m10 * A1323 - m11 * A0323 + m13 * A0123 )
 							   - m03 * ( m10 * A1223 - m11 * A0223 + m12 * A0123 );
 
-				if( det == Rational.Zero )
+				if( det == rat.zero )
 					throw new DivideByZeroException( "The matrix is not invertible - its determinant is 0" );
 
-				Rational A2313 = m12 * m33 - m13 * m32;
-				Rational A1313 = m11 * m33 - m13 * m31;
-				Rational A1213 = m11 * m32 - m12 * m31;
-				Rational A2312 = m12 * m23 - m13 * m22;
-				Rational A1312 = m11 * m23 - m13 * m21;
-				Rational A1212 = m11 * m22 - m12 * m21;
-				Rational A0313 = m10 * m33 - m13 * m30;
-				Rational A0213 = m10 * m32 - m12 * m30;
-				Rational A0312 = m10 * m23 - m13 * m20;
-				Rational A0212 = m10 * m22 - m12 * m20;
-				Rational A0113 = m10 * m31 - m11 * m30;
-				Rational A0112 = m10 * m21 - m11 * m20;
+				rat A2313 = m12 * m33 - m13 * m32;
+				rat A1313 = m11 * m33 - m13 * m31;
+				rat A1213 = m11 * m32 - m12 * m31;
+				rat A2312 = m12 * m23 - m13 * m22;
+				rat A1312 = m11 * m23 - m13 * m21;
+				rat A1212 = m11 * m22 - m12 * m21;
+				rat A0313 = m10 * m33 - m13 * m30;
+				rat A0213 = m10 * m32 - m12 * m30;
+				rat A0312 = m10 * m23 - m13 * m20;
+				rat A0212 = m10 * m22 - m12 * m20;
+				rat A0113 = m10 * m31 - m11 * m30;
+				rat A0112 = m10 * m21 - m11 * m20;
 
 				return new RationalMatrix4x4(
 					( m11 * A2323 - m12 * A1323 + m13 * A1223 ), -( m01 * A2323 - m02 * A1323 + m03 * A1223 ), ( m01 * A2313 - m02 * A1313 + m03 * A1213 ), -( m01 * A2312 - m02 * A1312 + m03 * A1212 ),
@@ -88,15 +88,15 @@ namespace Freya {
 		}
 
 		/// <summary>Returns the determinant of this matrix</summary>
-		public Rational Determinant {
+		public rat Determinant {
 			get {
 				// source: https://stackoverflow.com/questions/1148309/inverting-a-4x4-matrix
-				Rational A2323 = m22 * m33 - m23 * m32;
-				Rational A1323 = m21 * m33 - m23 * m31;
-				Rational A1223 = m21 * m32 - m22 * m31;
-				Rational A0323 = m20 * m33 - m23 * m30;
-				Rational A0223 = m20 * m32 - m22 * m30;
-				Rational A0123 = m20 * m31 - m21 * m30;
+				rat A2323 = m22 * m33 - m23 * m32;
+				rat A1323 = m21 * m33 - m23 * m31;
+				rat A1223 = m21 * m32 - m22 * m31;
+				rat A0323 = m20 * m33 - m23 * m30;
+				rat A0223 = m20 * m32 - m22 * m30;
+				rat A0123 = m20 * m31 - m21 * m30;
 				return m00 * ( m11 * A2323 - m12 * A1323 + m13 * A1223 )
 					   - m01 * ( m10 * A2323 - m12 * A0323 + m13 * A0223 )
 					   + m02 * ( m10 * A1323 - m11 * A0323 + m13 * A0123 )
@@ -124,7 +124,7 @@ namespace Freya {
 			);
 		}
 
-		public static RationalMatrix4x4 operator *( RationalMatrix4x4 c, Rational v ) =>
+		public static RationalMatrix4x4 operator *( RationalMatrix4x4 c, rat v ) =>
 			new(c.m00 * v, c.m01 * v, c.m02 * v, c.m03 * v,
 				c.m10 * v, c.m11 * v, c.m12 * v, c.m13 * v,
 				c.m20 * v, c.m21 * v, c.m22 * v, c.m23 * v,
@@ -137,10 +137,10 @@ namespace Freya {
 				0, 0, 0, 1);
 
 
-		public static RationalMatrix4x4 operator /( RationalMatrix4x4 c, Rational v ) => c * v.Reciprocal;
+		public static RationalMatrix4x4 operator /( RationalMatrix4x4 c, rat v ) => c * v.Reciprocal;
 
 		public static RationalMatrix4x4 operator *( RationalMatrix4x4 a, RationalMatrix4x4 b ) {
-			Rational GetEntry( int r, int c ) => a[r, 0] * b[0, c] + a[r, 1] * b[1, c] + a[r, 2] * b[2, c] + a[r, 3] * b[3, c];
+			rat GetEntry( int r, int c ) => a[r, 0] * b[0, c] + a[r, 1] * b[1, c] + a[r, 2] * b[2, c] + a[r, 3] * b[3, c];
 
 			return new RationalMatrix4x4(
 				GetEntry( 0, 0 ), GetEntry( 0, 1 ), GetEntry( 0, 2 ), GetEntry( 0, 3 ),

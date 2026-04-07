@@ -493,10 +493,10 @@ namespace Freya {
 
 		class MathSum {
 
-			Rational globalScale = Rational.One;
-			List<(Rational coeff, string var)> terms = new List<(Rational coeff, string var)>();
+			rat globalScale = rat.one;
+			List<(rat coeff, string var)> terms = new List<(rat coeff, string var)>();
 
-			public void AddTerm( Rational coeff, string var ) {
+			public void AddTerm( rat coeff, string var ) {
 				if( coeff != 0 )
 					terms.Add( ( coeff, var ) );
 			}
@@ -505,8 +505,8 @@ namespace Freya {
 				if( terms.Count < 2 )
 					return; // can't optimize 0 or 1 terms
 
-				Rational coeff0 = terms[0].coeff.Abs();
-				if( terms.TrueForAll( t => t.coeff.Abs() == coeff0 ) ) {
+				rat coeff0 = terms[0].coeff.abs;
+				if( terms.TrueForAll( t => t.coeff.abs == coeff0 ) ) {
 					globalScale = coeff0;
 					for( int i = 0; i < terms.Count; i++ )
 						terms[i] = ( terms[i].coeff / coeff0, terms[i].var );
@@ -534,16 +534,16 @@ namespace Freya {
 				return line;
 			}
 
-			string FormatRational( Rational v ) => v.IsInteger ? $"{v.n}" : $"({v}f)";
+			string FormatRational( rat v ) => v.isInteger ? $"{v.n}" : $"({v}f)";
 
 			string FormatTerm( int i ) {
-				Rational value = terms[i].coeff;
+				rat value = terms[i].coeff;
 				string sign = i > 0 && value >= 0 ? "+" : "";
 				string valueStr;
 				string op = "";
-				if( value == Rational.One )
+				if( value == rat.one )
 					valueStr = "";
-				else if( value == -Rational.One )
+				else if( value == -rat.one )
 					valueStr = "-";
 				else if( value > 0 ) {
 					valueStr = FormatRational( value );

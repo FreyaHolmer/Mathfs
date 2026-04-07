@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Freya {
 
-	[CustomPropertyDrawer( typeof(Rational) )]
+	[CustomPropertyDrawer( typeof(rat) )]
 	public class IngredientDrawer : PropertyDrawer {
 
 		bool hasInitialized;

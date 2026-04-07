@@ -11,17 +11,17 @@ namespace Freya {
 		public static readonly RationalMatrix3x3 Identity = new RationalMatrix3x3( 1, 0, 0, 0, 1, 0, 0, 0, 1 );
 		public static readonly RationalMatrix3x3 Zero = new RationalMatrix3x3( 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 
-		public readonly Rational m00, m01, m02;
-		public readonly Rational m10, m11, m12;
-		public readonly Rational m20, m21, m22;
+		public readonly rat m00, m01, m02;
+		public readonly rat m10, m11, m12;
+		public readonly rat m20, m21, m22;
 
-		public RationalMatrix3x3( Rational m00, Rational m01, Rational m02, Rational m10, Rational m11, Rational m12, Rational m20, Rational m21, Rational m22 ) {
+		public RationalMatrix3x3( rat m00, rat m01, rat m02, rat m10, rat m11, rat m12, rat m20, rat m21, rat m22 ) {
 			( this.m00, this.m01, this.m02 ) = ( m00, m01, m02 );
 			( this.m10, this.m11, this.m12 ) = ( m10, m11, m12 );
 			( this.m20, this.m21, this.m22 ) = ( m20, m21, m22 );
 		}
 
-		public Rational this[ int row, int column ] {
+		public rat this[ int row, int column ] {
 			get {
 				return ( row, column ) switch {
 					(0, 0) => m00,
@@ -41,12 +41,12 @@ namespace Freya {
 		/// <summary>Returns the inverse of this matrix. Throws a division by zero exception if it's not invertible</summary>
 		public RationalMatrix3x3 Inverse {
 			get {
-				Rational A1212 = m11 * m22 - m12 * m21;
-				Rational A0212 = m10 * m22 - m12 * m20;
-				Rational A0112 = m10 * m21 - m11 * m20;
-				Rational det = m00 * A1212 - m01 * A0212 + m02 * A0112;
+				rat A1212 = m11 * m22 - m12 * m21;
+				rat A0212 = m10 * m22 - m12 * m20;
+				rat A0112 = m10 * m21 - m11 * m20;
+				rat det = m00 * A1212 - m01 * A0212 + m02 * A0112;
 
-				if( det == Rational.Zero )
+				if( det == rat.zero )
 					throw new DivideByZeroException( "The matrix is not invertible - its determinant is 0" );
 
 				return new RationalMatrix3x3(
@@ -58,11 +58,11 @@ namespace Freya {
 		}
 
 		/// <summary>Returns the determinant of this matrix</summary>
-		public Rational Determinant {
+		public rat Determinant {
 			get {
-				Rational A1212 = m11 * m22 - m12 * m21;
-				Rational A0212 = m10 * m22 - m12 * m20;
-				Rational A0112 = m10 * m21 - m11 * m20;
+				rat A1212 = m11 * m22 - m12 * m21;
+				rat A0212 = m10 * m22 - m12 * m20;
+				rat A0112 = m10 * m21 - m11 * m20;
 				return m00 * A1212 - m01 * A0212 + m02 * A0112;
 			}
 		}
@@ -77,15 +77,15 @@ namespace Freya {
 			};
 		}
 
-		public static RationalMatrix3x3 operator *( RationalMatrix3x3 c, Rational v ) =>
+		public static RationalMatrix3x3 operator *( RationalMatrix3x3 c, rat v ) =>
 			new(c.m00 * v, c.m01 * v, c.m02 * v,
 				c.m10 * v, c.m11 * v, c.m12 * v,
 				c.m20 * v, c.m21 * v, c.m22 * v);
 
-		public static RationalMatrix3x3 operator /( RationalMatrix3x3 c, Rational v ) => c * v.Reciprocal;
+		public static RationalMatrix3x3 operator /( RationalMatrix3x3 c, rat v ) => c * v.Reciprocal;
 
 		public static RationalMatrix3x3 operator *( RationalMatrix3x3 a, RationalMatrix3x3 b ) {
-			Rational GetEntry( int r, int c ) => a[r, 0] * b[0, c] + a[r, 1] * b[1, c] + a[r, 2] * b[2, c] + a[r, 3] * b[3, c];
+			rat GetEntry( int r, int c ) => a[r, 0] * b[0, c] + a[r, 1] * b[1, c] + a[r, 2] * b[2, c] + a[r, 3] * b[3, c];
 
 			return new RationalMatrix3x3(
 				GetEntry( 0, 0 ), GetEntry( 0, 1 ), GetEntry( 0, 2 ),
