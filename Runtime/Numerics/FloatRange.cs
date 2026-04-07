@@ -1,13 +1,15 @@
 ﻿// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Freya {
 
 	/// <summary>A value range between two values a and b</summary>
-	[Serializable]
-	public struct FloatRange {
+	[Serializable] public struct FloatRange : IEquatable<FloatRange> {
 
 		/// <summary>The unit interval of 0 to 1</summary>
 		public static readonly FloatRange unit = new FloatRange( 0, 1 );
@@ -107,6 +109,100 @@ namespace Freya {
 				1 => ( Mathfs.Min( a, range.a ), Mathfs.Max( b, range.b ) ), // forward - a is min, b is max
 				_ => ( Mathfs.Min( b, range.b ), Mathfs.Max( a, range.a ) ) // reversed - b is min, a is max
 			};
+
+		/// <summary>Combines overlapping ranges and enumerates the results</summary>
+		public static IEnumerable<FloatRange> Union( IEnumerable<FloatRange> ranges ) {
+			int i = 0;
+			FloatRange range = default;
+			foreach( FloatRange r in ranges.OrderBy( r => r.a ) ) {
+				if( i == 0 ) {
+					range = r;
+				} else {
+					if( range.b < r.a ) { // r.a is guaranteed to be >= range.a
+						// the next range r is outside the current range, commit current range
+						yield return range;
+						// switch to next range
+						range = r;
+					} else {
+						range = range.Encapsulate( r ); // the next range starts inside the current one, combine them
+					}
+				}
+				i++;
+			}
+			if( i > 0 ) // if i == 0 there were no items provided
+				yield return range;
+		}
+
+		/// <summary>Enumerates the remaining float ranges after this range has range b taken out of it. May return either 0, 1 or 2 ranges</summary>
+		/// <param name="remove">The range to subtract with</param>
+		public IEnumerable<FloatRange> Difference( FloatRange remove ) {
+			if( this.Overlaps( remove ) == false ) {
+				yield return this; // nothing is subtracted
+			} else if( remove.a <= this.a && remove.b >= this.b ) {
+				// everything has been subtracted away
+			} else {
+				// now we know it's a partial cut, which leads to either one or two results
+				if( remove.a < this.b && remove.a > this.a )
+					yield return new FloatRange( this.a, remove.a );
+				if( remove.b < this.b && remove.b > this.a )
+					yield return new FloatRange( remove.b, this.b );
+			}
+		}
+
+		/// <summary>Returns the range shared by this range and <c>other</c>, which is either one range, or no ranges at all</summary>
+		/// <param name="other">The range to intersect with</param>
+		public IEnumerable<FloatRange> Intersection( FloatRange other ) {
+			if( this.TryIntersect( other, out FloatRange intersection ) )
+				yield return intersection;
+		}
+
+		/// <summary>Tries to get the range shared by this range and <c>other</c></summary>
+		/// <param name="other">The range to intersect with</param>
+		/// <param name="intersection">The range common to both ranges</param>
+		/// <returns>Returns true if there is a range shared by both</returns>
+		public bool TryIntersect( FloatRange other, out FloatRange intersection ) {
+			if( other.b <= this.a || other.a >= this.b ) {
+				intersection = default; // no overlap, return nothing
+				return false;
+			}
+			intersection = new FloatRange( math.max( other.a, this.a ), math.min( other.b, this.b ) );
+			return true;
+		}
+
+		/// <summary>Enumerates the remaining float ranges after range a has range b taken out of it</summary>
+		/// <param name="solid">The ranges to subtract from</param>
+		/// <param name="remove">The range to subtract with</param>
+		public static IEnumerable<FloatRange> Difference( IEnumerable<FloatRange> solid, FloatRange remove ) {
+			return solid.SelectMany( x => x.Difference( remove ) );
+		}
+
+		/// <summary>Splits the range if it crosses a modulo boundary. For example, the range <c>[-20,10]</c> mod <c>360</c> will return <c>[0,10]</c> and <c>[340,360]</c></summary>
+		/// <param name="mod">The value at the discontinuity. For example, if the ranges represent degrees, mod should be <c>360</c></param>
+		public IEnumerable<FloatRange> ModuloSplit( float mod ) {
+			float len = Length;
+			if( len >= mod ) { // this means the range necessarily covers the entire range
+				yield return new FloatRange( 0, mod );
+			} else {
+				float aCanon = Mathfs.Repeat( a, mod );
+
+				float spaceBeforeDiscontinuity = mod - aCanon;
+				if( len <= spaceBeforeDiscontinuity ) {
+					// this means it's not crossing the discontinuity
+					yield return new FloatRange( aCanon, aCanon + len );
+				} else {
+					// this means it needs to be split up into two around the discontinuity
+					yield return new FloatRange( aCanon, mod );
+					yield return new FloatRange( 0, len - spaceBeforeDiscontinuity );
+				}
+			}
+		}
+
+		/// <summary>Combines overlapping ranges with a specified modulo</summary>
+		/// <param name="ranges">The ranges to combine</param>
+		/// <param name="mod">The value at the discontinuity. For example, if the ranges represent degrees, mod should be <c>360</c></param>
+		public static IEnumerable<FloatRange> UnionModulo( IEnumerable<FloatRange> ranges, float mod ) {
+			return Union( ranges.SelectMany( r => r.ModuloSplit( mod ) ) );
+		}
 
 		/// <summary>Returns a version of this range, scaled around its start value</summary>
 		/// <param name="scale">The value to scale the range by</param>
