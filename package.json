@@ -1,9 +1,9 @@
 {
   "name": "com.acegikmo.mathfs",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "displayName": "Mathfs",
   "description": "Advanced math functionality for Unity",
-  "unity": "2021.2",
+  "unity": "6000.0",
   "documentationUrl": "https://github.com/FreyaHolmer/Mathfs",
   "licensesUrl": "https://github.com/FreyaHolmer/Mathfs/LICENSE.txt",
   "author": {
