@@ -888,6 +888,17 @@ namespace Freya {
 				_  => a * MathF.Exp( MathF.Log( b / a ) * t ) // same as exp( lerp(ln a, ln b, t) ), but without numeric issues!
 			};
 
+		/// <summary>Harmonic interpolation</summary>
+		/// <param name="a">The start value</param>
+		/// <param name="b">The end value</param>
+		/// <param name="t">The t-value from 0 to 1 representing position along the eerp</param>
+		[MethodImpl( INLINE )] public static float Herp( float a, float b, float t ) =>
+			t switch {
+				0f => a,
+				1f => b,
+				_  => ( a * b ) / ( t * ( a - b ) + b )
+			};
+
 		/// <inheritdoc cref="Eerp(float,float,float)"/>
 		[MethodImpl( INLINE )] public static Vector3 Eerp( Vector3 a, Vector3 b, float t ) =>
 			t switch {
