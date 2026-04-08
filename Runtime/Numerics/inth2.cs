@@ -11,7 +11,7 @@ namespace Freya {
 	[Serializable] public struct inth2 :
 		IEquatable<inth2>,
 		IVec2<inth2, inth, rat, rat, rat2>,
-		INumber<inth2, int2>,
+		INumber<inth2>,
 		ISignedNumber<int2>,
 		IHalfNumber<int2>,
 		IRoundable<int2> {
@@ -23,8 +23,12 @@ namespace Freya {
 
 		public inth X => x;
 		public inth Y => y;
+		public inth2 zeroX => new(0, y);
+		public inth2 zeroY => new(x, 0);
+		public inth2 flipX => new(-x, y);
+		public inth2 flipY => new(x, -y);
 		public inth this[ int i ] => i switch { 0 => x, 1 => y, _ => throw new IndexOutOfRangeException( i.ToString() ) };
-		public bool isOrthogonal => abs.cmin == 0;
+		public bool isOrthogonal => ( ceilAwayFrom0 > 0 ).csum() <= 1;
 		public bool isZero => x == 0 && y == 0;
 
 		public inth2( inth x, inth y ) => ( this.x, this.y ) = ( x, y );

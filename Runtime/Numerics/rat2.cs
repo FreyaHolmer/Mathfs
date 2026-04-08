@@ -11,14 +11,19 @@ namespace Freya {
 	/// <summary>A 2D vector with rational components (ℚ² instead of ℝ²)</summary>
 	[Serializable] public struct rat2 : IEquatable<rat2>,
 		IVec2<rat2, rat, rat, rat, rat2>,
-		INumber<rat2, int2>,
+		INumber<rat2>,
 		ISignedNumber<int2>,
+		IDotProduct<int2, rat>,
 		IRoundable<int2> {
 		[SerializeField] public rat x;
 		[SerializeField] public rat y;
 		public rat this[ int i ] => i switch { 0 => x, 1 => y, _ => throw new IndexOutOfRangeException( i.ToString() ) };
 		public rat X => x;
 		public rat Y => y;
+		public rat2 zeroX => new(0, y);
+		public rat2 zeroY => new(x, 0);
+		public rat2 flipX => new(-x, y);
+		public rat2 flipY => new(x, -y);
 		// public Rational2 rot45chebyshev => throw new NotImplementedException();
 		public static readonly rat2 zero = new(rat.zero, rat.zero);
 		public static readonly rat2 half = new(rat.half, rat.half);
@@ -36,7 +41,7 @@ namespace Freya {
 
 		public bool isZero => math.all( N == new int2( 0, 0 ) );
 		public bool isInteger => math.all( D == new int2( 1, 1 ) );
-		public bool isOrthogonal => abs.cmin == 0;
+		public bool isOrthogonal => ( ceilAwayFrom0 > 0 ).csum() <= 1;
 		public bool IsDiagonal => x.abs == y.abs;
 
 		// Chebyshev distances
