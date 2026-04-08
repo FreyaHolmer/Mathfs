@@ -10,7 +10,7 @@ namespace Freya {
 	[Serializable] public struct rat :
 		IComparable<rat>,
 		IEquatable<rat>,
-		INumber<rat, int>,
+		INumber<rat>,
 		ISignedNumber<int>,
 		IRoundable<int> {
 		/// <summary>The numerator of this number. Note: Directly modifying this value will not reduce the fraction</summary>
@@ -66,6 +66,8 @@ namespace Freya {
 		public rat Reciprocal => new(d, n);
 
 		public bool isInteger => d == 1;
+		public bool isZero => n == 0;
+		public bool isOrthogonal => true;
 
 
 		/// <summary>Returns this number to the power of another integer <c>pow</c></summary>
@@ -99,6 +101,7 @@ namespace Freya {
 		public rat abs => new(n.Abs(), d);
 		public rat max( rat other ) => this > other ? this : other;
 		public rat min( rat other ) => this < other ? this : other;
+		public rat to( rat target ) => target - this;
 		public int sign => MathF.Sign( n );
 		public int round( RoundingDirection rounding = RoundingDirection.ToEven ) => ( n < 0 == d < 0 ? ( n + d / 2 ) / d : ( n - d / 2 ) / d ); // todo: work out which rounding method this is
 		public int floorToward0 => n < 0 ? ceil : floor;

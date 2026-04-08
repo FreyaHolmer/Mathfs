@@ -11,7 +11,7 @@ namespace Freya {
 	[Serializable] public struct inth :
 		IComparable<inth>,
 		IEquatable<inth>,
-		INumber<inth, int>,
+		INumber<inth>,
 		ISignedNumber<int>,
 		IHalfNumber<int>,
 		IRoundable<int> {
@@ -22,10 +22,13 @@ namespace Freya {
 		public inth fromInt( int intValue ) => this.h = intValue * 2;
 
 		public bool isInteger => h % 2 == 0;
+		public bool isZero => h == 0;
+		public bool isOrthogonal => true;
 		public int sign => Math.Sign( h );
 		public inth abs => new() { h = Math.Abs( h ) };
 		public inth max( inth other ) => this > other ? this : other;
 		public inth min( inth other ) => this < other ? this : other;
+		public inth to( inth target ) => target - this;
 		public static int zero => 0;
 		public static inth half => new() { h = 1 };
 		public static int one => 1;
