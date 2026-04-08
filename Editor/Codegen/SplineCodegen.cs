@@ -1,43 +1,14 @@
-// by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Debug = UnityEngine.Debug;
 
 namespace Freya {
 
-	public static class MathfsCodegen {
-
-		class SplineType {
-			public int degree;
-			public string className;
-			public string prettyName;
-			public string prettyNameLower;
-			public string[] paramNames;
-			public string[] paramDescs;
-			public string matrixName;
-			public RationalMatrix4x4 charMatrix;
-
-			public SplineType( int degree, string className, string prettyName, string matrixName, RationalMatrix4x4 charMatrix, string[] paramNames, string[] paramDescs, string[] paramDescsQuad = null ) {
-				this.degree = degree;
-				this.className = className;
-				this.prettyName = prettyName;
-				this.prettyNameLower = prettyName.ToLowerInvariant();
-				this.paramDescs = paramDescs;
-				this.matrixName = matrixName;
-				this.paramNames = paramNames;
-				this.charMatrix = charMatrix;
-			}
-
-			public void AppendParamStrings( CodeGenerator gen, int degree, int i ) {
-				gen.Param( paramNames[i], paramDescs[i] );
-			}
-		}
+	public static class SplineCodegen {
 
 		#region Type Definitions
 
@@ -93,6 +64,17 @@ namespace Freya {
 		static SplineType[] allSplineTypes = { typeBezier, typeBezierQuad, typeHermite, typeBspline, typeCatRom };
 
 		#endregion
+
+		public static void GenerateUniformSplines( string splinesPath ) {
+			string pathUniformSplines = $"{splinesPath}/Uniform Spline Segments";
+			for( int dim = 1; dim < 5; dim++ ) { // 1D, 2D, 3D, 4D
+				GenerateUniformSplineType( pathUniformSplines, typeBezier, dim );
+				GenerateUniformSplineType( pathUniformSplines, typeBezierQuad, dim );
+				GenerateUniformSplineType( pathUniformSplines, typeHermite, dim );
+				GenerateUniformSplineType( pathUniformSplines, typeBspline, dim );
+				GenerateUniformSplineType( pathUniformSplines, typeCatRom, dim );
+			}
+		}
 
 		// [MenuItem( "Assets/Port Spline Data" )]
 		public static void PortSplineData() {
@@ -154,131 +136,8 @@ namespace Freya {
 			return false;
 		}
 
-		enum ElemType {
-			_1D = 1,
-			_2D,
-			_3D,
-			_4D,
-			Quat
-		}
 
-		static ElemType GetVectorOfDim( int dim ) => (ElemType)dim;
-
-		[MenuItem( "Assets/Run Mathfs Codegen" )]
-		public static void Regenerate() {
-			for( int dim = 1; dim < 5; dim++ ) { // 1D, 2D, 3D, 4D
-				GenerateUniformSplineType( typeBezier, dim );
-				GenerateUniformSplineType( typeBezierQuad, dim );
-				GenerateUniformSplineType( typeHermite, dim );
-				GenerateUniformSplineType( typeBspline, dim );
-				GenerateUniformSplineType( typeCatRom, dim );
-				GenerateMatrixNx1( 3, GetVectorOfDim( dim ) );
-				GenerateMatrixNx1( 4, GetVectorOfDim( dim ) );
-			}
-			GenerateMatrixNx1( 4, ElemType.Quat );
-		}
-
-		static string GetLerpName( ElemType dim ) {
-			return dim switch {
-				ElemType._1D  => "Mathfs.Lerp",
-				ElemType._2D  => "Vector2.LerpUnclamped",
-				ElemType._3D  => "Vector3.LerpUnclamped",
-				ElemType._4D  => "Vector4.LerpUnclamped",
-				ElemType.Quat => "Quaternion.SlerpUnclamped",
-				_             => throw new IndexOutOfRangeException()
-			};
-		}
-
-		static void GenerateMatrixNx1( int count, ElemType dim ) {
-			const string vCompStr = "xyzw";
-			const string vCompStrUp = "XYZW";
-			int elemCompCount = ( (int)dim ).AtMost( 4 ); // quats also have 4
-			int[] elemRange = Enumerable.Range( 0, count ).ToArray();
-			int[] compRange = Enumerable.Range( 0, elemCompCount ).ToArray();
-			string[] compRangeStr = compRange.Select( c => vCompStr[c].ToString() ).ToArray();
-			string JoinRange( string separator, Func<int, string> elem ) => string.Join( separator, elemRange.Select( elem ) );
-			string elemType = dim switch {
-				ElemType._1D  => "float",
-				ElemType.Quat => "Quaternion",
-				_             => $"Vector{elemCompCount}"
-			};
-			string typePrefix = dim == ElemType._1D ? "" : elemType;
-			string lerpName = GetLerpName( dim );
-			string typeName = $"{typePrefix}Matrix{count}x1";
-			string csParams = JoinRange( ", ", i => $"m{i}" );
-			string csParamsThis = JoinRange( ", ", i => $"this.m{i}" );
-			string ctorParams = JoinRange( ", ", i => $"{elemType} m{i}" );
-			string indexerException = $"throw new IndexOutOfRangeException( $\"Matrix row index has to be from 0 to {count - 1}, got: {{row}}\" )";
-			string indexerGetterCases = JoinRange( ", ", i => $"{i} => m{i}" ) + $", _ => {indexerException}";
-			string equalsCompare = JoinRange( " && ", i => $"m{i}.Equals( other.m{i} )" );
-			string equalsOpCompare = JoinRange( " && ", i => $"a.m{i} == b.m{i}" );
-			string lerpAtoB = JoinRange( ", ", i => $"{lerpName}( a.m{i}, b.m{i}, t )" );
-			bool isMultiComponentVector = dim != ElemType._1D && dim != ElemType.Quat;
-
-			// generate content
-			CodeGenerator code = new CodeGenerator();
-			code.AppendHeader();
-			code.Append( "using System;" );
-			if( dim != ElemType._1D ) // for Vector2/3
-				code.Append( "using UnityEngine;" );
-
-			using( code.BracketScope( "namespace Freya" ) ) {
-				code.Summary( $"A {count}x1 column matrix with {elemType} values" );
-				using( code.BracketScope( $"[Serializable] public struct {typeName}" ) ) {
-					// fields
-					code.Append( $"public {elemType} {csParams};" );
-
-					// constructors
-					code.Append( $"public {typeName}({ctorParams}) => ({csParamsThis}) = ({csParams});" );
-					if( isMultiComponentVector ) { // compose from float matrices
-						string s = $"public {typeName}({string.Join( ", ", compRangeStr.Select( c => $"Matrix{count}x1 {c}" ) )}) => ";
-						s += $"({csParams}) = ({JoinRange( ", ", i => $"new {elemType}({string.Join( ", ", compRangeStr.Select( c => $"{c}.m{i}" ) )})" )});";
-						code.Append( s );
-					}
-
-					// indexer
-					using( code.BracketScope( $"public {elemType} this[int row]" ) ) {
-						code.Append( $"get => row switch{{{indexerGetterCases}}};" );
-						using( code.BracketScope( "set" ) ) {
-							using( code.BracketScope( "switch(row)" ) ) {
-								code.Append( JoinRange( " ", i => $"case {i}: m{i} = value; break;" ) );
-								code.Append( $"default: {indexerException};" );
-							}
-						}
-					}
-
-					// component extraction for vector-valued matrices
-					if( isMultiComponentVector ) {
-						for( int c = 0; c < elemCompCount; c++ ) {
-							int cc = c;
-							string parameters = JoinRange( ", ", i => $"m{i}.{vCompStr[cc]}" );
-							code.Append( $"public Matrix{count}x1 {vCompStrUp[c]} => new({parameters});" );
-						}
-					}
-
-					// interpolation
-					code.Summary( "Linearly interpolates between two matrices, based on a value <c>t</c>" );
-					code.Param( "t", "The value to blend by" );
-					string interpName = dim == ElemType.Quat ? "Slerp" : "Lerp";
-					code.Append( $"public static {typeName} {interpName}( {typeName} a, {typeName} b, float t ) => new {typeName}({lerpAtoB});" );
-
-					// comparison/operators
-					code.Append( $"public static bool operator ==( {typeName} a, {typeName} b ) => {equalsOpCompare};" );
-					code.Append( $"public static bool operator !=( {typeName} a, {typeName} b ) => !( a == b );" );
-					code.Append( $"public bool Equals( {typeName} other ) => {equalsCompare};" );
-					code.Append( $"public override bool Equals( object obj ) => obj is {typeName} other && Equals( other );" );
-					code.Append( $"public override int GetHashCode() => HashCode.Combine( {csParams} );" );
-					string stringPrint = JoinRange( "\\n", i => $"[{{m{i}}}]" );
-					code.Append( $"public override string ToString() => $\"{stringPrint}\";" );
-				}
-			}
-
-			// save/finalize
-			string path = $"Assets/Spline Plugin/Mathfs/Runtime/Numerics/{typeName}.cs";
-			File.WriteAllLines( path, code.content );
-		}
-
-		static void GenerateUniformSplineType( SplineType type, int dim ) {
+		static void GenerateUniformSplineType( string uniformSplinePath, SplineType type, int dim ) {
 			int degree = type.degree;
 			string dataType = dim == 1 ? "float" : $"Vector{dim}";
 			string polynomType = dim == 1 ? "Polynomial" : $"Polynomial{dim}D";
@@ -487,8 +346,18 @@ namespace Freya {
 				}
 			}
 
-			string path = $"Assets/Spline Plugin/Mathfs/Runtime/Splines/Uniform Spline Segments/{structName}.cs";
-			File.WriteAllLines( path, code.content );
+			File.WriteAllLines( $"{uniformSplinePath}/{structName}.cs", code.content );
+		}
+
+		static string GetLerpName( ElemType dim ) {
+			return dim switch {
+				ElemType._1D  => "Mathfs.Lerp",
+				ElemType._2D  => "Vector2.LerpUnclamped",
+				ElemType._3D  => "Vector3.LerpUnclamped",
+				ElemType._4D  => "Vector4.LerpUnclamped",
+				ElemType.Quat => "Quaternion.SlerpUnclamped",
+				_             => throw new IndexOutOfRangeException()
+			};
 		}
 
 		class MathSum {
@@ -559,20 +428,9 @@ namespace Freya {
 
 		}
 
-		public static string GetDegreeName( int d, bool shortName ) {
-			return d switch {
-				1 => "Linear",
-				2 => shortName ? "Quad" : "Quadratic",
-				3 => "Cubic",
-				4 => "Quartic",
-				5 => "Quintic",
-				_ => throw new IndexOutOfRangeException()
-			};
-		}
-
 		static readonly string[] comp = { "x", "y", "z", "w" };
 
-		public static void AppendBezierSplit( CodeGenerator code, string structName, string dataType, int degree, int dim ) {
+		static void AppendBezierSplit( CodeGenerator code, string structName, string dataType, int degree, int dim ) {
 			string LerpStr( string A, string B, int c ) => $"{A}.{comp[c]} + ( {B}.{comp[c]} - {A}.{comp[c]} ) * t";
 
 			void AppendLerps( string varName, string A, string B ) {
@@ -601,6 +459,18 @@ namespace Freya {
 				code.Append( $"return ( new {structName}( P0, a, p ), new {structName}( p, b, P2 ) );" );
 			}
 		}
+
+		static string GetDegreeName( int d, bool shortName ) {
+			return d switch {
+				1 => "Linear",
+				2 => shortName ? "Quad" : "Quadratic",
+				3 => "Cubic",
+				4 => "Quartic",
+				5 => "Quintic",
+				_ => throw new IndexOutOfRangeException()
+			};
+		}
+
 
 	}
 
