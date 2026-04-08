@@ -63,13 +63,13 @@ namespace Freya {
 		#region Swizzling
 
 		/// <summary>Returns X and Y as a Vector2, equivalent to <c>new Vector2(v.x,v.y)</c></summary>
-		[MethodImpl( INLINE )] public static Vector2 XY( this Vector2 v ) => new Vector2( v.x, v.y );
+		[MethodImpl( INLINE )] public static Vector2 XY( this Vector3 v ) => new(v.x, v.y);
 
 		/// <summary>Returns Y and X as a Vector2, equivalent to <c>new Vector2(v.y,v.x)</c></summary>
-		[MethodImpl( INLINE )] public static Vector2 YX( this Vector2 v ) => new Vector2( v.y, v.x );
+		[MethodImpl( INLINE )] public static Vector2 YX( this Vector3 v ) => new(v.y, v.x);
 
 		/// <summary>Returns X and Z as a Vector2, equivalent to <c>new Vector2(v.x,v.z)</c></summary>
-		[MethodImpl( INLINE )] public static Vector2 XZ( this Vector3 v ) => new Vector2( v.x, v.z );
+		[MethodImpl( INLINE )] public static Vector2 XZ( this Vector3 v ) => new(v.x, v.z);
 
 		/// <summary>Returns this vector as a Vector3, slotting X into X, and Y into Z, and the input value y into Y.
 		/// Equivalent to <c>new Vector3(v.x,y,v.y)</c></summary>
