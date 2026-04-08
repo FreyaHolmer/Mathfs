@@ -85,7 +85,7 @@ namespace Freya {
 
 
 		public static rat projectionTValue( rat2 v, rat2 n ) => dot( v, n ) / dot( n, n );
-		public static rat projectionTValue( rat2 v, int2 n ) => dot( v, n ) / Mathfs.dot( n, n );
+		public static rat projectionTValue( rat2 v, int2 n ) => dot( v, n ) / dot( n, n );
 
 		public static rat projectionTValuePerp( rat2 v, rat2 n ) => dot( v, v ) / dot( v, n );
 
