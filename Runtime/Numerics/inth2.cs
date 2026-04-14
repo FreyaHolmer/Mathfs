@@ -28,7 +28,7 @@ namespace Freya {
 		public inth2 flipX => new(-x, y);
 		public inth2 flipY => new(x, -y);
 		public inth this[ int i ] => i switch { 0 => x, 1 => y, _ => throw new IndexOutOfRangeException( i.ToString() ) };
-		public bool isOrthogonal => ( ceilAwayFrom0 > 0 ).csum() <= 1;
+		public bool isOrthogonal => ( ceilAwayFrom0.abs() > 0 ).csum() <= 1;
 		public bool isZero => x == 0 && y == 0;
 
 		public inth2( inth x, inth y ) => ( this.x, this.y ) = ( x, y );

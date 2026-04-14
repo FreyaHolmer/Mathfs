@@ -10,12 +10,26 @@ namespace Freya {
 		int scope = 0;
 		public List<string> content = new List<string>();
 
-		public void Append( string s ) => content.Add( $"{new string( '\t', scope )}{s}" );
-		public void Comment( string s ) => Append( $"// {s}" );
-		public void Using( string s ) => Append( $"using {s};" );
-		public void Summary( string s ) => Append( $"/// <summary>{s}</summary>" );
-		public void Param( string param, string desc ) => Append( $"/// <param name=\"{param}\">{desc}</param>" );
+		public static string GetInheritdocString( string s ) => $"/// <inheritdoc cref=\"{s}\" />";
+
+		public void AppendLine( string s ) => content.Add( $"{new string( '\t', scope )}{s}" );
+		public void Comment( string s ) => AppendLine( $"// {s}" );
+		public void Using( string s ) => AppendLine( $"using {s};" );
+		public void Summary( string s ) => AppendLine( $"/// <summary>{s}</summary>" );
+		public void Inheritdoc( string s ) => AppendLine( GetInheritdocString( s ) );
+		public void Param( string param, string desc ) => AppendLine( $"/// <param name=\"{param}\">{desc}</param>" );
 		public void LineBreak() => content.Add( "" );
+
+		public void BeginScope( string s, bool includeBrackets = true ) {
+			AppendLine( includeBrackets ? $"{s} {{" : s );
+			scope++;
+		}
+
+		public void EndScope( bool includeBrackets = true ) {
+			scope--;
+			if( includeBrackets )
+				AppendLine( "}" );
+		}
 
 		public void AppendHeader() {
 			Comment( "by Freya Holmér (https://github.com/FreyaHolmer/Mathfs)" );
@@ -35,14 +49,11 @@ namespace Freya {
 			public CodeScope( CodeGenerator gen, string s, bool includeBrackets = true ) {
 				this.gen = gen;
 				this.includeBrackets = includeBrackets;
-				gen.Append( includeBrackets ? $"{s} {{" : s );
-				gen.scope++;
+				gen.BeginScope( s, includeBrackets );
 			}
 
 			public void Dispose() {
-				gen.scope--;
-				if( includeBrackets )
-					gen.Append( "}" );
+				gen.EndScope( includeBrackets );
 			}
 		}
 
@@ -52,13 +63,13 @@ namespace Freya {
 
 			public RegionScope( CodeGenerator gen, string s ) {
 				this.gen = gen;
-				gen.Append( $"#region {s}" );
+				gen.AppendLine( $"#region {s}" );
 				gen.LineBreak();
 			}
 
 			public void Dispose() {
 				gen.LineBreak();
-				gen.Append( "#endregion" );
+				gen.AppendLine( "#endregion" );
 			}
 		}
 	}

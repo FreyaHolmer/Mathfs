@@ -171,13 +171,13 @@ namespace Freya {
 				code.Summary( $"An optimized uniform {dim}D {degFullLower} {type.prettyNameLower} segment, with {ptCount} control points" );
 				using( code.BracketScope( $"[Serializable] public struct {structName} : IParamSplineSegment<{polynomType},{pointMatrixType}>" ) ) { // intentionally always Cubic right now
 					code.LineBreak();
-					code.Append( "const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;" );
+					code.AppendLine( "const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;" );
 					code.LineBreak();
 
 					// fields
-					code.Append( $"[SerializeField] {pointMatrixType} pointMatrix;" );
-					code.Append( $"[NonSerialized] {polynomType} curve;" );
-					code.Append( "[NonSerialized] bool validCoefficients;" );
+					code.AppendLine( $"[SerializeField] {pointMatrixType} pointMatrix;" );
+					code.AppendLine( $"[NonSerialized] {polynomType} curve;" );
+					code.AppendLine( "[NonSerialized] bool validCoefficients;" );
 					code.LineBreak();
 
 					// constructors
@@ -185,11 +185,11 @@ namespace Freya {
 					code.Summary( ctorSummary );
 					for( int i = 0; i < ptCount; i++ )
 						type.AppendParamStrings( code, degree, i );
-					code.Append( $"public {structName}( {ctorParams} ) : this(new {pointMatrixType}({csPoints})){{}}" );
+					code.AppendLine( $"public {structName}( {ctorParams} ) : this(new {pointMatrixType}({csPoints})){{}}" );
 
 					code.Summary( ctorSummary );
 					code.Param( "pointMatrix", "The matrix containing the control points of this spline" );
-					code.Append( $"public {structName}( {pointMatrixType} pointMatrix ) => (this.pointMatrix,curve,validCoefficients) = (pointMatrix,default,false);" );
+					code.AppendLine( $"public {structName}( {pointMatrixType} pointMatrix ) => (this.pointMatrix,curve,validCoefficients) = (pointMatrix,default,false);" );
 
 					code.LineBreak();
 
@@ -197,44 +197,44 @@ namespace Freya {
 					using( code.BracketScope( $"public {polynomType} Curve" ) ) {
 						using( code.BracketScope( $"get" ) ) {
 							using( code.Scope( "if( validCoefficients )" ) )
-								code.Append( "return curve; // no need to update" );
-							code.Append( "validCoefficients = true;" );
+								code.AppendLine( "return curve; // no need to update" );
+							code.AppendLine( "validCoefficients = true;" );
 							using( code.Scope( $"return curve = new {polynomType}(" ) ) {
 								for( int icRow = 0; icRow < ptCount; icRow++ ) {
 									MathSum sum = new MathSum();
 									for( int ip = 0; ip < ptCount; ip++ )
 										sum.AddTerm( type.charMatrix[icRow, ip], $"{type.paramNames[ip].ToUpperInvariant()}" );
-									code.Append( $"{sum}{( icRow < ptCount - 1 ? "," : "" )}" );
+									code.AppendLine( $"{sum}{( icRow < ptCount - 1 ? "," : "" )}" );
 								}
 							}
 
-							code.Append( ");" );
+							code.AppendLine( ");" );
 						}
 						// todo: set would be possible! setting the points based on a curve
 					}
 
-					code.Append( $"public {pointMatrixType} PointMatrix {{[MethodImpl( INLINE )] get => pointMatrix; [MethodImpl( INLINE )] set => _ = ( pointMatrix = value, validCoefficients = false ); }}" );
+					code.AppendLine( $"public {pointMatrixType} PointMatrix {{[MethodImpl( INLINE )] get => pointMatrix; [MethodImpl( INLINE )] set => _ = ( pointMatrix = value, validCoefficients = false ); }}" );
 					for( int i = 0; i < ptCount; i++ ) {
 						code.Summary( pointDescs[i] );
-						code.Append( $"public {dataType} {points[i].ToUpperInvariant()}{{ [MethodImpl( INLINE )] get => pointMatrix.m{i}; [MethodImpl( INLINE )] set => _ = ( pointMatrix.m{i} = value, validCoefficients = false ); }}" );
+						code.AppendLine( $"public {dataType} {points[i].ToUpperInvariant()}{{ [MethodImpl( INLINE )] get => pointMatrix.m{i}; [MethodImpl( INLINE )] set => _ = ( pointMatrix.m{i} = value, validCoefficients = false ); }}" );
 					}
 
 					code.Summary( $"Get or set a control point position by index. Valid indices from 0 to {degree}" );
 					using( code.BracketScope( $"public {dataType} this[ int i ]" ) ) {
 						string indexException = $"throw new ArgumentOutOfRangeException( nameof(i), $\"Index has to be in the 0 to {degree} range, and I think {{i}} is outside that range you know\" )";
-						code.Append( $"get => i switch {{ {JoinRange( ", ", i => $"{i} => {points[i].ToUpperInvariant()}" )}, _ => {indexException} }};" );
-						code.Append( $"set {{ switch( i ){{ {JoinRange( " ", i => $"case {i}: {points[i].ToUpperInvariant()} = value; break;" )} default: {indexException}; }}}}" );
+						code.AppendLine( $"get => i switch {{ {JoinRange( ", ", i => $"{i} => {points[i].ToUpperInvariant()}" )}, _ => {indexException} }};" );
+						code.AppendLine( $"set {{ switch( i ){{ {JoinRange( " ", i => $"case {i}: {points[i].ToUpperInvariant()} = value; break;" )} default: {indexException}; }}}}" );
 					}
 
 					// equality checks
 					string compEquals = JoinRangeStr( " && ", p => $"{p.ToUpperInvariant()}.Equals( other.{p.ToUpperInvariant()} )" );
 					string toStringParams = JoinRange( ", ", i => $"{{pointMatrix.m{i}}}" );
-					code.Append( $"public static bool operator ==( {structName} a, {structName} b ) => a.pointMatrix == b.pointMatrix;" );
-					code.Append( $"public static bool operator !=( {structName} a, {structName} b ) => !( a == b );" );
-					code.Append( $"public bool Equals( {structName} other ) => {compEquals};" );
-					code.Append( $"public override bool Equals( object obj ) => obj is {structName} other && pointMatrix.Equals( other.pointMatrix );" );
-					code.Append( $"public override int GetHashCode() => pointMatrix.GetHashCode();" );
-					code.Append( $"public override string ToString() => $\"({toStringParams})\";" );
+					code.AppendLine( $"public static bool operator ==( {structName} a, {structName} b ) => a.pointMatrix == b.pointMatrix;" );
+					code.AppendLine( $"public static bool operator !=( {structName} a, {structName} b ) => !( a == b );" );
+					code.AppendLine( $"public bool Equals( {structName} other ) => {compEquals};" );
+					code.AppendLine( $"public override bool Equals( object obj ) => obj is {structName} other && pointMatrix.Equals( other.pointMatrix );" );
+					code.AppendLine( $"public override int GetHashCode() => pointMatrix.GetHashCode();" );
+					code.AppendLine( $"public override string ToString() => $\"({toStringParams})\";" );
 					code.LineBreak();
 
 					// typecasting
@@ -245,7 +245,7 @@ namespace Freya {
 							code.Summary( "Returns this spline segment in 3D, where z = 0" );
 							code.Param( "curve2D", "The 2D curve to cast to 3D" );
 							string inParams = JoinRangeStr( ", ", p => $"curve2D.{p.ToUpperInvariant()}" );
-							code.Append( $"public static explicit operator {structName3D}( {structName} curve2D ) => new {structName3D}( {inParams} );" );
+							code.AppendLine( $"public static explicit operator {structName3D}( {structName} curve2D ) => new {structName3D}( {inParams} );" );
 						}
 
 						if( dim == 3 ) {
@@ -254,7 +254,7 @@ namespace Freya {
 							code.Summary( "Returns this curve flattened to 2D. Effectively setting z = 0" );
 							code.Param( "curve3D", "The 3D curve to flatten to the Z plane" );
 							string inParams = JoinRangeStr( ", ", p => $"curve3D.{p.ToUpperInvariant()}" );
-							code.Append( $"public static explicit operator {structName2D}( {structName} curve3D ) => new {structName2D}( {inParams} );" );
+							code.AppendLine( $"public static explicit operator {structName2D}( {structName} curve3D ) => new {structName2D}( {inParams} );" );
 						}
 					}
 
@@ -286,11 +286,11 @@ namespace Freya {
 										MathSum sum = new();
 										for( int iPt = 0; iPt < 4; iPt++ )
 											sum.AddTerm( C[oPt, iPt], $"s.{type.paramNames[iPt].ToUpperInvariant()}" );
-										code.Append( $"{sum}{( oPt < 3 ? "," : "" )}" );
+										code.AppendLine( $"{sum}{( oPt < 3 ? "," : "" )}" );
 									}
 								}
 
-								code.Append( ");" );
+								code.AppendLine( ");" );
 							}
 						}
 					}
@@ -303,11 +303,11 @@ namespace Freya {
 					using( code.Scope( $"public static {structName} Lerp( {structName} a, {structName} b, float t ) =>" ) ) {
 						using( code.Scope( "new(" ) ) {
 							for( int i = 0; i < ptCount; i++ ) {
-								code.Append( $"{lerpName}( a.{points[i].ToUpperInvariant()}, b.{points[i].ToUpperInvariant()}, t )" + ( i == ptCount - 1 ? "" : "," ) );
+								code.AppendLine( $"{lerpName}( a.{points[i].ToUpperInvariant()}, b.{points[i].ToUpperInvariant()}, t )" + ( i == ptCount - 1 ? "" : "," ) );
 							}
 						}
 
-						code.Append( ");" );
+						code.AppendLine( ");" );
 					}
 
 
@@ -321,16 +321,16 @@ namespace Freya {
 						code.Param( "b", "The second spline segment" );
 						code.Param( "t", "A value from 0 to 1 to blend between <c>a</c> and <c>b</c>" );
 						using( code.BracketScope( $"public static {structName} Slerp( {structName} a, {structName} b, float t )" ) ) {
-							code.Append( $"{dataType} P0 = {lerpName}( a.P0, b.P0, t );" );
-							code.Append( $"{dataType} P3 = {lerpName}( a.P3, b.P3, t );" );
+							code.AppendLine( $"{dataType} P0 = {lerpName}( a.P0, b.P0, t );" );
+							code.AppendLine( $"{dataType} P3 = {lerpName}( a.P3, b.P3, t );" );
 							using( code.Scope( $"return new {structName}(" ) ) {
-								code.Append( $"P0," );
-								code.Append( $"P0 + {slerpCast}Vector3.SlerpUnclamped( a.P1 - a.P0, b.P1 - b.P0, t )," );
-								code.Append( $"P3 + {slerpCast}Vector3.SlerpUnclamped( a.P2 - a.P3, b.P2 - b.P3, t )," );
-								code.Append( $"P3" );
+								code.AppendLine( $"P0," );
+								code.AppendLine( $"P0 + {slerpCast}Vector3.SlerpUnclamped( a.P1 - a.P0, b.P1 - b.P0, t )," );
+								code.AppendLine( $"P3 + {slerpCast}Vector3.SlerpUnclamped( a.P2 - a.P3, b.P2 - b.P3, t )," );
+								code.AppendLine( $"P3" );
 							}
 
-							code.Append( ");" );
+							code.AppendLine( ");" );
 						}
 					}
 
@@ -438,11 +438,11 @@ namespace Freya {
 					using( code.Scope( $"{dataType} {varName} = new {dataType}(" ) ) {
 						for( int c = 0; c < dim; c++ ) {
 							string end = c == dim - 1 ? " );" : ",";
-							code.Append( $"{LerpStr( A, B, c )}{end}" );
+							code.AppendLine( $"{LerpStr( A, B, c )}{end}" );
 						}
 					}
 				} else { // floats
-					code.Append( $"{dataType} {varName} = {A} + ( {B} - {A} ) * t;" );
+					code.AppendLine( $"{dataType} {varName} = {A} + ( {B} - {A} ) * t;" );
 				}
 			}
 
@@ -453,10 +453,10 @@ namespace Freya {
 				AppendLerps( "d", "a", "b" );
 				AppendLerps( "e", "b", "c" );
 				AppendLerps( "p", "d", "e" );
-				code.Append( $"return ( new {structName}( P0, a, d, p ), new {structName}( p, e, c, P3 ) );" );
+				code.AppendLine( $"return ( new {structName}( P0, a, d, p ), new {structName}( p, e, c, P3 ) );" );
 			} else if( degree == 2 ) {
 				AppendLerps( "p", "a", "b" );
-				code.Append( $"return ( new {structName}( P0, a, p ), new {structName}( p, b, P2 ) );" );
+				code.AppendLine( $"return ( new {structName}( P0, a, p ), new {structName}( p, b, P2 ) );" );
 			}
 		}
 

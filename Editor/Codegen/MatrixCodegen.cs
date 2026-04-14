@@ -42,31 +42,31 @@ namespace Freya {
 			// generate content
 			CodeGenerator code = new CodeGenerator();
 			code.AppendHeader();
-			code.Append( "using System;" );
+			code.AppendLine( "using System;" );
 			if( dim != ElemType._1D ) // for Vector2/3
-				code.Append( "using UnityEngine;" );
+				code.AppendLine( "using UnityEngine;" );
 
 			using( code.BracketScope( "namespace Freya" ) ) {
 				code.Summary( $"A {count}x1 column matrix with {elemType} values" );
 				using( code.BracketScope( $"[Serializable] public struct {typeName}" ) ) {
 					// fields
-					code.Append( $"public {elemType} {csParams};" );
+					code.AppendLine( $"public {elemType} {csParams};" );
 
 					// constructors
-					code.Append( $"public {typeName}({ctorParams}) => ({csParamsThis}) = ({csParams});" );
+					code.AppendLine( $"public {typeName}({ctorParams}) => ({csParamsThis}) = ({csParams});" );
 					if( isMultiComponentVector ) { // compose from float matrices
 						string s = $"public {typeName}({string.Join( ", ", compRangeStr.Select( c => $"Matrix{count}x1 {c}" ) )}) => ";
 						s += $"({csParams}) = ({JoinRange( ", ", i => $"new {elemType}({string.Join( ", ", compRangeStr.Select( c => $"{c}.m{i}" ) )})" )});";
-						code.Append( s );
+						code.AppendLine( s );
 					}
 
 					// indexer
 					using( code.BracketScope( $"public {elemType} this[int row]" ) ) {
-						code.Append( $"get => row switch{{{indexerGetterCases}}};" );
+						code.AppendLine( $"get => row switch{{{indexerGetterCases}}};" );
 						using( code.BracketScope( "set" ) ) {
 							using( code.BracketScope( "switch(row)" ) ) {
-								code.Append( JoinRange( " ", i => $"case {i}: m{i} = value; break;" ) );
-								code.Append( $"default: {indexerException};" );
+								code.AppendLine( JoinRange( " ", i => $"case {i}: m{i} = value; break;" ) );
+								code.AppendLine( $"default: {indexerException};" );
 							}
 						}
 					}
@@ -76,7 +76,7 @@ namespace Freya {
 						for( int c = 0; c < elemCompCount; c++ ) {
 							int cc = c;
 							string parameters = JoinRange( ", ", i => $"m{i}.{vCompStr[cc]}" );
-							code.Append( $"public Matrix{count}x1 {vCompStrUp[c]} => new({parameters});" );
+							code.AppendLine( $"public Matrix{count}x1 {vCompStrUp[c]} => new({parameters});" );
 						}
 					}
 
@@ -84,16 +84,16 @@ namespace Freya {
 					code.Summary( "Linearly interpolates between two matrices, based on a value <c>t</c>" );
 					code.Param( "t", "The value to blend by" );
 					string interpName = dim == ElemType.Quat ? "Slerp" : "Lerp";
-					code.Append( $"public static {typeName} {interpName}( {typeName} a, {typeName} b, float t ) => new {typeName}({lerpAtoB});" );
+					code.AppendLine( $"public static {typeName} {interpName}( {typeName} a, {typeName} b, float t ) => new {typeName}({lerpAtoB});" );
 
 					// comparison/operators
-					code.Append( $"public static bool operator ==( {typeName} a, {typeName} b ) => {equalsOpCompare};" );
-					code.Append( $"public static bool operator !=( {typeName} a, {typeName} b ) => !( a == b );" );
-					code.Append( $"public bool Equals( {typeName} other ) => {equalsCompare};" );
-					code.Append( $"public override bool Equals( object obj ) => obj is {typeName} other && Equals( other );" );
-					code.Append( $"public override int GetHashCode() => HashCode.Combine( {csParams} );" );
+					code.AppendLine( $"public static bool operator ==( {typeName} a, {typeName} b ) => {equalsOpCompare};" );
+					code.AppendLine( $"public static bool operator !=( {typeName} a, {typeName} b ) => !( a == b );" );
+					code.AppendLine( $"public bool Equals( {typeName} other ) => {equalsCompare};" );
+					code.AppendLine( $"public override bool Equals( object obj ) => obj is {typeName} other && Equals( other );" );
+					code.AppendLine( $"public override int GetHashCode() => HashCode.Combine( {csParams} );" );
 					string stringPrint = JoinRange( "\\n", i => $"[{{m{i}}}]" );
-					code.Append( $"public override string ToString() => $\"{stringPrint}\";" );
+					code.AppendLine( $"public override string ToString() => $\"{stringPrint}\";" );
 				}
 			}
 

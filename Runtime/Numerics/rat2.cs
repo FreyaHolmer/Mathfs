@@ -11,7 +11,6 @@ namespace Freya {
 	/// <summary>A 2D vector with rational components (ℚ² instead of ℝ²)</summary>
 	[Serializable] public struct rat2 : IEquatable<rat2>,
 		IVec2<rat2, rat, rat, rat, rat2>,
-		INumber<rat2>,
 		ISignedNumber<int2>,
 		IDotProduct<int2, rat>,
 		IRoundable<int2> {
@@ -41,7 +40,7 @@ namespace Freya {
 
 		public bool isZero => math.all( N == new int2( 0, 0 ) );
 		public bool isInteger => math.all( D == new int2( 1, 1 ) );
-		public bool isOrthogonal => ( ceilAwayFrom0 > 0 ).csum() <= 1;
+		public bool isOrthogonal => ( ceilAwayFrom0.abs() > 0 ).csum() <= 1;
 		public bool IsDiagonal => x.abs == y.abs;
 
 		// Chebyshev distances
