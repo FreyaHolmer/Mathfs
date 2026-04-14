@@ -8,7 +8,7 @@
 		/// <summary>This vector with a zeroed-out X component</summary>
 		public V zeroX { get; }
 	}
-
+	
 	/// <summary>Operations for vectors 2D and above</summary>
 	public interface IVec2Base<V, C, D> : IVec1Base<V, C, D> {
 		/// <summary>The Y component of this vector</summary>

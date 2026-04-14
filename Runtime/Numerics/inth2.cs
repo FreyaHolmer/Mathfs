@@ -10,7 +10,7 @@ namespace Freya {
 	/// <summary>A fixed precision data type for half-integers, using a single backing interger. For numbers like: 0, 0.5, 1, 1.5, 2, etc.</summary>
 	[Serializable] public struct inth2 :
 		IEquatable<inth2>,
-		IVec2<inth2, inth, rat, rat, rat2>,
+		IVec2<inth2, inth, rat, rat, rat2, rat>,
 		INumber<inth2>,
 		ISignedNumber<int2>,
 		IHalfNumber<int2>,
@@ -69,6 +69,7 @@ namespace Freya {
 		public int2 quadrantBasisX => ceilAwayFrom0.quadrantBasisX();
 		public (int2 x, int2 y) quadrantBasis => ceilAwayFrom0.quadrantBasis();
 		public int pointSideOfPlane( inth2 planePos, inth2 planeNormal ) => this.times2.pointSideOfPlane( planePos.times2, planeNormal.times2 );
+		public rat projTValue( inth2 n ) => this.dot( n ) / n.dot( n );
 
 		public rat2 complexMul( inth2 other ) => ( (rat2)times2.complexMul( other.times2 ) ) / 4;
 		public inth2 complexConj => new(x, -y);

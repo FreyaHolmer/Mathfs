@@ -6,55 +6,55 @@ using Unity.Mathematics;
 using UnityEngine;
 namespace Freya {
 	public static partial class mathfs_generics {
-		/// <inheritdoc cref="IVec2{V,C,D,W,M}.rot90" />
-		public static V rot90<V,C,D,W,M,Self>(Self v) where Self : IVec2<V,C,D,W,M> => v.rot90;
-		/// <inheritdoc cref="IVec2{V,C,D,W,M}.rotNeg90" />
-		public static V rotNeg90<V,C,D,W,M,Self>(Self v) where Self : IVec2<V,C,D,W,M> => v.rotNeg90;
-		/// <inheritdoc cref="IVec2{V,C,D,W,M}.rot180" />
-		public static V rot180<V,C,D,W,M,Self>(Self v) where Self : IVec2<V,C,D,W,M> => v.rot180;
+		/// <inheritdoc cref="IVec2{V,C,D,W,M,Proj}.rot90" />
+		public static V rot90<V,C,D,W,M,Proj,Self>(Self v) where Self : IVec2<V,C,D,W,M,Proj> => v.rot90;
+		/// <inheritdoc cref="IVec2{V,C,D,W,M,Proj}.rotNeg90" />
+		public static V rotNeg90<V,C,D,W,M,Proj,Self>(Self v) where Self : IVec2<V,C,D,W,M,Proj> => v.rotNeg90;
+		/// <inheritdoc cref="IVec2{V,C,D,W,M,Proj}.rot180" />
+		public static V rot180<V,C,D,W,M,Proj,Self>(Self v) where Self : IVec2<V,C,D,W,M,Proj> => v.rot180;
 	}
 	public static partial class mathfs {
-		/// <inheritdoc cref="IVec2{V,C,D,W,M}.rot90" />
+		/// <inheritdoc cref="IVec2{V,C,D,W,M,Proj}.rot90" />
 		public static rat2 rot90(rat2 v) => v.rot90;
-		/// <inheritdoc cref="IVec2{V,C,D,W,M}.rotNeg90" />
+		/// <inheritdoc cref="IVec2{V,C,D,W,M,Proj}.rotNeg90" />
 		public static rat2 rotNeg90(rat2 v) => v.rotNeg90;
-		/// <inheritdoc cref="IVec2{V,C,D,W,M}.rot180" />
+		/// <inheritdoc cref="IVec2{V,C,D,W,M,Proj}.rot180" />
 		public static rat2 rot180(rat2 v) => v.rot180;
-		/// <inheritdoc cref="IVec2{V,C,D,W,M}.rot90" />
+		/// <inheritdoc cref="IVec2{V,C,D,W,M,Proj}.rot90" />
 		public static inth2 rot90(inth2 v) => v.rot90;
-		/// <inheritdoc cref="IVec2{V,C,D,W,M}.rotNeg90" />
+		/// <inheritdoc cref="IVec2{V,C,D,W,M,Proj}.rotNeg90" />
 		public static inth2 rotNeg90(inth2 v) => v.rotNeg90;
-		/// <inheritdoc cref="IVec2{V,C,D,W,M}.rot180" />
+		/// <inheritdoc cref="IVec2{V,C,D,W,M,Proj}.rot180" />
 		public static inth2 rot180(inth2 v) => v.rot180;
-		/// <inheritdoc cref="IVec2{V,C,D,W,M}.rot90" />
+		/// <inheritdoc cref="IVec2{V,C,D,W,M,Proj}.rot90" />
 		public static int2 rot90(this int2 v) => new(-v.y,v.x);
-		/// <inheritdoc cref="IVec2{V,C,D,W,M}.rotNeg90" />
+		/// <inheritdoc cref="IVec2{V,C,D,W,M,Proj}.rotNeg90" />
 		public static int2 rotNeg90(this int2 v) => new(v.y,-v.x);
-		/// <inheritdoc cref="IVec2{V,C,D,W,M}.rot180" />
+		/// <inheritdoc cref="IVec2{V,C,D,W,M,Proj}.rot180" />
 		public static int2 rot180(this int2 v) => new(-v.x,-v.y);
-		/// <inheritdoc cref="IVec2{V,C,D,W,M}.rot90" />
+		/// <inheritdoc cref="IVec2{V,C,D,W,M,Proj}.rot90" />
 		public static Vector2Int rot90(this Vector2Int v) => new(-v.y,v.x);
-		/// <inheritdoc cref="IVec2{V,C,D,W,M}.rotNeg90" />
+		/// <inheritdoc cref="IVec2{V,C,D,W,M,Proj}.rotNeg90" />
 		public static Vector2Int rotNeg90(this Vector2Int v) => new(v.y,-v.x);
-		/// <inheritdoc cref="IVec2{V,C,D,W,M}.rot180" />
+		/// <inheritdoc cref="IVec2{V,C,D,W,M,Proj}.rot180" />
 		public static Vector2Int rot180(this Vector2Int v) => new(-v.x,-v.y);
-		/// <inheritdoc cref="IVec2{V,C,D,W,M}.rot90" />
+		/// <inheritdoc cref="IVec2{V,C,D,W,M,Proj}.rot90" />
 		public static float2 rot90(this float2 v) => new(-v.y,v.x);
-		/// <inheritdoc cref="IVec2{V,C,D,W,M}.rotNeg90" />
+		/// <inheritdoc cref="IVec2{V,C,D,W,M,Proj}.rotNeg90" />
 		public static float2 rotNeg90(this float2 v) => new(v.y,-v.x);
-		/// <inheritdoc cref="IVec2{V,C,D,W,M}.rot180" />
+		/// <inheritdoc cref="IVec2{V,C,D,W,M,Proj}.rot180" />
 		public static float2 rot180(this float2 v) => new(-v.x,-v.y);
-		/// <inheritdoc cref="IVec2{V,C,D,W,M}.rot90" />
+		/// <inheritdoc cref="IVec2{V,C,D,W,M,Proj}.rot90" />
 		public static Vector2 rot90(this Vector2 v) => new(-v.y,v.x);
-		/// <inheritdoc cref="IVec2{V,C,D,W,M}.rotNeg90" />
+		/// <inheritdoc cref="IVec2{V,C,D,W,M,Proj}.rotNeg90" />
 		public static Vector2 rotNeg90(this Vector2 v) => new(v.y,-v.x);
-		/// <inheritdoc cref="IVec2{V,C,D,W,M}.rot180" />
+		/// <inheritdoc cref="IVec2{V,C,D,W,M,Proj}.rot180" />
 		public static Vector2 rot180(this Vector2 v) => new(-v.x,-v.y);
-		/// <inheritdoc cref="IVec2{V,C,D,W,M}.rot90" />
+		/// <inheritdoc cref="IVec2{V,C,D,W,M,Proj}.rot90" />
 		public static double2 rot90(this double2 v) => new(-v.y,v.x);
-		/// <inheritdoc cref="IVec2{V,C,D,W,M}.rotNeg90" />
+		/// <inheritdoc cref="IVec2{V,C,D,W,M,Proj}.rotNeg90" />
 		public static double2 rotNeg90(this double2 v) => new(v.y,-v.x);
-		/// <inheritdoc cref="IVec2{V,C,D,W,M}.rot180" />
+		/// <inheritdoc cref="IVec2{V,C,D,W,M,Proj}.rot180" />
 		public static double2 rot180(this double2 v) => new(-v.x,-v.y);
 	}
 }

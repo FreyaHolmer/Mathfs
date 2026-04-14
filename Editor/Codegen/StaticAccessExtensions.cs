@@ -108,6 +108,7 @@ namespace Freya {
 			Type D = C; // dot product result type
 			Type M = V; // complex multiplication result type
 
+
 			interfaces.UnionWith( InterfacesOf( typeof(ISignedNumber<>).MakeGenericType( R ) ) );
 			if( info.numType is NumType.Double64 or NumType.Float32 or NumType.Half16 or NumType.Rational or NumType.IntHalf )
 				interfaces.UnionWith( InterfacesOf( typeof(IRoundable<>).MakeGenericType( R ) ) );
@@ -118,10 +119,12 @@ namespace Freya {
 					break;
 				case 2:
 					Type W2 = D; // wedge product result type
-					interfaces.UnionWith( InterfacesOf( typeof(IVec2<,,,,>).MakeGenericType( V, C, D, W2, M ) ) );
+					Type ProjSc2 = info.ScalarProjectionType;
+					interfaces.UnionWith( InterfacesOf( typeof(IVec2<,,,,,>).MakeGenericType( V, C, D, W2, M, ProjSc2 ) ) );
 					break;
 				case 3:
 					Type W3 = V; // wedge product result type
+					Type ProjSc3 = info.ScalarProjectionType;
 					interfaces.UnionWith( InterfacesOf( typeof(IVec3<,,,>).MakeGenericType( V, C, D, W3 ) ) );
 					break;
 				case 4:
@@ -230,12 +233,12 @@ namespace Freya {
 						return $"(int{info.dims})math.sign({{0}})"; // floats/doubles 
 					return info.NewFromComps( ( i, c ) => $"{{0}}.{c}.sign()" );
 				}
-			} else if( iTypeDef == typeof(IVec2<,,,,>) ) {
-				if( member == nameof(IVec2<object, object, object, object, object>.rot90) ) {
+			} else if( iTypeDef == typeof(IVec2<,,,,,>) ) {
+				if( member == nameof(IVec2<object, object, object, object, object, object>.rot90) ) {
 					return "new(-{0}.y,{0}.x)";
-				} else if( member == nameof(IVec2<object, object, object, object, object>.rotNeg90) ) {
+				} else if( member == nameof(IVec2<object, object, object, object, object, object>.rotNeg90) ) {
 					return "new({0}.y,-{0}.x)";
-				} else if( member == nameof(IVec2<object, object, object, object, object>.rot180) ) {
+				} else if( member == nameof(IVec2<object, object, object, object, object, object>.rot180) ) {
 					return "new(-{0}.x,-{0}.y)";
 				}
 			} else if( iTypeDef == typeof(IRoundable<>) ) {
@@ -310,6 +313,10 @@ namespace Freya {
 					nameof(IQuadrant2D.signedQuadrant) => $"mathfs.{nameof(mathfs.quadrantToSignedQuadrant)}({{0}}{rounding}.quadrant())",
 					_                                  => throw new NotImplementedException()
 				};
+			} else if( iTypeDef == typeof(IVecProjections<,>) ) {
+				switch( member ) {
+					case nameof(IVecProjections<object, object>.projTValue): return "{0}.dot({1})/{1}.dot({1})";
+				}
 			}
 
 			Debug.LogWarning( $"Missing custom implementation for nType {nType} with iType {iType} member {member}" );

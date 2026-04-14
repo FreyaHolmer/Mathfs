@@ -25,6 +25,7 @@ namespace Freya {
 		/// <param name="planePos">A point inside the plane</param>
 		/// <param name="planeNormal">The normal direction of the plane</param>
 		public int pointSideOfPlane( V planePos, V planeNormal );
+
 	}
 
 }

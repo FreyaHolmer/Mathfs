@@ -10,7 +10,7 @@ namespace Freya {
 
 	/// <summary>A 2D vector with rational components (ℚ² instead of ℝ²)</summary>
 	[Serializable] public struct rat2 : IEquatable<rat2>,
-		IVec2<rat2, rat, rat, rat, rat2>,
+		IVec2<rat2, rat, rat, rat, rat2, rat>,
 		ISignedNumber<int2>,
 		IDotProduct<int2, rat>,
 		IRoundable<int2> {
@@ -56,9 +56,10 @@ namespace Freya {
 		public int signedQuadrant => ceilAwayFrom0.signedQuadrant();
 		public int2 quadrantBasisX => ceilAwayFrom0.quadrantBasisX();
 		public (int2 x, int2 y) quadrantBasis => ceilAwayFrom0.quadrantBasis();
-		public int pointSideOfPlane( rat2 planePos, rat2 planeNormal ) => ( this - planePos ).dot( planeNormal ).sign;
 		public rat2 complexMul( rat2 other ) => new(x * other.x - y * other.y, x * other.y + y * other.x);
 		public rat2 complexConj => new(x, -y);
+		public int pointSideOfPlane( rat2 planePos, rat2 planeNormal ) => ( this - planePos ).dot( planeNormal ).sign;
+		public rat projTValue( rat2 n ) => this.dot( n ) / n.dot( n );
 
 		public rat2 normalizedTaxicab => this / magTaxicab;
 
