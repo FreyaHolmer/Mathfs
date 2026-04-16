@@ -25,7 +25,6 @@ namespace Freya {
 		public static readonly rat MaxValue = new(int.MaxValue, 1);
 		public static readonly rat MinValue = new(int.MinValue, 1);
 
-
 		/// <summary>Creates an exact representation of a rational number</summary>
 		/// <param name="num">The numerator of this number</param>
 		/// <param name="den">The denominator of this number</param>

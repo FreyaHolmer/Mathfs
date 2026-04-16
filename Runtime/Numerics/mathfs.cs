@@ -43,7 +43,6 @@ namespace Freya {
 		// UNSORTED:
 		public static Rect expandFromCenter( this Rect r, float expansionPerSide ) {
 			rat2 g = default;
-			Debug.Log( complexConj( g ) );
 			r.xMin -= expansionPerSide;
 			r.yMin -= expansionPerSide;
 			r.xMax += expansionPerSide;
