@@ -526,6 +526,12 @@ namespace Freya {
 		/// <summary>Add to the magnitude of this quaternion</summary>
 		public static Quaternion AddMagnitude( this Quaternion q, float amount ) => amount == 0f ? q : q.Mul( 1 + amount / q.Magnitude() );
 
+		public static quaternion Mirror( this quaternion q, float3 nPlane ) {
+			float4 v = q.value;
+			float4 n = new float4( nPlane, 0 );
+			return conjugate( reflect( v, n ) );
+		}
+
 		#endregion
 
 		#region Transform extensions
