@@ -5,8 +5,132 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Freya {
+
+	/// <summary>Contains either 0 to 4 valid return values</summary>
+	public readonly struct ResultsMax4<T> : IEnumerable<T> where T : struct {
+
+		/// <summary>The number of valid values</summary>
+		public readonly int count;
+
+		/// <summary>The first value. This may or may not be set/defined - use .count to see how many are valid</summary>
+		public readonly T a;
+
+		/// <summary>The second value. This may or may not be set/defined - use .count to see how many are valid</summary>
+		public readonly T b;
+
+		/// <summary>The third value. This may or may not be set/defined - use .count to see how many are valid</summary>
+		public readonly T c;
+
+		/// <summary>The third value. This may or may not be set/defined - use .count to see how many are valid</summary>
+		public readonly T d;
+
+		public ResultsMax4( T a, T b, T c, T d ) => ( this.a, this.b, this.c, this.d, this.count ) = ( a, b, c, d, 4 );
+		public ResultsMax4( T a, T b, T c ) => ( this.a, this.b, this.c, this.d, this.count ) = ( a, b, c, default, 3 );
+		public ResultsMax4( T a, T b ) => ( this.a, this.b, this.c, this.d, this.count ) = ( a, b, default, default, 2 );
+		public ResultsMax4( T a ) => ( this.a, this.b, this.c, this.d, this.count ) = ( a, default, default, default, 1 );
+
+		/// <summary>Returns the valid values at index i. Will throw an index out of range exception for invalid values. Use toghether with .count to ensure you don't get invalid values</summary>
+		/// <param name="i">The index of the result to get</param>
+		public T this[ int i ] => i switch { 0 => a, 1 => b, 2 => c, 3 => d, _ => throw new IndexOutOfRangeException() };
+
+		/// <summary>Returns a version of these results with one more element added to it. Note: this does not mutate the original struct</summary>
+		/// <param name="value">The value to add</param>
+		public ResultsMax4<T> Add( T value ) =>
+			count switch {
+				0 => new ResultsMax4<T>( value ),
+				1 => new ResultsMax4<T>( a, value ),
+				2 => new ResultsMax4<T>( a, b, value ),
+				3 => new ResultsMax4<T>( a, b, c, value ),
+				_ => throw new IndexOutOfRangeException( "Can't add more than four values to ResultsMax4" )
+			};
+
+
+		/// <summary>Implicitly casts from a tuple with nullables to a results structure</summary>
+		/// <param name="tuple">The tuple to cast</param>
+		public static implicit operator ResultsMax4<T>( (T?, T?, T?, T?) tuple ) {
+			ResultsMax4<T> results = new ResultsMax4<T>();
+			( T? a, T? b, T? c, T? d ) = tuple;
+			if( a.HasValue ) results = results.Add( a.Value );
+			if( b.HasValue ) results = results.Add( b.Value );
+			if( c.HasValue ) results = results.Add( c.Value );
+			if( d.HasValue ) results = results.Add( d.Value );
+			return results;
+		}
+
+		/// <summary>Implicitly casts a value to a results structure</summary>
+		/// <param name="v">The value to cast</param>
+		public static implicit operator ResultsMax4<T>( T v ) => new ResultsMax4<T>( v );
+
+		/// <summary>Implicitly casts ResultsMax2 to ResultsMax4</summary>
+		/// <param name="m2">The results to cast</param>
+		public static implicit operator ResultsMax4<T>( ResultsMax2<T> m2 ) =>
+			m2.count switch {
+				0 => default,
+				1 => new ResultsMax4<T>( m2.a ),
+				2 => new ResultsMax4<T>( m2.a, m2.b ),
+				_ => throw new InvalidCastException( "Failed to cast ResultsMax2 to ResultsMax4" )
+			};
+
+		/// <summary>Implicitly casts ResultsMax2 to ResultsMax4</summary>
+		/// <param name="m3">The results to cast</param>
+		public static implicit operator ResultsMax4<T>( ResultsMax3<T> m3 ) =>
+			m3.count switch {
+				0 => default,
+				1 => new ResultsMax4<T>( m3.a ),
+				2 => new ResultsMax4<T>( m3.a, m3.b ),
+				3 => new ResultsMax4<T>( m3.a, m3.b, m3.b ),
+				_ => throw new InvalidCastException( "Failed to cast ResultsMax2 to ResultsMax4" )
+			};
+
+		/// <summary>Explicitly casts ResultsMax4 to ResultsMax3</summary>
+		/// <param name="m4">The results to cast</param>
+		public static explicit operator ResultsMax3<T>( ResultsMax4<T> m4 ) =>
+			m4.count switch {
+				0 => default,
+				1 => new ResultsMax3<T>( m4.a ),
+				2 => new ResultsMax3<T>( m4.a, m4.b ),
+				3 => new ResultsMax3<T>( m4.a, m4.b, m4.c ),
+				_ => throw new IndexOutOfRangeException( $"Attempt to cast ResultsMax4 to ResultsMax2 when it had {m4.count} results" ),
+			};
+
+		/// <summary>Explicitly casts ResultsMax4 to ResultsMax3</summary>
+		/// <param name="m4">The results to cast</param>
+		public static explicit operator ResultsMax2<T>( ResultsMax4<T> m4 ) =>
+			m4.count switch {
+				0 => default,
+				1 => new ResultsMax2<T>( m4.a ),
+				2 => new ResultsMax2<T>( m4.a, m4.b ),
+				_ => throw new IndexOutOfRangeException( $"Attempt to cast ResultsMax4 to ResultsMax2 when it had {m4.count} results" ),
+			};
+
+
+		IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
+
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+		public struct ResultsMax4Enumerator : IEnumerator<T> {
+
+			int currentIndex;
+			readonly ResultsMax4<T> value;
+
+			public ResultsMax4Enumerator( ResultsMax4<T> value ) {
+				this.value = value;
+				currentIndex = -1;
+			}
+
+			public bool MoveNext() => ++currentIndex < value.count;
+			public void Reset() => currentIndex = -1;
+			public T Current => value[currentIndex];
+			object IEnumerator.Current => Current;
+			public void Dispose() => _ = 0;
+		}
+
+		public ResultsMax4Enumerator GetEnumerator() => new ResultsMax4Enumerator( this );
+
+	}
 
 	/// <summary>Contains either 0, 1, 2 or 3 valid return values</summary>
 	public readonly struct ResultsMax3<T> : IEnumerable<T> where T : struct {
@@ -109,7 +233,7 @@ namespace Freya {
 
 			throw new InvalidCastException( "Failed to cast ResultsMax2 to ResultsMax3" );
 		}
-		
+
 		/// <summary>Explicitly casts ResultsMax3 to ResultsMax2</summary>
 		/// <param name="m3">The results to cast</param>
 		public static explicit operator ResultsMax2<T>( ResultsMax3<T> m3 ) {
@@ -196,6 +320,8 @@ namespace Freya {
 			}
 		}
 
+		public static implicit operator ResultsMax2<T>( T v ) => new ResultsMax2<T>( v );
+		public static implicit operator ResultsMax2<T>( T? v ) => v.HasValue ? new ResultsMax2<T>( v.Value ) : default;
 
 		IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
 

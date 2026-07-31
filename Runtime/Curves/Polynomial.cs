@@ -3,7 +3,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Text;
-using UnityEngine;
+using Unity.Mathematics;
 using UnityEngine.Serialization;
 
 namespace Freya {
@@ -51,7 +51,7 @@ namespace Freya {
 
 		/// <summary>Creates a polynomial</summary>
 		/// <param name="coefficients">The coefficients to use</param>
-		public Polynomial( Vector4 coefficients ) => ( c0, c1, c2, c3 ) = ( coefficients.x, coefficients.y, coefficients.z, coefficients.w );
+		public Polynomial( float4 coefficients ) => ( c0, c1, c2, c3 ) = ( coefficients.x, coefficients.y, coefficients.z, coefficients.w );
 
 		/// <inheritdoc cref="Polynomial(Vector4)"/>
 		public Polynomial( Matrix4x1 coefficients ) => ( c0, c1, c2, c3 ) = ( coefficients.m0, coefficients.m1, coefficients.m2, coefficients.m3 );
@@ -252,7 +252,7 @@ namespace Freya {
 		}
 
 		/// <summary>Calculates the roots (values where this polynomial = 0)</summary>
-		public ResultsMax3<float> Roots => GetCubicRoots( c0, c1, c2, c3 );
+		public ResultsMax3<float> Roots => Solve.Polynomial( c0, c1, c2, c3 );
 
 		/// <summary>Calculates the local extrema of this polynomial</summary>
 		public ResultsMax2<float> LocalExtrema => (ResultsMax2<float>)Differentiate().Roots;
@@ -296,7 +296,7 @@ namespace Freya {
 		/// <summary>Creates a linear polynomial of the form <c>ax+b</c> from two points a and b</summary>
 		/// <param name="a">The first point</param>
 		/// <param name="b">The second point</param>
-		public static Polynomial Linear( Vector2 a, Vector2 b ) => Linear( a.x, a.y, b.x, b.y );
+		public static Polynomial Linear( float2 a, float2 b ) => Linear( a.x, a.y, b.x, b.y );
 
 		/// <summary>Creates a linear polynomial of the form <c>ax+b</c> from two points</summary>
 		/// <param name="x0">The coordinate of the first point</param>
@@ -321,59 +321,18 @@ namespace Freya {
 		/// <param name="c3">The cubic coefficient</param>
 		public static Polynomial Cubic( float c0, float c1, float c2, float c3 ) => new Polynomial( c0, c1, c2, c3 );
 
-		static bool ValueAlmost0( float v ) => Mathfs.Approximately( v, 0 );
-
 		/// <summary>Given the coefficients for a cubic polynomial, returns the net polynomial type/degree, accounting for values very close to 0</summary>
 		/// <param name="c0">The constant coefficient</param>
 		/// <param name="c1">The linear coefficient</param>
 		/// <param name="c2">The quadratic coefficient</param>
 		/// <param name="c3">The cubic coefficient</param>
-		[MethodImpl( INLINE )] public static int GetPolynomialDegree( float c0, float c1, float c2, float c3 ) => ValueAlmost0( c3 ) ? GetPolynomialDegree( c0, c1, c2 ) : 3;
-
-		/// <summary>Given the coefficients for a quadratic polynomial, returns the net polynomial degree, accounting for values very close to 0</summary>
-		/// <param name="c0">The constant coefficient</param>
-		/// <param name="c1">The linear coefficient</param>
-		/// <param name="c2">The quadratic coefficient</param>
-		[MethodImpl( INLINE )] public static int GetPolynomialDegree( float c0, float c1, float c2 ) => ValueAlmost0( c2 ) ? GetPolynomialDegree( c0, c1 ) : 2;
-
-		/// <summary>Given the coefficients for a linear polynomial, returns the net polynomial degree, accounting for values very close to 0</summary>
-		/// <param name="c0">The constant coefficient</param>
-		/// <param name="c1">The linear coefficient</param>
-		[MethodImpl( INLINE )] public static int GetPolynomialDegree( float c0, float c1 ) => ValueAlmost0( c1 ) ? 0 : 1;
-
-		/// <summary>Returns the roots/solutions/x-values where this polynomial equals 0. There's either 0, 1, 2 or 3 roots, filled in left to right among the return values</summary>
-		/// <param name="c0">The constant coefficient</param>
-		/// <param name="c1">The linear coefficient</param>
-		/// <param name="c2">The quadratic coefficient</param>
-		/// <param name="c3">The cubic coefficient</param>
-		public static ResultsMax3<float> GetCubicRoots( float c0, float c1, float c2, float c3 ) =>
-			GetPolynomialDegree( c0, c1, c2, c3 ) switch {
-				0 => default, // either no roots or infinite roots if c == 0
-				1 => new ResultsMax3<float>( SolveLinearRoot( c1, c0 ) ),
-				2 => SolveQuadraticRoots( c2, c1, c0 ),
-				3 => SolveCubicRoots( c3, c2, c1, c0 ),
-				_ => throw new IndexOutOfRangeException()
-			};
-
-		/// <summary>Returns the roots/solutions/x-values where this polynomial equals 0. There's either 0, 1 or 2 roots, filled in left to right among the return values</summary>
-		/// <param name="c0">The constant coefficient</param>
-		/// <param name="c1">The linear coefficient</param>
-		/// <param name="c2">The quadratic coefficient</param>
-		public static ResultsMax2<float> GetQuadraticRoots( float c0, float c1, float c2 ) =>
-			GetPolynomialDegree( c0, c1, c2 ) switch {
-				0 => default, // either no roots or infinite roots if c == 0
-				1 => new ResultsMax2<float>( SolveLinearRoot( c1, c0 ) ),
-				2 => SolveQuadraticRoots( c2, c1, c0 ),
-				_ => throw new IndexOutOfRangeException()
-			};
-
-		/// <summary>Returns the roots/solutions/x-values where this polynomial equals 0. Returns null if there is no root</summary>
-		/// <param name="c0">The constant coefficient</param>
-		/// <param name="c1">The linear coefficient</param>
-		public static float? GetLinearRoots( float c0, float c1 ) {
-			if( GetPolynomialDegree( c0, c1 ) == 0 )
-				return null;
-			return -c0 / c1;
+		/// <param name="c4">The quartic coefficient</param>
+		[MethodImpl( INLINE )] public static int GetPolynomialDegree( float c0, float c1 = 0, float c2 = 0, float c3 = 0, float c4 = 0 ) {
+			if( Mathfs.Approximately( c4, 0 ) == false ) return 4;
+			if( Mathfs.Approximately( c3, 0 ) == false ) return 3;
+			if( Mathfs.Approximately( c2, 0 ) == false ) return 2;
+			if( Mathfs.Approximately( c1, 0 ) == false ) return 1;
+			return 0;
 		}
 
 		/// <summary>Linearly interpolates between two polynomials</summary>
@@ -387,85 +346,6 @@ namespace Freya {
 				t.Lerp( a.c2, b.c2 ),
 				t.Lerp( a.c3, b.c3 )
 			);
-
-		#region Internal root solvers
-
-		// These functions lack safety checks (division by zero etc.) for lower degree equivalency - they presume "a" is always nonzero.
-		// These are private to avoid people mistaking them for the more stable/safe functions you are more likely to want to use
-
-		[MethodImpl( INLINE )] static float SolveLinearRoot( float a, float b ) => -b / a;
-
-		static ResultsMax2<float> SolveQuadraticRoots( float a, float b, float c ) {
-			float rootContent = b * b - 4 * a * c;
-			if( ValueAlmost0( rootContent ) )
-				return new ResultsMax2<float>( -b / ( 2 * a ) ); // two equivalent solutions at one point
-
-			if( rootContent >= 0 ) { // crosses at two points
-				float u = -b * -( b < 0 ? -1 : 1 ) * MathF.Sqrt( rootContent );
-				float r0 = u / ( 2 * a );
-				float r1 = ( 2 * c ) / u;
-				return new ResultsMax2<float>( MathF.Min( r0, r1 ), MathF.Max( r0, r1 ) );
-			}
-
-			return default; // no roots
-		}
-
-		static ResultsMax3<float> SolveCubicRoots( float a, float b, float c, float d ) {
-			// first, depress the cubic to make it easier to solve
-			float aa = a * a;
-			float ac = a * c;
-			float bb = b * b;
-			float p = ( 3 * ac - bb ) / ( 3 * aa );
-			float q = ( 2 * bb * b - 9 * ac * b + 27 * aa * d ) / ( 27 * aa * a );
-
-			ResultsMax3<float> dpr = SolveDepressedCubicRoots( p, q );
-
-			// we now have the roots of the depressed cubic, now convert back to the normal cubic
-			float UndepressRoot( float r ) => r - b / ( 3 * a );
-			switch( dpr.count ) {
-				case 1:  return new ResultsMax3<float>( UndepressRoot( dpr.a ) );
-				case 2:  return new ResultsMax3<float>( UndepressRoot( dpr.a ), UndepressRoot( dpr.b ) );
-				case 3:  return new ResultsMax3<float>( UndepressRoot( dpr.a ), UndepressRoot( dpr.b ), UndepressRoot( dpr.c ) );
-				default: return default;
-			}
-		}
-
-		// t³+pt+q = 0
-		static ResultsMax3<float> SolveDepressedCubicRoots( float p, float q ) {
-			if( ValueAlmost0( p ) ) // triple root - one solution. solve x³+q = 0 => x = cr(-q)
-				return new ResultsMax3<float>( Mathfs.Cbrt( -q ) );
-			float discriminant = 4 * p * p * p + 27 * q * q;
-			if( discriminant < 0.00001 ) { // two or three roots guaranteed, use trig solution
-				float pre = 2 * MathF.Sqrt( -p / 3 );
-				float acosInner = ( ( 3 * q ) / ( 2 * p ) ) * MathF.Sqrt( -3 / p );
-
-				float GetRoot( int k ) => pre * MathF.Cos( ( 1f / 3f ) * Mathfs.Acos( acosInner.ClampNeg1to1() ) - ( Mathfs.TAU / 3f ) * k );
-				// if acos hits 0 or TAU/2, the offsets will have the same value,
-				// which means we have a double root plus one regular root on our hands
-				if( acosInner >= 0.9999f )
-					return new ResultsMax3<float>( GetRoot( 0 ), GetRoot( 2 ) ); // two roots - one single and one double root
-				if( acosInner <= -0.9999f )
-					return new ResultsMax3<float>( GetRoot( 1 ), GetRoot( 2 ) ); // two roots - one single and one double root
-				return new ResultsMax3<float>( GetRoot( 0 ), GetRoot( 1 ), GetRoot( 2 ) ); // three roots
-			}
-
-			if( discriminant > 0 && p < 0 ) { // one root
-				float coshInner = ( 1f / 3f ) * Mathfs.Acosh( ( -3 * q.Abs() / ( 2 * p ) ) * MathF.Sqrt( -3 / p ) );
-				float r = -2 * Mathfs.Sign( q ) * MathF.Sqrt( -p / 3 ) * Mathfs.Cosh( coshInner );
-				return new ResultsMax3<float>( r );
-			}
-
-			if( p > 0 ) { // one root
-				float sinhInner = ( 1f / 3f ) * Mathfs.Asinh( ( ( 3 * q ) / ( 2 * p ) ) * MathF.Sqrt( 3 / p ) );
-				float r = ( -2 * MathF.Sqrt( p / 3 ) ) * Mathfs.Sinh( sinhInner );
-				return new ResultsMax3<float>( r );
-			}
-
-			// no roots
-			return default;
-		}
-
-		#endregion
 
 		#endregion
 
@@ -520,5 +400,6 @@ namespace Freya {
 		public string ToStringCoefficients() => $"({c0},{c1},{c2},{c3})";
 
 	}
+
 
 }
