@@ -158,6 +158,9 @@ namespace Freya {
 			}
 		}
 
+		/// <summary>Returns 1 when even, -1 when odd</summary>
+		public static int esign( this int x ) => x % 2 == 0 ? 1 : -1;
+
 		public static inth divideBy2( this int p ) => new() { h = p };
 		public static inth2 divideBy2( this int2 p ) => new(p.x.divideBy2(), p.y.divideBy2());
 
