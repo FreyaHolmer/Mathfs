@@ -33,12 +33,17 @@ namespace Freya {
 		public static rat round( rat r, rat interval, RoundingDirection rounding = RoundingDirection.ToEven ) => ( r / interval ).round( rounding ) * interval;
 		public static rat2 round( rat2 r, rat interval, RoundingDirection rounding = RoundingDirection.ToEven ) => new(round( r.x, interval ), round( r.y, interval ));
 		public static rat2 round( rat2 r, rat2 intervals, RoundingDirection rounding = RoundingDirection.ToEven ) => new(round( r.x, intervals.x ), round( r.y, intervals.y ));
-		
+
 		// todo: these should probably move to codegen
 		public static int csum( this bool b ) => b ? 1 : 0;
 		public static int csum( this bool2 b ) => math.csum( (int2)b );
 		public static int csum( this bool3 b ) => math.csum( (int3)b );
 		public static int csum( this bool4 b ) => math.csum( (int4)b );
+
+		public static Vector3 asVec3( this int2 v, float z = 0f ) => new(v.x, v.y, z);
+		public static float3 asFloat3( this int2 v, float z = 0f ) => new(v.x, v.y, z);
+		public static Vector4 asVec4( this int3 v, float w = 0f ) => new(v.x, v.y, v.z, w);
+		public static float4 asFloat4( this int3 v, float w = 0f ) => new(v.x, v.y, v.z, w);
 
 		// UNSORTED:
 		public static Rect expandFromCenter( this Rect r, float expansionPerSide ) {
