@@ -1178,12 +1178,12 @@ namespace Freya {
 		/// <summary>Returns the direction of the input angle, as a normalized vector</summary>
 		/// <param name="aRad">The input angle, in radians</param>
 		/// <seealso cref="MathfsExtensions.Angle"/>
-		[MethodImpl( INLINE )] public static Vector2 AngToDir( float aRad ) => new Vector2( MathF.Cos( aRad ), MathF.Sin( aRad ) );
+		[MethodImpl( INLINE )] public static float2 AngToDir( float aRad ) => new float2( MathF.Cos( aRad ), MathF.Sin( aRad ) );
 
 		/// <summary>Returns the angle of the input vector, in radians. You can also use <c>myVector.Angle()</c></summary>
 		/// <param name="vec">The vector to get the angle of. It does not have to be normalized</param>
 		/// <seealso cref="MathfsExtensions.Angle"/>
-		[MethodImpl( INLINE )] public static float DirToAng( Vector2 vec ) => MathF.Atan2( vec.y, vec.x );
+		[MethodImpl( INLINE )] public static float DirToAng( float2 vec ) => MathF.Atan2( vec.y, vec.x );
 
 		/// <summary>Returns a 2D orientation from a vector, representing the X axis</summary>
 		/// <param name="v">The direction to create a 2D orientation from (does not have to be normalized)</param>
@@ -1420,6 +1420,21 @@ namespace Freya {
 					MathF.Sin( angle ) * radius
 				), i );
 			}
+		}
+
+		/// <summary>Converts a yaw/pitch pair in radians, into a direction vector</summary>
+		/// <param name="pitch">A pitch of 0 points along the horizon. An angle of tau/4 points directly up</param>
+		/// <param name="yaw">A yaw of 0 points along the axis after your up axis. If Y is up, a yaw of 0 points along Z. If Z is up, a yaw of 0 points along X</param>
+		/// <param name="upAxis">The axis considered up</param>
+		public static float3 PitchYawToDirection( float pitch, float yaw, Axis upAxis = Axis.Y ) {
+			float2 a = AngToDir( yaw );
+			float2 b = AngToDir( pitch );
+			float3 v = default;
+			int u = (int)upAxis;
+			v[u] = b.y;
+			v[( u + 1 ) % 3] = a.x * b.x;
+			v[( u + 2 ) % 3] = a.y * b.x;
+			return v;
 		}
 
 		#endregion
