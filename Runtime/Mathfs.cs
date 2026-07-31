@@ -11,7 +11,6 @@ using Uei = UnityEngine.Internal;
 using System.Linq; // used for arbitrary count min/max functions, so it's safe and won't allocate garbage don't worry~
 using System.Runtime.CompilerServices;
 using Unity.Mathematics;
-
 using MidpointRounding = System.MidpointRounding;
 
 namespace Freya {
@@ -640,7 +639,7 @@ namespace Freya {
 		[MethodImpl( INLINE )] public static Vector2 Round( Vector2 value, float snapInterval, System.MidpointRounding midpointRounding = System.MidpointRounding.ToEven ) => new Vector2( Round( value.x, snapInterval, midpointRounding ), Round( value.y, snapInterval, midpointRounding ) );
 
 		/// <inheritdoc cref="Mathfs.Round(Vector2,float,System.MidpointRounding)"/>
-		[MethodImpl( INLINE )] public static Vector3 Round( Vector3 value, float snapInterval, System.MidpointRounding midpointRounding = System.MidpointRounding.ToEven ) => new Vector3( Round( value.x, snapInterval, midpointRounding ), Round( value.y, snapInterval, midpointRounding ), Round( value.z, snapInterval, midpointRounding ) );
+		[MethodImpl( INLINE )] public static Vector3 Round( Vector3 value, float snapInterval, System.MidpointRounding midpointRounding = System.MidpointRounding.ToEven ) => new(Round( value.x, snapInterval, midpointRounding ), Round( value.y, snapInterval, midpointRounding ), Round( value.z, snapInterval, midpointRounding ));
 
 		/// <inheritdoc cref="Mathfs.Round(Vector2,float,System.MidpointRounding)"/>
 		[MethodImpl( INLINE )] public static Vector4 Round( Vector4 value, float snapInterval, System.MidpointRounding midpointRounding = System.MidpointRounding.ToEven ) => new Vector4( Round( value.x, snapInterval, midpointRounding ), Round( value.y, snapInterval, midpointRounding ), Round( value.z, snapInterval, midpointRounding ), Round( value.w, snapInterval, midpointRounding ) );

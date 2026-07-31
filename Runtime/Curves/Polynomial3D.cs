@@ -88,7 +88,7 @@ namespace Freya {
 			};
 		}
 
-		public Vector3 Eval( float t ) {
+		public readonly Vector3 Eval( float t ) {
 			float t2 = t * t;
 			float t3 = t2 * t;
 			return new Vector3(
@@ -100,7 +100,7 @@ namespace Freya {
 
 		[MethodImpl( INLINE )] public Vector3 Eval( float t, int n ) => Differentiate( n ).Eval( t );
 
-		[MethodImpl( INLINE )] public Polynomial3D Differentiate( int n = 1 ) => new(x.Differentiate( n ), y.Differentiate( n ), z.Differentiate( n ));
+		[MethodImpl( INLINE )] public readonly Polynomial3D Differentiate( int n = 1 ) => new(x.Differentiate( n ), y.Differentiate( n ), z.Differentiate( n ));
 
 		public Polynomial3D ScaleParameterSpace( float factor ) {
 			// ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -181,7 +181,7 @@ namespace Freya {
 		#region IParamCurve3Diff interface implementations
 
 		public int Degree => Mathfs.Max( x.Degree, y.Degree, z.Degree );
-		public Vector3 EvalDerivative( float t ) => Differentiate().Eval( t );
+		public readonly Vector3 EvalDerivative( float t ) => Differentiate().Eval( t );
 		public Vector3 EvalSecondDerivative( float t ) => Differentiate( 2 ).Eval( t );
 		public Vector3 EvalThirdDerivative( float t = 0 ) => Differentiate( 3 ).Eval( 0 );
 

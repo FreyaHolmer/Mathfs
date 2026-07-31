@@ -2,7 +2,9 @@
 
 using System;
 using System.Runtime.CompilerServices;
+using Unity.Mathematics;
 using UnityEngine;
+using static Unity.Mathematics.math;
 
 namespace Freya {
 
@@ -17,6 +19,9 @@ namespace Freya {
 		/// <param name="v">The vector to get the angle of. It does not have to be normalized</param>
 		/// <seealso cref="Mathfs.DirToAng"/>
 		[MethodImpl( INLINE )] public static float Angle( this Vector2 v ) => MathF.Atan2( v.y, v.x );
+
+		/// <inheritdoc cref="Angle(Vector2)" />
+		[MethodImpl( INLINE )] public static float Angle( this float2 v ) => atan2( v.y, v.x );
 
 		/// <summary>Rotates the vector 90 degrees clockwise (negative Z axis rotation)</summary>
 		[MethodImpl( INLINE )] public static Vector2 Rotate90CW( this Vector2 v ) => new Vector2( v.y, -v.x );

@@ -42,15 +42,15 @@ namespace Freya {
 
 		/// <summary>Interpolates a value from <c>a</c> to <c>b</c>, based on a parameter <c>t</c></summary>
 		/// <param name="t">The normalized interpolant from <c>a</c> to <c>b</c>. A value of 0 returns <c>a</c>, a value of 1 returns <c>b</c></param>
-		public float Lerp( float t ) => Mathfs.Lerp( a, b, t );
+		public readonly float Lerp( float t ) => Mathfs.Lerp( a, b, t );
 
 		/// <summary>Returns the normalized position of the input value <c>v</c> within this range</summary>
 		/// <param name="v">The value to get the normalized position of</param>
-		public float InverseLerp( float v ) => Mathfs.InverseLerp( a, b, v );
+		public readonly float InverseLerp( float v ) => Mathfs.InverseLerp( a, b, v );
 
 		/// <summary>Returns whether or not this range contains the value <c>v</c> (inclusive)</summary>
 		/// <param name="v">The value to see if it's inside</param>
-		public bool Contains( float v ) => v >= MathF.Min( a, b ) && v <= MathF.Max( a, b );
+		public readonly bool Contains( float v ) => v >= MathF.Min( a, b ) && v <= MathF.Max( a, b );
 
 		/// <summary>Returns whether or not this range contains the range <c>r</c></summary>
 		/// <param name="r">The range to see if it's inside</param>

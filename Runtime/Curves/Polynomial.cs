@@ -117,7 +117,7 @@ namespace Freya {
 
 		[MethodImpl( INLINE )] public float Eval( float t, int n ) => Differentiate( n ).Eval( t );
 
-		[MethodImpl( INLINE )] public Polynomial Differentiate( int n = 1 ) {
+		[MethodImpl( INLINE )] public readonly Polynomial Differentiate( int n = 1 ) {
 			return n switch {
 				0 => this,
 				1 => new Polynomial( c1, 2 * c2, 3 * c3, 0 ),
