@@ -73,6 +73,90 @@ namespace Freya {
 		/// <inheritdoc cref="quadrantDelta(int2,int2)" />
 		public static int quadrantDelta( rat2 a, rat2 b ) => a.wedge( b ).sign * modDelta( a.quadrant, b.quadrant, 4 );
 
+		/// <summary>Integer powers of floats, using repeated multiplication. Falls back to standard pow() beyond a power of 16</summary>
+		public static float pow( this float x, int exp ) {
+			switch( exp ) {
+				case 0: return 1f;
+				case 1: return x;
+				case 2: return x * x;
+				case 3: {
+					return x * x * x;
+				}
+				case 4: {
+					float x2 = x * x;
+					return x2 * x2;
+				}
+				case 5: {
+					float x2 = x * x;
+					float x4 = x2 * x2;
+					return x4 * x;
+				}
+				case 6: {
+					float x2 = x * x;
+					float x4 = x2 * x2;
+					return x4 * x2;
+				}
+				case 7: {
+					float x2 = x * x;
+					float x4 = x2 * x2;
+					return x4 * x2 * x;
+				}
+				case 8: {
+					float x2 = x * x;
+					float x4 = x2 * x2;
+					return x4 * x4;
+				}
+				case 9: {
+					float x2 = x * x;
+					float x4 = x2 * x2;
+					float x8 = x4 * x4;
+					return x8 * x;
+				}
+				case 10: {
+					float x2 = x * x;
+					float x4 = x2 * x2;
+					float x8 = x4 * x4;
+					return x8 * x2;
+				}
+				case 11: {
+					float x2 = x * x;
+					float x4 = x2 * x2;
+					float x8 = x4 * x4;
+					return x8 * x2 * x;
+				}
+				case 12: {
+					float x2 = x * x;
+					float x4 = x2 * x2;
+					float x8 = x4 * x4;
+					return x8 * x4;
+				}
+				case 13: {
+					float x2 = x * x;
+					float x4 = x2 * x2;
+					float x8 = x4 * x4;
+					return x8 * x4 * x;
+				}
+				case 14: {
+					float x2 = x * x;
+					float x4 = x2 * x2;
+					float x8 = x4 * x4;
+					return x8 * x4 * x2;
+				}
+				case 15: {
+					float x2 = x * x;
+					float x4 = x2 * x2;
+					float x8 = x4 * x4;
+					return x8 * x4 * x2 * x;
+				}
+				case 16: {
+					float x2 = x * x;
+					float x4 = x2 * x2;
+					float x8 = x4 * x4;
+					return x8 * x8;
+				}
+				default: return MathF.Pow( x, exp );
+			}
+		}
 
 		public static inth divideBy2( this int p ) => new() { h = p };
 		public static inth2 divideBy2( this int2 p ) => new(p.x.divideBy2(), p.y.divideBy2());
