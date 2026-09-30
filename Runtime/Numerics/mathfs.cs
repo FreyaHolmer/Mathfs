@@ -85,6 +85,13 @@ namespace Freya {
 			int i = math.abs( v ).cmaxIndex();
 			return new float3 { [i] = v[i].safeSign() };
 		}
+
+		/// <summary>Returns an arbitrary perpendicular direction of the given unit vector</summary>
+		public static float3 perpendicularDirection( this float3 dir ) {
+			float3 axisOrtho = dir.nearestOrthoAxis().yzx; // swizzles to an axis guaranteed to be at least 45 degrees away
+			return math.cross( axisOrtho, dir );
+		}
+
 		public static Vector3 asVec3( this int2 v, float z = 0f ) => new(v.x, v.y, z);
 		public static float3 asFloat3( this int2 v, float z = 0f ) => new(v.x, v.y, z);
 		public static Vector4 asVec4( this int3 v, float w = 0f ) => new(v.x, v.y, v.z, w);
