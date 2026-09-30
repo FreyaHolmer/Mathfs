@@ -97,7 +97,23 @@ namespace Freya {
 		public quatUnit pow( float t ) => quat.pow( this, t );
 		public float3 Rotate( float3 v ) => quat.rotate( this, v );
 
+		/// <summary>Rotates 180° around the extrinsic pre-rotation X axis, sometimes this is interpreted as a world space rotation, as opposed to rotating around its own axes</summary>
+		[MethodImpl( MethodImplOptions.AggressiveInlining )] public quatUnit rotate180AroundExtrX() => new(w, -z, y, -x);
 
+		/// <summary>Rotates 180° around the extrinsic pre-rotation Y axis, sometimes this is interpreted as a world space rotation, as opposed to rotating around its own axes</summary>
+		[MethodImpl( MethodImplOptions.AggressiveInlining )] public quatUnit rotate180AroundExtrY() => new(z, w, -x, -y);
+
+		/// <summary>Rotates 180° around the extrinsic pre-rotation Z axis, sometimes this is interpreted as a world space rotation, as opposed to rotating around its own axes</summary>
+		[MethodImpl( MethodImplOptions.AggressiveInlining )] public quatUnit rotate180AroundExtrZ() => new(-y, x, w, -z);
+
+		/// <summary>Rotates 180° around its local X axis</summary>
+		[MethodImpl( MethodImplOptions.AggressiveInlining )] public quatUnit rotate180AroundSelfX() => new(w, z, -y, -x);
+
+		/// <summary>Rotates 180° around its local Y axis</summary>
+		[MethodImpl( MethodImplOptions.AggressiveInlining )] public quatUnit rotate180AroundSelfY() => new(-z, w, x, -y);
+
+		/// <summary>Rotates 180° around its local Z axis</summary>
+		[MethodImpl( MethodImplOptions.AggressiveInlining )] public quatUnit rotate180AroundSelfZ() => new(y, -x, w, -z);
 
 		public quatUnit( float x, float y, float z, float w ) => ( this.x, this.y, this.z, this.w ) = ( x, y, z, w );
 		public quatUnit( float3 xyz, float w ) => ( this.x, this.y, this.z, this.w ) = ( xyz.x, xyz.y, xyz.z, w );
