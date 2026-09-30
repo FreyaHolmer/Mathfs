@@ -63,6 +63,20 @@ namespace Freya {
 		public bool IsPure => Mathfs.Approximately( w, 0 );
 		public float SqMag => 1;
 		public float Mag => 1;
+		public float Angle {
+			get => AngleS3 * 2;
+			set => AngleS3 = value / 2;
+		}
+		public float AngleS3 {
+			get => math.acos( math.clamp( w, -1, 1 ) );
+			set {
+				quatUnit q = this.pow( value / AngleS3 );
+				this.x = q.x;
+				this.y = q.y;
+				this.z = q.z;
+				this.w = q.w;
+			}
+		}
 		public float this[ int i ] {
 			get { return i switch { 0 => x, 1 => y, 2 => z, 3 => w, _ => this[i.Mod( 4 )] }; }
 			set {
@@ -81,7 +95,8 @@ namespace Freya {
 		public quatPure Ln() => quat.ln( this, out _ );
 		public quatPure Ln( out float theta ) => quat.ln( this, out theta );
 		public quatUnit pow( float t ) => quat.pow( this, t );
-		public float3 Rotate( float3 v ) => quat.Rotate( this, v );
+		public float3 Rotate( float3 v ) => quat.rotate( this, v );
+
 
 
 		public quatUnit( float x, float y, float z, float w ) => ( this.x, this.y, this.z, this.w ) = ( x, y, z, w );
