@@ -40,6 +40,16 @@ namespace Freya {
 		public static int csum( this bool3 b ) => math.csum( (int3)b );
 		public static int csum( this bool4 b ) => math.csum( (int4)b );
 
+
+		// todo: codegen freya pls
+		/// <summary>Always -1 or 1. Returns 1 if x is 0 or NaN</summary>
+		public static int safeSign( this float x ) => x < 0 ? -1 : 1;
+
+		/// <inheritdoc cref="safeSign(float)" />
+		public static int safeSign( this double x ) => x < 0 ? -1 : 1;
+
+		/// <inheritdoc cref="safeSign(float)" />
+		public static int safeSign( this int x ) => x < 0 ? -1 : 1;
 		public static Vector3 asVec3( this int2 v, float z = 0f ) => new(v.x, v.y, z);
 		public static float3 asFloat3( this int2 v, float z = 0f ) => new(v.x, v.y, z);
 		public static Vector4 asVec4( this int3 v, float w = 0f ) => new(v.x, v.y, v.z, w);
