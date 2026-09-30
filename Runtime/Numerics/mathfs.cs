@@ -59,6 +59,32 @@ namespace Freya {
 
 		/// <inheritdoc cref="safeSign(float)" />
 		public static int safeSign( this int x ) => x < 0 ? -1 : 1;
+
+		const double ANGLE_EPSILON_UNIT_PROJ = 1.0 / ( 1 << 12 );
+		static readonly double UNIT_PROJ_THRESH_PARALLEL = Math.Cos( ANGLE_EPSILON_UNIT_PROJ );
+		static readonly double UNIT_PROJ_THRESH_PERPENDICULAR = Math.Cos( Math.PI / 2 - ANGLE_EPSILON_UNIT_PROJ );
+
+		/// <summary>Snaps the scalar projection of a unit vector (cosine of an angle) to the special values when near them</summary>
+		public static double snapUnitProjection( double x, bool snapNear0 = false, bool snapNearEnds = true ) {
+			if( snapNearEnds ) {
+				if( x >= +UNIT_PROJ_THRESH_PARALLEL )
+					return +1; // parallel, same direction
+				if( x <= -UNIT_PROJ_THRESH_PARALLEL )
+					return -1; // parallel, opposite directions
+			}
+			if( snapNear0 && Math.Abs( x ) <= UNIT_PROJ_THRESH_PERPENDICULAR )
+				return 0; // perpendicular
+			return x;
+		}
+
+		/// <inheritdoc cref="snapUnitProjection(double, bool, bool)" />
+		public static float snapUnitProjection( float x, bool snapNear0 = false, bool snapNearEnds = true ) => (float)snapUnitProjection( (double)x, snapNear0 );
+
+		/// <summary>Snaps to the nearest orthogonal axis. Note: might point along negative axes</summary>
+		public static float3 nearestOrthoAxis( this float3 v ) {
+			int i = math.abs( v ).cmaxIndex();
+			return new float3 { [i] = v[i].safeSign() };
+		}
 		public static Vector3 asVec3( this int2 v, float z = 0f ) => new(v.x, v.y, z);
 		public static float3 asFloat3( this int2 v, float z = 0f ) => new(v.x, v.y, z);
 		public static Vector4 asVec4( this int3 v, float w = 0f ) => new(v.x, v.y, v.z, w);
@@ -188,12 +214,17 @@ namespace Freya {
 			return math.clamp( v + v.rot90(), new int2( -m, -m ), new int2( m, m ) );
 		}
 
+		// todo: codegen pls
 		public static float projectionTValue( float2 v, float2 n ) => math.dot( v, n ) / math.dot( n, n );
+		public static float projectionTValue( float3 v, float3 n ) => math.dot( v, n ) / math.dot( n, n );
+		public static float projectionTValue( float4 v, float4 n ) => math.dot( v, n ) / math.dot( n, n );
 		public static rat projectionTValue( rat2 v, rat2 n ) => dot( v, n ) / dot( n, n );
 		public static rat projectionTValue( rat2 v, int2 n ) => dot( v, n ) / dot( n, n );
 
 		public static rat projectionTValuePerp( rat2 v, rat2 n ) => dot( v, v ) / dot( v, n );
 
+		public static float4 projectToNormal( float4 v, float4 n ) => n * projectionTValue( v, n );
+		public static float3 projectToNormal( float3 v, float3 n ) => n * projectionTValue( v, n );
 		public static float2 projectToNormal( float2 v, float2 n ) => n * projectionTValue( v, n );
 		public static rat2 projectToNormal( rat2 v, rat2 n ) => n * projectionTValue( v, n );
 		public static rat2 projectToNormal( rat2 v, int2 n ) => n * projectionTValue( v, n );
@@ -205,6 +236,19 @@ namespace Freya {
 		public static rat lerp( rat a, rat b, rat t ) => a + t * ( b - a );
 
 		public static rat inverseLerp( rat a, rat b, rat v ) => ( v - a ) / ( b - a );
+
+		public static float cosFromSin( float s ) {
+			// when |X.y| < 0.1, the quadratic approximation error is about 0.0003°
+			// 1px = 0.0013°, hFoV of 10° and x resolution of 7680 (8K)
+			const float SINE_APPROX_THRESHOLD = 0.1f;
+			float s2 = s * s;
+			if( s2 < SINE_APPROX_THRESHOLD * SINE_APPROX_THRESHOLD ) { // use small angle approximation when close to being flat already
+				return 1 - s2 * ( 1 + s2 / 4 ) / 2; // 1 - (1/2)x^2 - (1/8)x^4
+			} else {
+				float csq = 1 - s2;
+				return csq * math.rsqrt( csq );
+			}
+		}
 
 
 	}
