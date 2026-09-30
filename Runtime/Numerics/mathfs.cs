@@ -60,6 +60,8 @@ namespace Freya {
 		/// <inheritdoc cref="safeSign(float)" />
 		public static int safeSign( this int x ) => x < 0 ? -1 : 1;
 
+		public static int randomSign() => UnityEngine.Random.value <= 0.5f ? -1 : 1;
+
 		const double ANGLE_EPSILON_UNIT_PROJ = 1.0 / ( 1 << 12 );
 		static readonly double UNIT_PROJ_THRESH_PARALLEL = Math.Cos( ANGLE_EPSILON_UNIT_PROJ );
 		static readonly double UNIT_PROJ_THRESH_PERPENDICULAR = Math.Cos( Math.PI / 2 - ANGLE_EPSILON_UNIT_PROJ );
