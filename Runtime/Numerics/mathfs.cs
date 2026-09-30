@@ -40,6 +40,15 @@ namespace Freya {
 		public static int csum( this bool3 b ) => math.csum( (int3)b );
 		public static int csum( this bool4 b ) => math.csum( (int4)b );
 
+		public static int cmaxIndex( this float3 v ) {
+			float3 a = math.abs( v );
+			float max = a.cmax();
+			if( a.x == max || float.IsNaN( max ) )
+				return 0;
+			if( a.y == max )
+				return 1;
+			return 2;
+		}
 
 		// todo: codegen freya pls
 		/// <summary>Always -1 or 1. Returns 1 if x is 0 or NaN</summary>
