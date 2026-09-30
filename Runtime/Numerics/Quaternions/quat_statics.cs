@@ -145,6 +145,11 @@ namespace Freya {
 		public static quatUnit Bislerp( quatUnit q00, quatUnit q01, quatUnit q10, quatUnit q11, float2 uv, DeltaPath path = DeltaPath.Natural ) {
 			return slerp( slerp( q00, q01, uv.x, path ), slerp( q10, q11, uv.x, path ), uv.y );
 		}
+
+		// random rotations
+		public static quatUnit RandomRotation => ( mathfs.randomSign() * (quat)UnityEngine.Random.rotationUniform ).ToUnitQuat( normalize: false );
+		public static quatUnit RandomRotationUpright => ( mathfs.randomSign() * (quat)quaternion.LookRotationSafe( UnityEngine.Random.onUnitSphere, new float3( 0, 1, 0 ) ) ).ToUnitQuat( normalize: false );
+
 	}
 
 }
