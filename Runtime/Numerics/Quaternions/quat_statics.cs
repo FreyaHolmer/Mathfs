@@ -19,8 +19,37 @@ namespace Freya {
 			new(0, 0, 0, 1)
 		};
 
+		/// <summary>Angle in radians. Assumes axis is already normalized</summary>
+		public static quatUnit AxisAngle( float3 axis, float angle ) => exp( axis.x * ( angle / 2 ), axis.y * ( angle / 2 ), axis.z * ( angle / 2 ) );
 
+		/// <summary>The quaternion rotation representation of a rotation vector, where the magnitude is the rotation angle in radians, and the direction is the axis</summary>
+		public static quatUnit FromRotationVector( float3 v ) => exp( v.x / 2, v.y / 2, v.z / 2 );
 
+		/// <summary>A 180 degree rotation around the specified axis. Assumes axis is already normalized</summary>
+		public static quatUnit RotationBy180Around( float3 axis ) => new(axis.x, axis.y, axis.z, 0);
+
+		/// <summary>A rotation around Y followed by an intrinsic rotation around X</summary>
+		public static quatUnit FromYawPitch( float yaw, float pitch ) {
+			math.sincos( yaw / 2, out float sy, out float cy );
+			math.sincos( pitch / 2, out float sp, out float cp );
+			return new quatUnit( cy * sp, sy * cp, -sy * sp, cy * cp );
+		}
+
+		/// <summary>A rotation that flips a normalized vector to its opposite direction</summary>
+		public static quatUnit AxisFlipRotation( float3 v ) => RotationBy180Around( v.perpendicularDirection() );
+
+		/// <summary>The rotation from a normalized vector a to another normalized vector b</summary>
+		public static quatUnit FromToRotation( float3 a, float3 b ) {
+			double dot = mathfs.snapUnitProjection( math.dot( (double3)a, b ), snapNear0: false );
+			switch( dot ) {
+				case -1:
+					return AxisFlipRotation( a ); // 180 degree rotation around *any* axis perpendicular to both
+				case 1:
+					return identity;
+				default:
+					float w = (float)math.sqrt( ( 1 + dot ) / 2 );
+					return new quatUnit( math.cross( a, b ) / ( 2 * w ), w );
+			}
 		}
 
 		/// <summary>Rotates a vector <c>v</c> by the quaternion <c>q</c></summary>
