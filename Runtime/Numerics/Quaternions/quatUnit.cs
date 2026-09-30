@@ -113,12 +113,11 @@ namespace Freya {
 		public static quat operator *( float x, quatUnit q ) => new(q.x * x, q.y * x, q.z * x, q.w * x);
 		public static quat operator *( quatUnit q, float x ) => new(q.x * x, q.y * x, q.z * x, q.w * x);
 
-		public static quatUnit operator *( quatUnit q, quatUnit p ) {
-			return new quatUnit( // unverified
-				p.Im * q.w + q.Im * p.w + quat.cross( q.Im, p.Im ),
-				q.w * p.w - quat.dot( q.Im, p.Im )
-			);
-		}
+		public static quatUnit operator *( quatUnit q, quatUnit p ) => new(p.Im * q.w + q.Im * p.w + quat.cross( q.Im, p.Im ), q.w * p.w - quat.dot( q.Im, p.Im ));
+		public static quat operator *( quatUnit q, quatPure p ) => new(p.Im * q.w + quat.cross( q.Im, p.Im ), -quat.dot( q.Im, p.Im ));
+		public static quat operator *( quatPure q, quatUnit p ) => new(q.Im * p.w + quat.cross( q.Im, p.Im ), -quat.dot( q.Im, p.Im ));
+
+
 
 	}
 

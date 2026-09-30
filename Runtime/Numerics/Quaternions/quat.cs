@@ -1,11 +1,9 @@
-using System;
 using System.Runtime.InteropServices;
 using Unity.Mathematics;
 using UnityEngine;
 using static Unity.Mathematics.math;
 
 namespace Freya {
-
 
 	[StructLayout( LayoutKind.Sequential )]
 	public partial struct quat : IQuat<quat> {
@@ -81,8 +79,22 @@ namespace Freya {
 
 		public static quat operator *( quat q, quat p ) {
 			return new quat(
-				p.Im * q.w + q.Im * p.w + quat.cross( q.Im, p.Im ),
-				q.w * p.w - quat.dot( q.Im, p.Im )
+				p.Im * q.w + q.Im * p.w + cross( q.Im, p.Im ),
+				q.w * p.w - dot( q.Im, p.Im )
+			);
+		}
+
+		public static quat operator *( quatPure q, quat p ) {
+			return new quat(
+				q.Im * p.w + cross( q.Im, p.Im ),
+				-dot( q.Im, p.Im )
+			);
+		}
+
+		public static quat operator *( quat q, quatPure p ) {
+			return new quat(
+				p.Im * q.w + cross( q.Im, p.Im ),
+				-dot( q.Im, p.Im )
 			);
 		}
 	}

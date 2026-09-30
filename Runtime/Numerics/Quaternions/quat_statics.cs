@@ -19,58 +19,30 @@ namespace Freya {
 			new(0, 0, 0, 1)
 		};
 
-		public enum DeltaPath {
-			Natural,
-			Shortest,
-			Longest
+
+
 		}
 
-		static quatUnit DeltaPathAdjust( quatUnit a, quatUnit b, DeltaPath path ) {
-			return path switch {
-				DeltaPath.Shortest => dot( a, b ) < 0 ? -b : b, // flip b to the closer side
-				DeltaPath.Longest  => dot( a, b ) > 0 ? -b : b, // flip b to the farther side
-				_                  => b
-			};
-		}
-
-		static quat DeltaPathAdjust( quat a, quat b, DeltaPath path ) {
-			return path switch {
-				DeltaPath.Shortest => dot( a, b ) < 0 ? -b : b, // flip b to the closer side
-				DeltaPath.Longest  => dot( a, b ) > 0 ? -b : b, // flip b to the farther side
-				_                  => b
-			};
-		}
+		/// <summary>Rotates a vector <c>v</c> by the quaternion <c>q</c></summary>
+		public static float3 rotate( quatUnit q, float3 v ) => (float3)( q * new quatPure( v ) * q.Conj ).Im; // todo: simplify
 
 		public static float dot( quat a, quat b ) => a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
 		public static float dot( quatUnit a, quatUnit b ) => a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
 		public static float dot( quatPure a, quatPure b ) => a.x * b.x + a.y * b.y + a.z * b.z;
 		public static quatPure cross( quatPure a, quatPure b ) => (quatPure)math.cross( (float3)a, (float3)b );
 
-		public static quatUnit Delta( quatUnit from, quatUnit to, DeltaPath path = DeltaPath.Natural ) => from.Conj * DeltaPathAdjust( from, to, path );
-		public static quat Delta( quatUnit from, quat to, DeltaPath path = DeltaPath.Natural ) => from.Conj * DeltaPathAdjust( from, to, path );
-		public static quat Delta( quat from, quat to, DeltaPath path = DeltaPath.Natural ) => from.Inverse * DeltaPathAdjust( from, to, path );
-		public static quatUnit Slerp( quatUnit a, quatUnit b, float t, DeltaPath path = DeltaPath.Natural ) => a * pow( Delta( a, b, path ), t );
-		public static quat Slerp( quat a, quat b, float t, DeltaPath path = DeltaPath.Natural ) => a * pow( Delta( a, b, path ), t );
+		// exp/log
 		public static quatUnit pow( quatUnit q, float t ) => exp( ln( q ) * t );
-
 		public static quat pow( quat q, float t ) => exp( ln( q ) * t );
+		public static quat exp( quat q ) => exp( q.x, q.y, q.z, q.w );
+		public static quat exp( float x, float y, float z, float w ) => exp( x, y, z ) * math.exp( w );
+		public static quatUnit exp( float3 v ) => exp( v.x, v.y, v.z );
+		public static quatUnit exp( quatPure q ) => exp( q.x, q.y, q.z );
 
-		public static float3 Rotate( quatUnit q, float3 v ) => (float3)( q * new quat( v, 0 ) * q.Conj ).Im; // todo: simplify
-
-		// bilinear spherical interpolation
-		static quatUnit Bislerp( quatUnit q00, quatUnit q01, quatUnit q10, quatUnit q11, float2 uv, DeltaPath path = DeltaPath.Natural ) {
-			return Slerp( Slerp( q00, q01, uv.x, path ), Slerp( q10, q11, uv.x, path ), uv.y );
-		}
-		public static quat exp( quat q ) => exp( q.Im ) * math.exp( q.w );
-		public static quatUnit exp( float3 v ) => exp( (quatPure)v );
-
-		// exp(pure) = unit
-		public static quatUnit exp( quatPure q ) {
-			float angle = q.Mag;
-			return new quatUnit(
-				q * Mathfs.Sinc( angle ),
-				math.cos( angle )
-			);
+		public static quatUnit exp( float x, float y, float z ) {
+			float angleS3 = math.sqrt( x * x + y * y + z * z );
+			float s = Mathfs.Sinc( angleS3 );
+			return new quatUnit( x * s, y * s, z * s, math.cos( angleS3 ) );
 		}
 
 		public static quatPure ln( quatUnit q ) => ln( q, out _ );
@@ -111,6 +83,38 @@ namespace Freya {
 				scV * q.z,
 				vW
 			);
+		}
+		public enum DeltaPath {
+			Natural,
+			Shortest,
+			Longest
+		}
+
+		static quatUnit DeltaPathAdjust( quatUnit a, quatUnit b, DeltaPath path ) {
+			return path switch {
+				DeltaPath.Shortest => dot( a, b ) < 0 ? -b : b, // flip b to the closer side
+				DeltaPath.Longest  => dot( a, b ) > 0 ? -b : b, // flip b to the farther side
+				_                  => b
+			};
+		}
+
+		static quat DeltaPathAdjust( quat a, quat b, DeltaPath path ) {
+			return path switch {
+				DeltaPath.Shortest => dot( a, b ) < 0 ? -b : b, // flip b to the closer side
+				DeltaPath.Longest  => dot( a, b ) > 0 ? -b : b, // flip b to the farther side
+				_                  => b
+			};
+		}
+
+		public static quatUnit Delta( quatUnit from, quatUnit to, DeltaPath path = DeltaPath.Natural ) => from.Conj * DeltaPathAdjust( from, to, path );
+		public static quat Delta( quatUnit from, quat to, DeltaPath path = DeltaPath.Natural ) => from.Conj * DeltaPathAdjust( from, to, path );
+		public static quat Delta( quat from, quat to, DeltaPath path = DeltaPath.Natural ) => from.Inverse * DeltaPathAdjust( from, to, path );
+		public static quatUnit slerp( quatUnit a, quatUnit b, float t, DeltaPath path = DeltaPath.Natural ) => a * pow( Delta( a, b, path ), t );
+		public static quat slerp( quat a, quat b, float t, DeltaPath path = DeltaPath.Natural ) => a * pow( Delta( a, b, path ), t );
+
+		// bilinear spherical interpolation
+		public static quatUnit Bislerp( quatUnit q00, quatUnit q01, quatUnit q10, quatUnit q11, float2 uv, DeltaPath path = DeltaPath.Natural ) {
+			return slerp( slerp( q00, q01, uv.x, path ), slerp( q10, q11, uv.x, path ), uv.y );
 		}
 	}
 
