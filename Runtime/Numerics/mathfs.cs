@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -7,8 +8,9 @@ namespace Freya {
 
 	/// <summary>Static functions appropriate for <c>using static</c></summary>
 	public static partial class mathfs {
-
 		// todo: this file is under construction
+
+		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 
 		// global functions?
 		public static int2 quadrantToBasisX( int i ) =>
@@ -246,6 +248,14 @@ namespace Freya {
 
 		public static rat inverseLerp( rat a, rat b, rat v ) => ( v - a ) / ( b - a );
 
+		[MethodImpl( INLINE )] public static float magSq( float x ) => x * x;
+		[MethodImpl( INLINE )] public static float magSq( float x, float y ) => x * x + y * y;
+		[MethodImpl( INLINE )] public static float magSq( float x, float y, float z ) => x * x + y * y + z * z;
+		[MethodImpl( INLINE )] public static float magSq( float x, float y, float z, float w ) => x * x + y * y + z * z + w * w;
+		[MethodImpl( INLINE )] public static float mag( float x ) => math.sqrt( magSq( x ) );
+		[MethodImpl( INLINE )] public static float mag( float x, float y ) => math.sqrt( magSq( x, y ) );
+		[MethodImpl( INLINE )] public static float mag( float x, float y, float z ) => math.sqrt( magSq( x, y, z ) );
+		[MethodImpl( INLINE )] public static float mag( float x, float y, float z, float w ) => math.sqrt( magSq( x, y, z, w ) );
 		public static float cosFromSin( float s ) {
 			// when |X.y| < 0.1, the quadratic approximation error is about 0.0003°
 			// 1px = 0.0013°, hFoV of 10° and x resolution of 7680 (8K)
