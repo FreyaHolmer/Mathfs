@@ -52,8 +52,12 @@ namespace Freya {
 			}
 		}
 
-		/// <summary>Rotates a vector <c>v</c> by the quaternion <c>q</c></summary>
-		public static float3 rotate( quatUnit q, float3 v ) => (float3)( q * new quatPure( v ) * q.Conj ).Im; // todo: simplify
+		/// <summary>Rotates a vector <c>v</c> by the quaternion <c>q</c>. Equivalent to (q * (quatPure)v * q.Conj).Im</summary>
+		public static float3 rotate( quatUnit q, float3 v ) {
+			float3 u = q.xyz;
+			float3 t = 2 * math.cross( u, v );
+			return math.mad( q.w, t, v ) + math.cross( u, t );
+		}
 
 		public static float dot( quat a, quat b ) => a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
 		public static float dot( quatUnit a, quatUnit b ) => a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
