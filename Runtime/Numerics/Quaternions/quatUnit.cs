@@ -68,7 +68,7 @@ namespace Freya {
 			set => AngleS3 = value / 2;
 		}
 		public float AngleS3 {
-			get => math.acos( math.clamp( w, -1, 1 ) );
+			get => math.atan2( mathfs.mag( x, y, z ), w );
 			set {
 				quatUnit q = this.pow( value / AngleS3 );
 				this.x = q.x;
@@ -147,7 +147,6 @@ namespace Freya {
 		public static quatUnit operator *( quatUnit q, quatUnit p ) => new(p.Im * q.w + q.Im * p.w + quat.cross( q.Im, p.Im ), q.w * p.w - quat.dot( q.Im, p.Im ));
 		public static quat operator *( quatUnit q, quatPure p ) => new(p.Im * q.w + quat.cross( q.Im, p.Im ), -quat.dot( q.Im, p.Im ));
 		public static quat operator *( quatPure q, quatUnit p ) => new(q.Im * p.w + quat.cross( q.Im, p.Im ), -quat.dot( q.Im, p.Im ));
-
 
 
 	}
