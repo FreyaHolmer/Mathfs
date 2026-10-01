@@ -256,6 +256,10 @@ namespace Freya {
 		[MethodImpl( INLINE )] public static float mag( float x, float y ) => math.sqrt( magSq( x, y ) );
 		[MethodImpl( INLINE )] public static float mag( float x, float y, float z ) => math.sqrt( magSq( x, y, z ) );
 		[MethodImpl( INLINE )] public static float mag( float x, float y, float z, float w ) => math.sqrt( magSq( x, y, z, w ) );
+
+		/// <summary>Computes ln(sqrt(x)) by ln(x)/2</summary>
+		public static float logSqrt( float x ) => math.log( x ) / 2;
+
 		public static float cosFromSin( float s ) {
 			// when |X.y| < 0.1, the quadratic approximation error is about 0.0003°
 			// 1px = 0.0013°, hFoV of 10° and x resolution of 7680 (8K)
