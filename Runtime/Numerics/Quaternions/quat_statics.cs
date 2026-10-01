@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -6,6 +7,7 @@ using UnityEngine.Assertions;
 namespace Freya {
 
 	public partial struct quat {
+		const MethodImplOptions INLINE = MethodImplOptions.AggressiveInlining;
 
 		public static readonly quatUnit i = new(1, 0, 0, 0);
 		public static readonly quatUnit j = new(0, 1, 0, 0);
@@ -65,58 +67,83 @@ namespace Freya {
 		public static quatPure cross( quatPure a, quatPure b ) => (quatPure)math.cross( (float3)a, (float3)b );
 
 		// exp/log
-		public static quatUnit pow( quatUnit q, float t ) => exp( ln( q ) * t );
-		public static quat pow( quat q, float t ) => exp( ln( q ) * t );
-		public static quat exp( quat q ) => exp( q.x, q.y, q.z, q.w );
-		public static quat exp( float x, float y, float z, float w ) => exp( x, y, z ) * math.exp( w );
-		public static quatUnit exp( float3 v ) => exp( v.x, v.y, v.z );
-		public static quatUnit exp( quatPure q ) => exp( q.x, q.y, q.z );
+		[MethodImpl( INLINE )] public static quat exp( quat q ) => exp( q.x, q.y, q.z, q.w );
+		[MethodImpl( INLINE )] public static quat pow( quat q, float t ) => pow( q.x, q.y, q.z, q.w, t );
+		[MethodImpl( INLINE )] public static quat ln( quat q ) => ln( q.x, q.y, q.z, q.w, out _ );
+		[MethodImpl( INLINE )] public static quat ln( quat q, out float angleS3 ) => ln( q.x, q.y, q.z, q.w, out angleS3 );
 
+		/// <inheritdoc cref="exp(float,float,float)" />
+		[MethodImpl( INLINE )] public static quatUnit exp( float3 v ) => exp( v.x, v.y, v.z );
+
+		/// <inheritdoc cref="exp(float,float,float)" />
+		[MethodImpl( INLINE )] public static quatUnit exp( quatPure q ) => exp( q.x, q.y, q.z );
+
+		/// <inheritdoc cref="lnUnit(float,float,float,float,out float)" />
+		[MethodImpl( INLINE )] public static quatPure ln( quatUnit q ) => lnUnit( q.x, q.y, q.z, q.w, out _ );
+
+		/// <inheritdoc cref="lnUnit(float,float,float,float,out float)" />
+		[MethodImpl( INLINE )] public static quatPure ln( quatUnit q, out float angleS3 ) => lnUnit( q.x, q.y, q.z, q.w, out angleS3 );
+
+		/// <inheritdoc cref="powUnit(float,float,float,float,float)" />
+		[MethodImpl( INLINE )] public static quatUnit pow( quatUnit q, float t ) => powUnit( q.x, q.y, q.z, q.w, t );
+
+		public static quat exp( float x, float y, float z, float w ) { // exp( x, y, z ) * math.exp( w )
+			float angleS3 = mathfs.mag( x, y, z );
+			math.sincos( angleS3, out float sin, out float cos );
+			float r = math.exp( w );
+			float scale = r * mathfs.sincFromSin( sin, angleS3 );
+			return new quat( x * scale, y * scale, z * scale, cos * r );
+		}
+
+		/// <summary>Converts a pure quaternion, often representing a half-angle rotation vector,
+		/// into a unit quaternion, representing a rotation by twice the half-angle</summary>
 		public static quatUnit exp( float x, float y, float z ) {
-			float angleS3 = math.sqrt( x * x + y * y + z * z );
-			float s = Mathfs.Sinc( angleS3 );
-			return new quatUnit( x * s, y * s, z * s, math.cos( angleS3 ) );
+			float angleS3 = mathfs.mag( x, y, z );
+			math.sincos( angleS3, out float sin, out float cos );
+			float scale = mathfs.sincFromSin( sin, angleS3 );
+			return new quatUnit( x * scale, y * scale, z * scale, cos );
 		}
 
-		public static quatPure ln( quatUnit q ) => ln( q, out _ );
-		public static quat ln( quat q ) => ln( q, out _ );
-
-		// ln(unit) = pure
-		public static quatPure ln( quatUnit q, out float theta ) {
-			float vMagSq = q.Im.SqMag;
-			float vMag = math.sqrt( vMagSq );
-			theta = math.atan2( vMag, q.w );
-			float scV = ( vMag >= 0.001f ) ? theta / vMag : Mathfs.SincRcp( theta );
-			return q.Im * scV;
+		/// <summary>Converts a unit quaternion, often representing a rotation,
+		/// into a pure quaternion, usually representing a half-angle rotation vector</summary>
+		/// <param name="angleS3">half of the original quaternion rotation angle</param>
+		public static quatPure lnUnit( float x, float y, float z, float w, out float angleS3 ) {
+			decomposePolar( x, y, z, w, out float s, out float sSq, out angleS3 );
+			float scale = nearIdentity( sSq, w ) ? 1f : angleS3 / s;
+			return new quatPure( x * scale, y * scale, z * scale );
 		}
 
-		public static quat ln( quat q, out float theta ) {
-			float vMagSq = q.Im.SqMag;
-			float vMag = math.sqrt( vMagSq );
-			float qMagSq = vMagSq + q.w * q.w;
-
-			theta = math.atan2( vMag, q.w );
-			float scV;
-			if( vMag >= 0.001f ) {
-				scV = theta / vMag;
-			} else {
-				scV = Mathfs.SincRcp( theta );
-			}
-			float vW = 0;
-			if( Mathfs.Approximately( qMagSq, 1 ) == false ) {
-				// non-unit quaternion
-				float qMag = math.sqrt( qMagSq );
-				scV /= qMag;
-				vW = math.log( qMag );
-			}
-
-			return new quat(
-				scV * q.x,
-				scV * q.y,
-				scV * q.z,
-				vW
-			);
+		public static quat ln( float x, float y, float z, float w, out float angleS3 ) {
+			decomposePolar( x, y, z, w, out float s, out float sSq, out angleS3 );
+			float scale = nearIdentity( sSq, w ) ? 1f / w : angleS3 / s;
+			return new quat( x * scale, y * scale, z * scale, mathfs.logSqrt( sSq + w * w ) );
 		}
+
+		/// <summary>Scales a quaternion's rotation angle by <c>t</c></summary>
+		public static quatUnit powUnit( float x, float y, float z, float w, float t ) { // exp( ln( q ) * t )
+			decomposePolar( x, y, z, w, out float s, out float sSq, out float angleS3 );
+			math.sincos( t * angleS3, out float newSin, out float newCos );
+			float scale = nearIdentity( sSq, w ) ? t : newSin / s;
+			return new quatUnit( x * scale, y * scale, z * scale, newCos );
+		}
+
+		public static quat pow( float x, float y, float z, float w, float t ) { // exp( ln( q ) * t )
+			decomposePolar( x, y, z, w, out float s, out float sSq, out float angleS3 );
+			math.sincos( t * angleS3, out float newSin, out float newCos );
+			float r = math.exp( t * mathfs.logSqrt( sSq + w * w ) ); // radial scale
+			float scale = r * ( nearIdentity( sSq, w ) ? t / w : newSin / s );
+			return new quat( x * scale, y * scale, z * scale, newCos * r );
+		}
+
+		const float EPSILON_LN = 1e-12f;
+		[MethodImpl( INLINE )] static bool nearIdentity( float sSq, float w ) => w > 0 && sSq < EPSILON_LN * w * w;
+
+		/// <summary>Decomposes the quaternion into its sine component magnitude and angleS3</summary>
+		[MethodImpl( INLINE )] static void decomposePolar( float x, float y, float z, float w, out float mag, out float magSq, out float angleS3 ) {
+			mag = math.sqrt( magSq = ( x * x + y * y + z * z ) );
+			angleS3 = math.atan2( mag, w );
+		}
+
 		public enum DeltaPath {
 			Natural,
 			Shortest,
