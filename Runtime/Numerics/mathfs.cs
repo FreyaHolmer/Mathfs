@@ -273,6 +273,12 @@ namespace Freya {
 			}
 		}
 
+		const float EPSILON_SINC_SMALL_ANGLE_SQ = 1e-4f;
+
+		[MethodImpl( INLINE )] public static float sincFromSin( float sinx, float x ) {
+			float xx = x * x;
+			return xx < EPSILON_SINC_SMALL_ANGLE_SQ ? math.mad( xx, -1 / 6f, 1f ) : sinx / x; // avoids 0/0 and division for small angles
+		}
 
 	}
 
