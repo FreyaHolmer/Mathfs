@@ -121,18 +121,28 @@ namespace Freya {
 
 		/// <summary>Scales a quaternion's rotation angle by <c>t</c></summary>
 		public static quatUnit powUnit( float x, float y, float z, float w, float t ) { // exp( ln( q ) * t )
-			decomposePolar( x, y, z, w, out float s, out float sSq, out float angleS3 );
-			math.sincos( t * angleS3, out float newSin, out float newCos );
-			float scale = nearIdentity( sSq, w ) ? t : newSin / s;
-			return new quatUnit( x * scale, y * scale, z * scale, newCos );
+			switch( t ) {
+				case 0: return new quatUnit( 0, 0, 0, 1 );
+				case 1: return new quatUnit( x, y, z, w );
+				default:
+					decomposePolar( x, y, z, w, out float s, out float sSq, out float angleS3 );
+					math.sincos( t * angleS3, out float newSin, out float newCos );
+					float scale = nearIdentity( sSq, w ) ? t : newSin / s;
+					return new quatUnit( x * scale, y * scale, z * scale, newCos );
+			}
 		}
 
 		public static quat pow( float x, float y, float z, float w, float t ) { // exp( ln( q ) * t )
-			decomposePolar( x, y, z, w, out float s, out float sSq, out float angleS3 );
-			math.sincos( t * angleS3, out float newSin, out float newCos );
-			float r = math.exp( t * mathfs.logSqrt( sSq + w * w ) ); // radial scale
-			float scale = r * ( nearIdentity( sSq, w ) ? t / w : newSin / s );
-			return new quat( x * scale, y * scale, z * scale, newCos * r );
+			switch( t ) {
+				case 0: return new quat( 0, 0, 0, 1 );
+				case 1: return new quat( x, y, z, w );
+				default:
+					decomposePolar( x, y, z, w, out float s, out float sSq, out float angleS3 );
+					math.sincos( t * angleS3, out float newSin, out float newCos );
+					float r = math.exp( t * mathfs.logSqrt( sSq + w * w ) ); // radial scale
+					float scale = r * ( nearIdentity( sSq, w ) ? t / w : newSin / s );
+					return new quat( x * scale, y * scale, z * scale, newCos * r );
+			}
 		}
 
 		const float EPSILON_LN = 1e-12f;
