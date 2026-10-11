@@ -181,6 +181,16 @@ namespace Freya {
 		public static quatUnit RandomRotation => ( mathfs.randomSign() * (quat)UnityEngine.Random.rotationUniform ).ToUnitQuat( normalize: false );
 		public static quatUnit RandomRotationUpright => ( mathfs.randomSign() * (quat)quaternion.LookRotationSafe( UnityEngine.Random.onUnitSphere, new float3( 0, 1, 0 ) ) ).ToUnitQuat( normalize: false );
 
+
+		/// <summary>Removes "roll" with the shortest possible rotation, by flattening the X axis to the extrinsic Y plane</summary>
+		public static quatUnit FlattenXtoYPlane( quatUnit q ) {
+			// optimized version of: fromToRotation( X, math.normalize( X.zeroY() ) ) * q;
+			float sin = 2 * ( q.x * q.y + q.w * q.z ); // sin(x), aka X.y
+			float cos = mathfs.cosFromSin( sin ); // cos(x)
+			float sec = 1f / cos; // sec(x)
+			float tan = sin * sec; // tan(x)
+			return new quatUnit( math.normalize( ( sec + 1 ) * q.xyzw - tan * q.yxwz ) );
+		}
 	}
 
 }
