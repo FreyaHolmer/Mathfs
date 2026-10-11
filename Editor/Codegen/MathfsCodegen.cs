@@ -7,11 +7,17 @@ using System.Linq;
 using Unity.Mathematics;
 using UnityEditor;
 
+#if UNITY_6000_4_OR_NEWER
+using GUID = UnityEngine.GUID;
+#else
+using GUID = UnityEditor.GUID;
+#endif
+
 namespace Freya {
 
 	public static class MathfsCodegen {
 
-		static UnityEngine.GUID guidRuntimeAsm = new("6071c9f2ce0a4407c93af459fa416e54"); // Mathfs.asmdef
+		static GUID guidRuntimeAsm = new("6071c9f2ce0a4407c93af459fa416e54"); // Mathfs.asmdef
 		static string PathRuntime => Path.GetDirectoryName( AssetDatabase.GUIDToAssetPath( guidRuntimeAsm ) );
 		public static string PathSpline => $"{PathRuntime}/Splines";
 		public static string PathNumerics => $"{PathRuntime}/Numerics";
